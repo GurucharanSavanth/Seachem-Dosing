@@ -1,0 +1,126 @@
+<resources>
+    <string name="app_name">Aquarium Dosing</string>
+
+    <!-- Navigation -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_calculators">Calculators</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Water Status</string>
+    <string name="dashboard_subtitle">Monitor your aquarium parameters</string>
+    <string name="section_parameters">Water Parameters</string>
+    <string name="section_recommendations">Recommendations</string>
+    <string name="section_volume">Tank Volume</string>
+
+    <!-- Parameters -->
+    <string name="param_ammonia">Ammonia (NH₃/NH₄⁺)</string>
+    <string name="param_nitrate">Nitrate (NO₃)</string>
+    <string name="param_nitrite">Nitrite (NO₂)</string>
+    <string name="param_gh">General Hardness (GH)</string>
+    <string name="param_kh">Carbonate Hardness (KH)</string>
+    <string name="unit_ppm">ppm</string>
+    <string name="unit_dgh">°dGH</string>
+    <string name="unit_dkh">°dKH</string>
+
+    <!-- Status Messages -->
+    <string name="status_good">Good</string>
+    <string name="status_danger">DANGER</string>
+    <string name="status_warning">High</string>
+    <string name="status_info">Info</string>
+
+    <!-- Volume -->
+    <string name="volume_direct">Direct Entry</string>
+    <string name="volume_lbh">L × B × H</string>
+    <string name="label_volume">Volume</string>
+    <string name="label_length">Length</string>
+    <string name="label_breadth">Breadth</string>
+    <string name="label_height">Height</string>
+    <string name="unit_liters">Litres (L)</string>
+    <string name="unit_litre">Litres</string>
+    <string name="unit_us_gallon">US Gallons</string>
+    <string name="unit_uk_gallon">UK Gallons</string>
+    <string name="unit_cm">cm</string>
+    <string name="unit_in">in</string>
+    <string name="unit_ft">ft</string>
+    <string name="calculated_volume">Calculated: %s L</string>
+
+    <!-- Calculators -->
+    <string name="calc_title">Dosing Calculators</string>
+    <string name="calc_khco3_title">KH Booster</string>
+    <string name="calc_khco3_subtitle">Potassium Bicarbonate (KHCO₃)</string>
+    <string name="calc_equilibrium_title">GH Booster</string>
+    <string name="calc_equilibrium_subtitle">Seachem Equilibrium</string>
+    <string name="calc_safe_title">Water Conditioner</string>
+    <string name="calc_safe_subtitle">Seachem Safe</string>
+    <string name="calc_safe_info">Removes chlorine, chloramine &amp; detoxifies ammonia.\nDose: 1g per 200L.</string>
+    <string name="calc_apt_title">Plant Fertilizer</string>
+    <string name="calc_apt_subtitle">APT Complete (80% dose)</string>
+    <string name="calc_apt_info">80% of standard 3ml/100L daily dose.\nEstimated NO₃ increase shown below.</string>
+    <string name="calc_neutral_title">pH Neutralizer</string>
+    <string name="calc_neutral_subtitle">Seachem Neutral Regulator</string>
+    <string name="calc_acid_title">KH &amp; pH Reducer</string>
+    <string name="calc_acid_subtitle">Seachem Acid Buffer</string>
+    <string name="calc_gold_title">Goldfish Buffer</string>
+    <string name="calc_gold_subtitle">Seachem Gold Buffer</string>
+
+    <!-- Calculator Inputs -->
+    <string name="label_current">Current</string>
+    <string name="label_target">Target</string>
+    <string name="label_current_kh">Current KH (°dKH)</string>
+    <string name="label_target_kh">Target KH (°dKH)</string>
+    <string name="label_current_gh">Current GH (°dGH)</string>
+    <string name="label_target_gh">Target GH (°dGH)</string>
+    <string name="label_current_ph">Current pH</string>
+    <string name="label_target_ph">Target pH</string>
+    <string name="label_purity">Purity</string>
+    <string name="label_purity_hint">0.5 - 1.0</string>
+
+    <!-- Results -->
+    <string name="result_grams">%s g</string>
+    <string name="result_ml">%s ml</string>
+    <string name="result_no_dose">No dose needed</string>
+    <string name="result_gh_above_target">GH already at or above target</string>
+    <string name="result_full_dose">Full Dose</string>
+    <string name="result_half_dose">Half Dose</string>
+    <string name="nitrate_estimate">Est. NO₃ +%s ppm</string>
+
+    <!-- Recommendations -->
+    <string name="reco_title">Emergency Actions</string>
+    <string name="reco_ok">✓ All parameters look good!</string>
+    <string name="reco_ammonia">⚠️ Ammonia detected!\nDose %.2f mL Seachem Prime immediately.</string>
+    <string name="reco_nitrite">⚠️ Nitrite detected!\nAdd %.2f mL Seachem Stability.</string>
+    <string name="reco_nitrate">⚠️ High Nitrates (>50ppm)\nConsider 30-50%% water change.</string>
+    <string name="reco_gh_low">ℹ️ GH is low (&lt;3 dGH)\nConsider adding Seachem Equilibrium.</string>
+    <string name="reco_kh_low">ℹ️ KH is low (&lt;3 dKH)\nLow KH can cause pH swings.</string>
+    <string name="reco_enter_volume">Enter tank volume to calculate doses.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_system">System default</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_defaults">Default Units</string>
+    <string name="settings_volume_unit">Volume Unit</string>
+    <string name="settings_hardness_unit">Hardness Unit</string>
+    <string name="settings_data">Data</string>
+    <string name="settings_reset">Reset All Values</string>
+    <string name="settings_reset_confirm">Reset all values to defaults?</string>
+    <string name="settings_about">About</string>
+    <string name="settings_version">Version %s</string>
+    <string name="settings_source">Based on Seachem dosing guidelines</string>
+
+    <!-- Actions -->
+    <string name="action_calculate">Calculate</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_copied">Copied!</string>
+    <string name="action_reset">Reset</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_ok">OK</string>
+
+    <!-- Content descriptions -->
+    <string name="cd_status_icon">Status indicator</string>
+    <string name="cd_copy_result">Copy result to clipboard</string>
+</resources>
