@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:clipToPadding="false"
+    android:background="@drawable/bg_dashboard"
     android:paddingBottom="16dp">
 
     <LinearLayout
@@ -14,31 +15,96 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Header -->
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- Hero -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardHero"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/dashboard_title"
-            android:textAppearance="?attr/textAppearanceHeadlineMedium"
-            android:textColor="?attr/colorOnBackground" />
+            app:cardElevation="4dp"
+            app:cardCornerRadius="24dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:strokeWidth="0dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/dashboard_subtitle"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:background="@drawable/bg_hero_gradient">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:padding="8dp"
+                        android:background="@drawable/bg_logo_chip"
+                        android:src="@drawable/ic_app_logo"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/app_name"
+                            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                            android:textColor="@android:color/white" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/app_tagline"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:textColor="#E6FFFFFF" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/dashboard_subtitle"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="#ECFFFFFF" />
+
+                <TextView
+                    android:id="@+id/tvProfileBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_profile_badge"
+                    android:text="@string/profile_badge_freshwater"
+                    android:textAppearance="?attr/textAppearanceLabelMedium"
+                    android:textColor="?attr/colorOnPrimaryContainer"
+                    tools:text="Freshwater Profile" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Tank Volume Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            app:cardElevation="0dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="?attr/colorOutlineVariant"
-            app:cardCornerRadius="16dp">
+            app:cardElevation="2dp"
+            app:cardCornerRadius="20dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:strokeWidth="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -228,45 +294,207 @@
             android:textAppearance="?attr/textAppearanceTitleMedium"
             android:textColor="?attr/colorOnSurface" />
 
-        <!-- Ammonia Parameter -->
-        <include
-            android:id="@+id/paramAmmonia"
-            layout="@layout/item_parameter"
+        <LinearLayout
+            android:id="@+id/groupFreshwater"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" />
+            android:orientation="vertical">
 
-        <!-- Nitrite Parameter -->
-        <include
-            android:id="@+id/paramNitrite"
-            layout="@layout/item_parameter"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
+            <!-- Ammonia Parameter -->
+            <include
+                android:id="@+id/paramAmmonia"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
 
-        <!-- Nitrate Parameter -->
-        <include
-            android:id="@+id/paramNitrate"
-            layout="@layout/item_parameter"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
+            <!-- Nitrite Parameter -->
+            <include
+                android:id="@+id/paramNitrite"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
 
-        <!-- GH Parameter -->
-        <include
-            android:id="@+id/paramGh"
-            layout="@layout/item_parameter_hardness"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
+            <!-- Nitrate Parameter -->
+            <include
+                android:id="@+id/paramNitrate"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
 
-        <!-- KH Parameter -->
-        <include
-            android:id="@+id/paramKh"
-            layout="@layout/item_parameter_hardness"
+            <!-- GH Parameter -->
+            <include
+                android:id="@+id/paramGh"
+                layout="@layout/item_parameter_hardness"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- KH Parameter -->
+            <include
+                android:id="@+id/paramKh"
+                layout="@layout/item_parameter_hardness"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- pH Parameter -->
+            <include
+                android:id="@+id/paramPh"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Temperature Parameter -->
+            <include
+                android:id="@+id/paramTemp"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/groupSaltwater"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Salinity -->
+            <include
+                android:id="@+id/paramSalinity"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+            <!-- Alkalinity -->
+            <include
+                android:id="@+id/paramAlkalinity"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Calcium -->
+            <include
+                android:id="@+id/paramCalcium"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Magnesium -->
+            <include
+                android:id="@+id/paramMagnesium"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Nitrate -->
+            <include
+                android:id="@+id/paramNitrateSalt"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Phosphate -->
+            <include
+                android:id="@+id/paramPhosphate"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- pH -->
+            <include
+                android:id="@+id/paramPhSalt"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Temperature -->
+            <include
+                android:id="@+id/paramTempSalt"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/groupPond"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Ammonia -->
+            <include
+                android:id="@+id/paramAmmoniaPond"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+            <!-- Nitrite -->
+            <include
+                android:id="@+id/paramNitritePond"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Nitrate -->
+            <include
+                android:id="@+id/paramNitratePond"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- KH -->
+            <include
+                android:id="@+id/paramKhPond"
+                layout="@layout/item_parameter_hardness"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- pH -->
+            <include
+                android:id="@+id/paramPhPond"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Temperature -->
+            <include
+                android:id="@+id/paramTempPond"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Dissolved Oxygen -->
+            <include
+                android:id="@+id/paramOxygenPond"
+                layout="@layout/item_parameter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
 
         <!-- Recommendations Section -->
         <com.google.android.material.card.MaterialCardView
@@ -274,9 +502,132 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            app:cardElevation="0dp"
+            app:cardElevation="2dp"
             app:cardBackgroundColor="?attr/colorSurfaceVariant"
-            app:cardCornerRadius="16dp">
+            app:cardCornerRadius="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/section_recommendations"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <ImageButton
+                        android:id="@+id/btnRecommendationsMenu"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/cd_recommendations_menu"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_more_vert"
+                        android:tint="?attr/colorOnSurfaceVariant" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvRecommendations"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    tools:text="All parameters look good!" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardAiInsight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:cardCornerRadius="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/ai_insight_title"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAiInsight"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ai_insight_button" />
+
+                </LinearLayout>
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/progressAiInsight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvAiInsightError"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorError"
+                    android:visibility="gone"
+                    tools:text="AI is not configured." />
+
+                <TextView
+                    android:id="@+id/tvAiInsight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurface"
+                    android:text="@string/ai_insight_placeholder"
+                    tools:text="Next steps: Monitor nitrate and schedule a 20% water change." />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardAiChat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:cardCornerRadius="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -287,18 +638,64 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/section_recommendations"
+                    android:text="@string/ai_chat_title"
                     android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
+                    android:textColor="?attr/colorOnSurface" />
 
                 <TextView
-                    android:id="@+id/tvRecommendations"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/ai_chat_hint"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/chatScroll"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="12dp"
+                    android:fillViewport="true">
+
+                    <LinearLayout
+                        android:id="@+id/chatMessagesContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                </androidx.core.widget.NestedScrollView>
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    tools:text="All parameters look good!" />
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:hint="@string/ai_chat_input_hint">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etChatInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:imeOptions="actionSend"
+                            android:inputType="text" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnChatSend"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/ai_chat_send" />
+
+                </LinearLayout>
 
             </LinearLayout>
 

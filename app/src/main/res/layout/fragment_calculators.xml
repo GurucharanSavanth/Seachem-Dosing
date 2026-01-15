@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:clipToPadding="false"
+    android:background="@drawable/bg_calculators"
     android:paddingBottom="16dp">
 
     <LinearLayout
@@ -15,12 +16,76 @@
         android:padding="16dp">
 
         <!-- Header -->
-        <TextView
-            android:layout_width="wrap_content"
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/calc_title"
-            android:textAppearance="?attr/textAppearanceHeadlineMedium"
-            android:textColor="?attr/colorOnBackground" />
+            app:cardElevation="4dp"
+            app:cardCornerRadius="24dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:background="@drawable/bg_hero_gradient">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:padding="8dp"
+                        android:background="@drawable/bg_logo_chip"
+                        android:src="@drawable/ic_app_logo"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/calc_title"
+                            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                            android:textColor="@android:color/white" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/calc_subtitle"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            android:textColor="#E6FFFFFF" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvProfileBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_profile_badge"
+                    android:text="@string/profile_badge_freshwater"
+                    android:textAppearance="?attr/textAppearanceLabelMedium"
+                    android:textColor="?attr/colorOnPrimaryContainer"
+                    tools:text="Freshwater Profile" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Volume Display Card -->
         <com.google.android.material.card.MaterialCardView
@@ -28,9 +93,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:cardElevation="0dp"
+            app:cardElevation="2dp"
             app:cardBackgroundColor="?attr/colorPrimaryContainer"
-            app:cardCornerRadius="12dp">
+            app:cardCornerRadius="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -59,7 +124,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Edit"
+                    android:text="@string/action_edit"
                     android:textAppearance="?attr/textAppearanceLabelMedium"
                     android:textColor="?attr/colorOnPrimaryContainer" />
 
@@ -67,70 +132,215 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- KH Booster (KHCO3) -->
-        <include
-            android:id="@+id/cardKhco3"
-            layout="@layout/card_khco3"
+        <LinearLayout
+            android:id="@+id/groupCalcFreshwater"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" />
+            android:orientation="vertical">
 
-        <!-- GH Booster (Equilibrium) -->
-        <include
-            android:id="@+id/cardEquilibrium"
-            layout="@layout/card_equilibrium"
+            <!-- KH Booster (KHCO3) -->
+            <include
+                android:id="@+id/cardKhco3"
+                layout="@layout/card_khco3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" />
+
+            <!-- GH Booster (Equilibrium) -->
+            <include
+                android:id="@+id/cardEquilibrium"
+                layout="@layout/card_equilibrium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Water Conditioner (Safe) -->
+            <include
+                android:id="@+id/cardSafeFresh"
+                layout="@layout/card_safe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Plant Fertilizer (APT) -->
+            <include
+                android:id="@+id/cardApt"
+                layout="@layout/card_apt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Quick Doses -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/calc_quick_doses"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurface" />
+
+            <include
+                android:id="@+id/cardPrimeFresh"
+                layout="@layout/card_prime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+            <include
+                android:id="@+id/cardStabilityFresh"
+                layout="@layout/card_stability"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Section: Buffers -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/calc_section_buffers"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurface" />
+
+            <!-- Neutral Regulator -->
+            <include
+                android:id="@+id/cardNeutral"
+                layout="@layout/card_neutral"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+            <!-- Acid Buffer -->
+            <include
+                android:id="@+id/cardAcid"
+                layout="@layout/card_acid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Gold Buffer -->
+            <include
+                android:id="@+id/cardGold"
+                layout="@layout/card_gold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Utilities -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/calc_utilities"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurface" />
+
+            <include
+                android:id="@+id/cardWaterChangeFresh"
+                layout="@layout/card_water_change"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/groupCalcSaltwater"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
+            android:orientation="vertical"
+            android:visibility="gone">
 
-        <!-- Water Conditioner (Safe) -->
-        <include
-            android:id="@+id/cardSafe"
-            layout="@layout/card_safe"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/calc_quick_doses"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurface" />
+
+            <include
+                android:id="@+id/cardSafeSalt"
+                layout="@layout/card_safe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+            <include
+                android:id="@+id/cardPrimeSalt"
+                layout="@layout/card_prime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <include
+                android:id="@+id/cardStabilitySalt"
+                layout="@layout/card_stability"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/calc_utilities"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurface" />
+
+            <include
+                android:id="@+id/cardWaterChangeSalt"
+                layout="@layout/card_water_change"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/groupCalcPond"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
+            android:orientation="vertical"
+            android:visibility="gone">
 
-        <!-- Plant Fertilizer (APT) -->
-        <include
-            android:id="@+id/cardApt"
-            layout="@layout/card_apt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
+            <include
+                android:id="@+id/cardSafePond"
+                layout="@layout/card_safe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" />
 
-        <!-- Section: Buffers -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="pH Buffers"
-            android:textAppearance="?attr/textAppearanceTitleMedium"
-            android:textColor="?attr/colorOnSurface" />
+            <include
+                android:id="@+id/cardPrimePond"
+                layout="@layout/card_prime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
 
-        <!-- Neutral Regulator -->
-        <include
-            android:id="@+id/cardNeutral"
-            layout="@layout/card_neutral"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" />
+            <include
+                android:id="@+id/cardStabilityPond"
+                layout="@layout/card_stability"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
 
-        <!-- Acid Buffer -->
-        <include
-            android:id="@+id/cardAcid"
-            layout="@layout/card_acid"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/calc_utilities"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurface" />
 
-        <!-- Gold Buffer -->
-        <include
-            android:id="@+id/cardGold"
-            layout="@layout/card_gold"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" />
+            <include
+                android:id="@+id/cardWaterChangePond"
+                layout="@layout/card_water_change"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

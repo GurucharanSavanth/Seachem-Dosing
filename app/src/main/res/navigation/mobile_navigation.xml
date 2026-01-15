@@ -3,7 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_dashboard">
+    app:startDestination="@+id/navigation_profile">
+
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.example.seachem_dosing.ui.profile.ProfileSelectionFragment"
+        android:label="@string/profile_select_title"
+        tools:layout="@layout/fragment_profile_selection" />
 
     <fragment
         android:id="@+id/navigation_dashboard"

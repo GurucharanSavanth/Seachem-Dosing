@@ -4,6 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
+import com.example.seachem_dosing.ai.AiInsightState
+import com.example.seachem_dosing.ai.ChatMessage
+import com.example.seachem_dosing.ai.ChatRole
 import com.example.seachem_dosing.logic.Calculations
 
 /**
@@ -11,6 +14,34 @@ import com.example.seachem_dosing.logic.Calculations
  * Manages all water parameters, volume settings, and calculation results.
  */
 class MainViewModel : ViewModel() {
+
+    enum class AquariumProfile(val id: String) {
+        FRESHWATER("freshwater"),
+        SALTWATER("saltwater"),
+        POND("pond");
+
+        companion object {
+            fun fromId(id: String): AquariumProfile? {
+                return values().firstOrNull { it.id == id }
+            }
+        }
+    }
+
+    private val _profile = MutableLiveData(AquariumProfile.FRESHWATER)
+    val profile: LiveData<AquariumProfile> = _profile
+
+    private val _aiInsight = MutableLiveData(AiInsightState())
+    val aiInsight: LiveData<AiInsightState> = _aiInsight
+
+    private val _chatMessages = MutableLiveData<List<ChatMessage>>(emptyList())
+    val chatMessages: LiveData<List<ChatMessage>> = _chatMessages
+
+    private val aquariumKeywords = setOf(
+        "aquarium", "fish", "tank", "dosing", "gh", "kh", "ph", "ammonia", "nitrite", "nitrate",
+        "salinity", "alkalinity", "calcium", "magnesium", "phosphate", "pond", "reef", "freshwater",
+        "saltwater", "water change", "prime", "stability", "safe", "buffer", "filter", "cycle",
+        "bioload", "ppm", "dgh", "dkh", "seachem", "plant", "substrate", "oxygen", "co2"
+    )
 
     // ==================== Volume Settings ====================
 
@@ -52,6 +83,30 @@ class MainViewModel : ViewModel() {
 
     private val _kh = MutableLiveData(6.0)
     val kh: LiveData<Double> = _kh
+
+    private val _ph = MutableLiveData(7.2)
+    val ph: LiveData<Double> = _ph
+
+    private val _temperature = MutableLiveData(26.0)
+    val temperature: LiveData<Double> = _temperature
+
+    private val _salinity = MutableLiveData(35.0)
+    val salinity: LiveData<Double> = _salinity
+
+    private val _alkalinity = MutableLiveData(8.0)
+    val alkalinity: LiveData<Double> = _alkalinity
+
+    private val _calcium = MutableLiveData(420.0)
+    val calcium: LiveData<Double> = _calcium
+
+    private val _magnesium = MutableLiveData(1300.0)
+    val magnesium: LiveData<Double> = _magnesium
+
+    private val _phosphate = MutableLiveData(0.05)
+    val phosphate: LiveData<Double> = _phosphate
+
+    private val _dissolvedOxygen = MutableLiveData(7.5)
+    val dissolvedOxygen: LiveData<Double> = _dissolvedOxygen
 
     private val _ghUnit = MutableLiveData("dh") // dh or ppm
     val ghUnit: LiveData<String> = _ghUnit
@@ -265,6 +320,42 @@ class MainViewModel : ViewModel() {
         return Calculations.calculateStabilityDose(getEffectiveVolumeLitres())
     }
 
+    fun calculateWaterChangeLitres(percent: Double): Double {
+        if (percent <= 0) return 0.0
+        val litres = getEffectiveVolumeLitres()
+        return litres * (percent / 100.0)
+    }
+
+    fun requestAiInsight() {
+        _aiInsight.value = AiInsightState(
+            isLoading = false,
+            text = null,
+            error = "AI disabled for now."
+        )
+    }
+
+    fun sendChatMessage(message: String) {
+        val trimmed = message.trim()
+        if (trimmed.isBlank()) return
+        appendChatMessage(ChatMessage(ChatRole.USER, trimmed))
+
+        if (!isAquariumTopic(trimmed)) {
+            appendChatMessage(
+                ChatMessage(
+                    ChatRole.ASSISTANT,
+                    "I can only help with aquarium, fish, and dosing questions."
+                )
+            )
+            return
+        }
+        appendChatMessage(
+            ChatMessage(
+                ChatRole.ASSISTANT,
+                "AI disabled for now."
+            )
+        )
+    }
+
     // ==================== Setters ====================
 
     fun setVolume(value: Double) { _volume.value = value }
@@ -280,8 +371,31 @@ class MainViewModel : ViewModel() {
     fun setNitrate(value: Double) { _nitrate.value = value }
     fun setGh(value: Double) { _gh.value = value }
     fun setKh(value: Double) { _kh.value = value }
+    fun setPh(value: Double) { _ph.value = value }
+    fun setTemperature(value: Double) { _temperature.value = value }
+    fun setSalinity(value: Double) { _salinity.value = value }
+    fun setAlkalinity(value: Double) { _alkalinity.value = value }
+    fun setCalcium(value: Double) { _calcium.value = value }
+    fun setMagnesium(value: Double) { _magnesium.value = value }
+    fun setPhosphate(value: Double) { _phosphate.value = value }
+    fun setDissolvedOxygen(value: Double) { _dissolvedOxygen.value = value }
     fun setGhUnit(unit: String) { _ghUnit.value = unit }
     fun setKhUnit(unit: String) { _khUnit.value = unit }
+    fun updateHardnessUnit(unit: String) {
+        val targetUnit = if (unit == "ppm") "ppm" else "dh"
+        val currentGhUnit = _ghUnit.value ?: "dh"
+        val currentKhUnit = _khUnit.value ?: "dh"
+        if (currentGhUnit != targetUnit) {
+            _gh.value = convertHardness(_gh.value ?: 0.0, currentGhUnit, targetUnit)
+            _ghUnit.value = targetUnit
+        }
+        if (currentKhUnit != targetUnit) {
+            _kh.value = convertHardness(_kh.value ?: 0.0, currentKhUnit, targetUnit)
+            _khUnit.value = targetUnit
+        }
+        syncGhFromParams()
+        syncKhFromParams()
+    }
 
     fun setKhCurrent(value: Double) { _khCurrent.value = value }
     fun setKhTarget(value: Double) { _khTarget.value = value }
@@ -298,6 +412,11 @@ class MainViewModel : ViewModel() {
 
     fun setGoldPhCurrent(value: Double) { _goldPhCurrent.value = value }
     fun setGoldPhTarget(value: Double) { _goldPhTarget.value = value }
+
+    fun setProfile(profile: AquariumProfile) {
+        _profile.value = profile
+        applyProfileDefaults(profile)
+    }
 
     // ==================== Sync Methods ====================
 
@@ -319,6 +438,15 @@ class MainViewModel : ViewModel() {
         _ghCurrent.value = ghDegrees
     }
 
+    /**
+     * Sync pH value from parameters to calculator inputs
+     */
+    fun syncPhFromParams() {
+        val currentPh = _ph.value ?: 7.0
+        _phCurrent.value = currentPh
+        _goldPhCurrent.value = currentPh
+    }
+
     // ==================== Utility ====================
 
     private fun getSplitText(grams: Double): String {
@@ -329,6 +457,92 @@ class MainViewModel : ViewModel() {
     }
 
     private fun Double.format(decimals: Int): String = "%.${decimals}f".format(this)
+
+    private fun convertHardness(value: Double, fromUnit: String, toUnit: String): Double {
+        return when {
+            fromUnit == toUnit -> value
+            fromUnit == "ppm" && toUnit == "dh" -> Calculations.ppmToDh(value)
+            fromUnit == "dh" && toUnit == "ppm" -> Calculations.dhToPpm(value)
+            else -> value
+        }
+    }
+
+    private fun buildInsightSystemPrompt(context: String): String {
+        return """
+            You are an aquarium assistant. Only answer aquarium, fish, dosing, and water-parameter questions.
+            Give concise, actionable guidance. Avoid medical or unrelated topics. If readings are missing,
+            ask for them. Do not invent dosing formulas; reference the app's calculators instead.
+            Double-check recommendations against the provided readings before responding.
+
+            Readings:
+            $context
+        """.trimIndent()
+    }
+
+    private fun buildChatPrompt(): String {
+        val context = buildDashboardContext()
+        return """
+            Use the latest dashboard readings as context. If the user asks about dosing or parameters,
+            respond with safe, conservative guidance and mention relevant app calculators.
+            If the question is unclear, ask a clarifying question.
+
+            Latest readings:
+            $context
+        """.trimIndent()
+    }
+
+    private fun buildDashboardContext(): String {
+        val profile = _profile.value ?: AquariumProfile.FRESHWATER
+        val unit = _volumeUnit.value ?: "L"
+        val ghUnit = _ghUnit.value ?: "dh"
+        val khUnit = _khUnit.value ?: "dh"
+        val lines = mutableListOf<String>()
+        lines.add("Profile: ${profile.name.lowercase().replaceFirstChar { it.uppercase() }}")
+        lines.add("Effective volume: ${"%.1f".format(getEffectiveVolumeLitres())} L (unit: $unit)")
+        lines.add("GH unit: $ghUnit, KH unit: $khUnit")
+        when (profile) {
+            AquariumProfile.FRESHWATER -> {
+                lines.add("Ammonia: ${_ammonia.value ?: 0.0} ppm")
+                lines.add("Nitrite: ${_nitrite.value ?: 0.0} ppm")
+                lines.add("Nitrate: ${_nitrate.value ?: 0.0} ppm")
+                lines.add("GH input: ${_gh.value ?: 0.0} $ghUnit (dGH: ${"%.2f".format(getGhInDegrees())})")
+                lines.add("KH input: ${_kh.value ?: 0.0} $khUnit (dKH: ${"%.2f".format(getKhInDegrees())})")
+                lines.add("pH: ${_ph.value ?: 0.0}")
+                lines.add("Temperature: ${_temperature.value ?: 0.0} C")
+            }
+            AquariumProfile.SALTWATER -> {
+                lines.add("Salinity: ${_salinity.value ?: 0.0} ppt")
+                lines.add("Alkalinity: ${_alkalinity.value ?: 0.0} dKH")
+                lines.add("Calcium: ${_calcium.value ?: 0.0} ppm")
+                lines.add("Magnesium: ${_magnesium.value ?: 0.0} ppm")
+                lines.add("Nitrate: ${_nitrate.value ?: 0.0} ppm")
+                lines.add("Phosphate: ${_phosphate.value ?: 0.0} ppm")
+                lines.add("pH: ${_ph.value ?: 0.0}")
+                lines.add("Temperature: ${_temperature.value ?: 0.0} C")
+            }
+            AquariumProfile.POND -> {
+                lines.add("Ammonia: ${_ammonia.value ?: 0.0} ppm")
+                lines.add("Nitrite: ${_nitrite.value ?: 0.0} ppm")
+                lines.add("Nitrate: ${_nitrate.value ?: 0.0} ppm")
+                lines.add("KH input: ${_kh.value ?: 0.0} $khUnit (dKH: ${"%.2f".format(getKhInDegrees())})")
+                lines.add("pH: ${_ph.value ?: 0.0}")
+                lines.add("Temperature: ${_temperature.value ?: 0.0} C")
+                lines.add("Dissolved oxygen: ${_dissolvedOxygen.value ?: 0.0} mg/L")
+            }
+        }
+        return lines.joinToString(separator = "\n")
+    }
+
+    private fun isAquariumTopic(message: String): Boolean {
+        val lower = message.lowercase()
+        return aquariumKeywords.any { lower.contains(it) }
+    }
+
+    private fun appendChatMessage(message: ChatMessage) {
+        val current = _chatMessages.value.orEmpty()
+        val updated = (current + message).takeLast(20)
+        _chatMessages.value = updated
+    }
 
     fun resetAll() {
         _volume.value = 10.0
@@ -343,6 +557,14 @@ class MainViewModel : ViewModel() {
         _nitrate.value = 15.0
         _gh.value = 4.0
         _kh.value = 6.0
+        _ph.value = 7.2
+        _temperature.value = 26.0
+        _salinity.value = 35.0
+        _alkalinity.value = 8.0
+        _calcium.value = 420.0
+        _magnesium.value = 1300.0
+        _phosphate.value = 0.05
+        _dissolvedOxygen.value = 7.5
         _ghUnit.value = "dh"
         _khUnit.value = "dh"
         _khCurrent.value = 0.0
@@ -357,5 +579,56 @@ class MainViewModel : ViewModel() {
         _acidTargetKh.value = 4.0
         _goldPhCurrent.value = 7.0
         _goldPhTarget.value = 7.5
+        _aiInsight.value = AiInsightState()
+        _chatMessages.value = emptyList()
+        applyProfileDefaults(_profile.value ?: AquariumProfile.FRESHWATER)
+    }
+
+    private fun applyProfileDefaults(profile: AquariumProfile) {
+        when (profile) {
+            AquariumProfile.FRESHWATER -> {
+                _ammonia.value = 0.0
+                _nitrite.value = 0.0
+                _nitrate.value = 15.0
+                _gh.value = 4.0
+                _kh.value = 6.0
+                _ph.value = 7.2
+                _temperature.value = 26.0
+                _ghUnit.value = "dh"
+                _khUnit.value = "dh"
+                syncGhFromParams()
+                syncKhFromParams()
+                syncPhFromParams()
+            }
+            AquariumProfile.SALTWATER -> {
+                _ammonia.value = 0.0
+                _nitrite.value = 0.0
+                _gh.value = 0.0
+                _kh.value = 0.0
+                _dissolvedOxygen.value = 0.0
+                _salinity.value = 35.0
+                _alkalinity.value = 8.0
+                _calcium.value = 420.0
+                _magnesium.value = 1300.0
+                _nitrate.value = 10.0
+                _phosphate.value = 0.05
+                _ph.value = 8.2
+                _temperature.value = 26.0
+                syncPhFromParams()
+            }
+            AquariumProfile.POND -> {
+                _ammonia.value = 0.0
+                _nitrite.value = 0.0
+                _nitrate.value = 20.0
+                _gh.value = 0.0
+                _kh.value = 5.0
+                _ph.value = 7.4
+                _temperature.value = 22.0
+                _dissolvedOxygen.value = 7.5
+                _khUnit.value = "dh"
+                syncKhFromParams()
+                syncPhFromParams()
+            }
+        }
     }
 }

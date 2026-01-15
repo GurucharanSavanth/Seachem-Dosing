@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_switch_profile"
+        android:icon="@drawable/ic_switch_profile"
+        android:title="@string/menu_switch_profile"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_theme"
+        android:title="@string/menu_theme">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/menu_theme_system"
+                    android:checkable="true"
+                    android:title="@string/settings_theme_system" />
+                <item
+                    android:id="@+id/menu_theme_light"
+                    android:checkable="true"
+                    android:title="@string/settings_theme_light" />
+                <item
+                    android:id="@+id/menu_theme_dark"
+                    android:checkable="true"
+                    android:title="@string/settings_theme_dark" />
+            </group>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/menu_hardness_unit"
+        android:title="@string/menu_hardness_unit">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/menu_hardness_dh"
+                    android:checkable="true"
+                    android:title="@string/unit_dgh" />
+                <item
+                    android:id="@+id/menu_hardness_ppm"
+                    android:checkable="true"
+                    android:title="@string/unit_ppm" />
+            </group>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/menu_settings"
+        app:showAsAction="never" />
+
+</menu>

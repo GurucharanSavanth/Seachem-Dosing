@@ -13,6 +13,7 @@ import androidx.fragment.app.activityViewModels
 import com.example.seachem_dosing.BuildConfig
 import com.example.seachem_dosing.R
 import com.example.seachem_dosing.ui.MainViewModel
+import com.google.android.material.transition.MaterialFadeThrough
 
 class SettingsFragment : Fragment() {
 
@@ -29,6 +30,13 @@ class SettingsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_settings, container, false)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enterTransition = MaterialFadeThrough()
+        exitTransition = MaterialFadeThrough()
+        reenterTransition = MaterialFadeThrough()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -43,6 +51,13 @@ class SettingsFragment : Fragment() {
         val settingTheme = view.findViewById<LinearLayout>(R.id.settingTheme)
         val tvCurrentTheme = view.findViewById<TextView>(R.id.tvCurrentTheme)
 
+        currentThemeMode = AppCompatDelegate.getDefaultNightMode().let { mode ->
+            if (mode == AppCompatDelegate.MODE_NIGHT_UNSPECIFIED) {
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            } else {
+                mode
+            }
+        }
         updateThemeText(tvCurrentTheme)
 
         settingTheme.setOnClickListener {
@@ -165,9 +180,11 @@ class SettingsFragment : Fragment() {
         AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.settings_hardness_unit))
             .setSingleChoiceItems(units, currentSelection) { dialog, which ->
+                val oldUnit = currentHardnessUnit
                 currentHardnessUnit = if (which == 0) "dh" else "ppm"
-                viewModel.setGhUnit(currentHardnessUnit)
-                viewModel.setKhUnit(currentHardnessUnit)
+                if (currentHardnessUnit != oldUnit) {
+                    viewModel.updateHardnessUnit(currentHardnessUnit)
+                }
                 updateHardnessUnitText(tvCurrentHardnessUnit)
                 dialog.dismiss()
             }

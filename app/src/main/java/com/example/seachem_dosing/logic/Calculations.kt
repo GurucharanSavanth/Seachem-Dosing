@@ -41,6 +41,14 @@ object Calculations {
         }
     }
 
+    fun fromLitres(litres: Double, unit: String): Double {
+        return when (unit) {
+            "US" -> litres / US_GAL_TO_L
+            "UK" -> litres / UK_GAL_TO_L
+            else -> litres // "L"
+        }
+    }
+
     fun dimensionsToLitres(length: Double, breadth: Double, height: Double, unit: String): Double {
         val volume = length * breadth * height
         if (volume <= 0) return 0.0
