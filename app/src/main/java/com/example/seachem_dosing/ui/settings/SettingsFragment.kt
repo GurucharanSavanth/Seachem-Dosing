@@ -1,13 +1,21 @@
 package com.example.seachem_dosing.ui.settings
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.seachem_dosing.BuildConfig
@@ -41,9 +49,13 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupThemeSetting(view)
+        setupLanguageSetting(view)
         setupVolumeUnitSetting(view)
         setupHardnessUnitSetting(view)
+        setupWaterChangeSetting(view)
+        setupExportSetting(view)
         setupResetSetting(view)
+        setupSupportSettings(view)
         setupVersion(view)
     }
 
@@ -103,6 +115,49 @@ class SettingsFragment : Fragment() {
             AppCompatDelegate.MODE_NIGHT_YES -> getString(R.string.settings_theme_dark)
             else -> getString(R.string.settings_theme_system)
         }
+    }
+
+    private fun setupLanguageSetting(view: View) {
+        val settingLanguage = view.findViewById<LinearLayout>(R.id.settingLanguage)
+        val tvCurrentLanguage = view.findViewById<TextView>(R.id.tvCurrentLanguage)
+
+        // Detect current app locale
+        val currentLocale = AppCompatDelegate.getApplicationLocales().get(0)
+        val langCode = currentLocale?.language ?: "en"
+        
+        tvCurrentLanguage.text = if (langCode == "kn") getString(R.string.settings_language_kn) else getString(R.string.settings_language_en)
+
+        settingLanguage.setOnClickListener {
+            showLanguageDialog(tvCurrentLanguage)
+        }
+    }
+
+    private fun showLanguageDialog(tvCurrentLanguage: TextView) {
+        val languages = arrayOf(
+            getString(R.string.settings_language_en),
+            getString(R.string.settings_language_kn)
+        )
+        
+        // Check current
+        val currentLocale = AppCompatDelegate.getApplicationLocales().get(0)
+        val currentCode = currentLocale?.language ?: "en"
+        val checkedItem = if (currentCode == "kn") 1 else 0
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.settings_language))
+            .setSingleChoiceItems(languages, checkedItem) { dialog, which ->
+                val newLocale = if (which == 1) "kn" else "en"
+                
+                // Apply Locale
+                val appLocale = LocaleListCompat.forLanguageTags(newLocale)
+                AppCompatDelegate.setApplicationLocales(appLocale)
+                
+                dialog.dismiss()
+                // Activity will likely recreate, but if not:
+                tvCurrentLanguage.text = languages[which]
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     private fun setupVolumeUnitSetting(view: View) {
@@ -200,6 +255,48 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    private fun setupWaterChangeSetting(view: View) {
+        val settingWaterChange = view.findViewById<LinearLayout>(R.id.settingWaterChange)
+        val tvCurrentWaterChange = view.findViewById<TextView>(R.id.tvCurrentWaterChange)
+
+        viewModel.defaultWaterChangePercent.observe(viewLifecycleOwner) { percent ->
+            tvCurrentWaterChange.text = "${percent.toInt()}%"
+        }
+
+        settingWaterChange.setOnClickListener {
+            showWaterChangeDialog()
+        }
+    }
+
+    private fun showWaterChangeDialog() {
+        val input = EditText(requireContext())
+        input.inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+        input.setText(viewModel.defaultWaterChangePercent.value.toString())
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.settings_water_change_dialog_title))
+            .setView(input)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val newValue = input.text.toString().toDoubleOrNull()
+                if (newValue != null && newValue in 0.0..100.0) {
+                    viewModel.setDefaultWaterChangePercent(newValue)
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun setupExportSetting(view: View) {
+        val settingExport = view.findViewById<LinearLayout>(R.id.settingExport)
+        settingExport.setOnClickListener {
+            val data = viewModel.generateExportData()
+            val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("Seachem Dosing Data", data)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(requireContext(), R.string.settings_export_success, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun setupResetSetting(view: View) {
         val settingReset = view.findViewById<LinearLayout>(R.id.settingReset)
 
@@ -224,6 +321,22 @@ class SettingsFragment : Fragment() {
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
+    }
+    
+    private fun setupSupportSettings(view: View) {
+        view.findViewById<LinearLayout>(R.id.settingContact).setOnClickListener {
+            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:")
+                putExtra(Intent.EXTRA_EMAIL, arrayOf("savanthgc@gmail.com"))
+                putExtra(Intent.EXTRA_SUBJECT, "Seachem Dosing App Support")
+            }
+            startActivity(Intent.createChooser(intent, getString(R.string.settings_contact)))
+        }
+
+        view.findViewById<LinearLayout>(R.id.settingSourceCode).setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.settings_source_url)))
+            startActivity(intent)
+        }
     }
 
     private fun setupVersion(view: View) {

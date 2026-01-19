@@ -121,51 +121,94 @@
                     android:textColor="?attr/colorOnPrimaryContainer"
                     tools:text="Tank Volume: 37.85 L" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/action_edit"
-                    android:textAppearance="?attr/textAppearanceLabelMedium"
-                    android:textColor="?attr/colorOnPrimaryContainer" />
-
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- PLANTED PROFILE -->
         <LinearLayout
             android:id="@+id/groupCalcFreshwater"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- KH Booster (KHCO3) -->
+            <!-- Flourish Series -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Supplements"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurface" />
+
             <include
-                android:id="@+id/cardKhco3"
-                layout="@layout/card_khco3"
+                android:id="@+id/cardFlourishIron"
+                layout="@layout/card_universal_calculator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" />
+                android:layout_marginTop="12dp" />
 
-            <!-- GH Booster (Equilibrium) -->
+            <include
+                android:id="@+id/cardFlourishNitrogen"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <include
+                android:id="@+id/cardFlourishPhosphorus"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <include
+                android:id="@+id/cardFlourishPotassium"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Buffers & Minerals -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Buffers &amp; Minerals"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurface" />
+
+            <include
+                android:id="@+id/cardAlkalineBuffer"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+            <include
+                android:id="@+id/cardAcidBuffer"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <include
+                android:id="@+id/cardPotassiumBicarbonate"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
             <include
                 android:id="@+id/cardEquilibrium"
-                layout="@layout/card_equilibrium"
+                layout="@layout/card_universal_calculator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp" />
-
-            <!-- Water Conditioner (Safe) -->
+                
             <include
-                android:id="@+id/cardSafeFresh"
-                layout="@layout/card_safe"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
-
-            <!-- Plant Fertilizer (APT) -->
-            <include
-                android:id="@+id/cardApt"
-                layout="@layout/card_apt"
+                android:id="@+id/cardNeutralRegulator"
+                layout="@layout/card_universal_calculator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp" />
@@ -180,6 +223,20 @@
                 android:textColor="?attr/colorOnSurface" />
 
             <include
+                android:id="@+id/cardFlourish"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+            <include
+                android:id="@+id/cardFlourishTrace"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <include
                 android:id="@+id/cardPrimeFresh"
                 layout="@layout/card_prime"
                 android:layout_width="match_parent"
@@ -192,49 +249,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp" />
-
-            <!-- Section: Buffers -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/calc_section_buffers"
-                android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textColor="?attr/colorOnSurface" />
-
-            <!-- Neutral Regulator -->
+                
             <include
-                android:id="@+id/cardNeutral"
-                layout="@layout/card_neutral"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" />
-
-            <!-- Acid Buffer -->
-            <include
-                android:id="@+id/cardAcid"
-                layout="@layout/card_acid"
+                android:id="@+id/cardSafeFresh"
+                layout="@layout/card_safe"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp" />
-
-            <!-- Gold Buffer -->
-            <include
-                android:id="@+id/cardGold"
-                layout="@layout/card_gold"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
-
-            <!-- Utilities -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/calc_utilities"
-                android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textColor="?attr/colorOnSurface" />
-
+                
             <include
                 android:id="@+id/cardWaterChangeFresh"
                 layout="@layout/card_water_change"
@@ -244,6 +266,7 @@
 
         </LinearLayout>
 
+        <!-- SALTWATER PROFILE -->
         <LinearLayout
             android:id="@+id/groupCalcSaltwater"
             android:layout_width="match_parent"
@@ -251,6 +274,103 @@
             android:orientation="vertical"
             android:visibility="gone">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Reef Supplements"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurface" />
+
+            <!-- Reef Advantage (Powders) -->
+            <include
+                android:id="@+id/cardReefAdvCalcium"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" />
+
+            <include
+                android:id="@+id/cardReefAdvMagnesium"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <include
+                android:id="@+id/cardReefAdvStrontium"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Reef Liquids -->
+            <include
+                android:id="@+id/cardReefCalcium"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <include
+                android:id="@+id/cardReefComplete"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+                
+            <include
+                android:id="@+id/cardReefStrontium"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <include
+                android:id="@+id/cardReefIodide"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Reef Buffers -->
+            <include
+                android:id="@+id/cardReefBuffer"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <include
+                android:id="@+id/cardReefBuilder"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <include
+                android:id="@+id/cardReefCarbonate"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+                
+            <!-- Reef Fusion -->
+            <include
+                android:id="@+id/cardReefFusion1"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+                
+            <include
+                android:id="@+id/cardReefFusion2"
+                layout="@layout/card_universal_calculator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <!-- Quick Doses -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -280,14 +400,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/calc_utilities"
-                android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textColor="?attr/colorOnSurface" />
-
             <include
                 android:id="@+id/cardWaterChangeSalt"
                 layout="@layout/card_water_change"
@@ -297,6 +409,7 @@
 
         </LinearLayout>
 
+        <!-- SAND AND GRAVEL PROFILE -->
         <LinearLayout
             android:id="@+id/groupCalcPond"
             android:layout_width="match_parent"
@@ -305,40 +418,18 @@
             android:visibility="gone">
 
             <include
-                android:id="@+id/cardSafePond"
-                layout="@layout/card_safe"
+                android:id="@+id/cardSubstrate"
+                layout="@layout/card_substrate_calculator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" />
 
             <include
-                android:id="@+id/cardPrimePond"
-                layout="@layout/card_prime"
+                android:id="@+id/cardSaltMix"
+                layout="@layout/card_salt_mix"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
-
-            <include
-                android:id="@+id/cardStabilityPond"
-                layout="@layout/card_stability"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/calc_utilities"
-                android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textColor="?attr/colorOnSurface" />
-
-            <include
-                android:id="@+id/cardWaterChangePond"
-                layout="@layout/card_water_change"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" />
+                android:layout_marginTop="16dp" />
 
         </LinearLayout>
 

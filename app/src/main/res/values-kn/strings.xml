@@ -1,0 +1,180 @@
+<resources>
+    <string name="app_name">ಅಕ್ವೇರಿಯಂ ಡೋಸಿಂಗ್</string>
+    <string name="app_tagline">ಸ್ಮಾರ್ಟ್ ಡೋಸ್, ನೀರನ್ನು ಸ್ಥಿರವಾಗಿಡಿ.</string>
+    <string name="profile_select_title">ನಿಮ್ಮ ಅಕ್ವೇರಿಯಂ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಆರಿಸಿ</string>
+    <string name="profile_select_subtitle">ಪ್ರೊಫೈಲ್‌ಗಳು ರೀಡಿಂಗ್ ಮತ್ತು ಕ್ಯಾಲ್ಕುಲೇಟರ್‌ಗಳನ್ನು ಸರಿಹೊಂದಿಸುತ್ತವೆ.</string>
+    <string name="profile_select_continue">ಮುಂದುವರಿಸಿ</string>
+    <string name="profile_freshwater">ಸಸ್ಯಗಳ ಅಕ್ವೇರಿಯಂ</string>
+    <string name="profile_saltwater">ಉಪ್ಪು ನೀರು (Saltwater)</string>
+    <string name="profile_pond">ಮರಳು ಮತ್ತು ಜಲ್ಲಿ (Sand and Gravel)</string>
+    <string name="profile_freshwater_desc">ಸಸ್ಯಗಳು, ಕಮ್ಯುನಿಟಿ ಮೀನುಗಳು ಮತ್ತು ಗೋಲ್ಡ್ ಫಿಷ್.</string>
+    <string name="profile_saltwater_desc">ರೀಫ್ ಮತ್ತು ಮೆರೈನ್ ಸ್ಥಿರತೆ.</string>
+    <string name="profile_pond_desc">ಇತರೆ ಉಪಯುಕ್ತತೆಗಳು ಮತ್ತು ಸಬ್‌ಸ್ಟ್ರೇಟ್ ಲೆಕ್ಕಾಚಾರಗಳು.</string>
+    <string name="profile_badge_freshwater">ಸಸ್ಯಗಳ ಪ್ರೊಫೈಲ್</string>
+    <string name="profile_badge_saltwater">ಉಪ್ಪು ನೀರಿನ ಪ್ರೊಫೈಲ್</string>
+    <string name="profile_badge_pond">ಮರಳು ಮತ್ತು ಜಲ್ಲಿ ಪ್ರೊಫೈಲ್</string>
+
+    <!-- Navigation -->
+    <string name="nav_dashboard">ಡ್ಯಾಶ್‌ಬೋರ್ಡ್</string>
+    <string name="nav_calculators">ಕ್ಯಾಲ್ಕುಲೇಟರ್‌ಗಳು</string>
+    <string name="nav_settings">ಸೆಟ್ಟಿಂಗ್‌ಗಳು</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">ನೀರಿನ ಸ್ಥಿತಿ</string>
+    <string name="dashboard_subtitle">ನಿಮ್ಮ ಅಕ್ವೇರಿಯಂ ಪ್ಯಾರಾಮೀಟರ್‌ಗಳನ್ನು ಮೇಲ್ವಿಚಾರಣೆ ಮಾಡಿ</string>
+    <string name="dashboard_section_profile">ಟ್ಯಾಂಕ್ ಪ್ರೊಫೈಲ್</string>
+    <string name="section_parameters">ನೀರಿನ ಪ್ಯಾರಾಮೀಟರ್‌ಗಳು</string>
+    <string name="section_recommendations">ಶಿಫಾರಸುಗಳು</string>
+    <string name="section_volume">ಟ್ಯಾಂಕ್ ವಾಲ್ಯೂಮ್</string>
+    <string name="volume_edit_title">ಟ್ಯಾಂಕ್ ವಾಲ್ಯೂಮ್ ಎಡಿಟ್ ಮಾಡಿ</string>
+
+    <!-- Parameters -->
+    <string name="param_ammonia">ಅಮೋನಿಯಾ (NH₃/NH₄⁺)</string>
+    <string name="param_nitrate">ನೈಟ್ರೇಟ್ (NO₃)</string>
+    <string name="param_nitrite">ನೈಟ್ರೈಟ್ (NO₂)</string>
+    <string name="param_gh">ಜನರಲ್ ಹಾರ್ಡ್‌ನೆಸ್ (GH)</string>
+    <string name="param_kh">ಕಾರ್ಬೊನೇಟ್ ಹಾರ್ಡ್‌ನೆಸ್ (KH)</string>
+    <string name="param_ph">pH</string>
+    <string name="param_temp">ತಾಪಮಾನ</string>
+    <string name="param_salinity">ಲವಣಾಂಶ (Salinity)</string>
+    <string name="param_alkalinity">ಕ್ಷಾರೀಯತೆ (Alkalinity)</string>
+    <string name="param_calcium">ಕ್ಯಾಲ್ಸಿಯಂ (Ca)</string>
+    <string name="param_magnesium">ಮೆಗ್ನೀಸಿಯಮ್ (Mg)</string>
+    <string name="param_phosphate">ಫಾಸ್ಫೇಟ್ (PO4)</string>
+    <string name="param_oxygen">ಕರಗಿದ ಆಮ್ಲಜನಕ</string>
+    <string name="unit_ppm">ppm</string>
+    <string name="unit_dgh">°dGH</string>
+    <string name="unit_dkh">°dKH</string>
+    <string name="unit_temp_c">°C</string>
+    <string name="unit_salinity_ppt">ppt</string>
+    <string name="unit_mg_l">mg/L</string>
+    
+    <!-- Status Messages -->
+    <string name="status_good">ಉತ್ತಮ</string>
+    <string name="status_danger">ಅಪಾಯ</string>
+    <string name="status_warning">ಹೆಚ್ಚು</string>
+    <string name="status_info">ಮಾಹಿತಿ</string>
+
+    <!-- Volume -->
+    <string name="volume_direct">ನೇರ ಪ್ರವೇಶ</string>
+    <string name="volume_lbh">L × B × H</string>
+    <string name="label_volume">ವಾಲ್ಯೂಮ್</string>
+    <string name="label_length">ಉದ್ದ</string>
+    <string name="label_breadth">ಅಗಲ</string>
+    <string name="label_height">ಎತ್ತರ</string>
+    <string name="unit_liters">ಲೀಟರ್ (L)</string>
+    <string name="unit_litre">ಲೀಟರ್</string>
+    <string name="unit_us_gallon">US ಗ್ಯಾಲನ್‌ಗಳು</string>
+    <string name="unit_uk_gallon">UK ಗ್ಯಾಲನ್‌ಗಳು</string>
+    <string name="unit_cm">cm</string>
+    <string name="unit_in">in</string>
+    <string name="unit_ft">ft</string>
+    <string name="calculated_volume">ಲೆಕ್ಕಹಾಕಲಾಗಿದೆ: %s L</string>
+
+    <!-- Calculators -->
+    <string name="calc_title">ಡೋಸಿಂಗ್ ಕ್ಯಾಲ್ಕುಲೇಟರ್‌ಗಳು</string>
+    <string name="calc_subtitle">ನಿಮ್ಮ ರೀಡಿಂಗ್ ಆಧಾರದ ಮೇಲೆ ನಿಖರವಾದ ಡೋಸಿಂಗ್</string>
+    <string name="calc_volume_label">ಟ್ಯಾಂಕ್ ವಾಲ್ಯೂಮ್: %s L</string>
+    <string name="calc_quick_doses">ತ್ವರಿತ ಡೋಸ್‌ಗಳು</string>
+    <string name="calc_utilities">ಉಪಯುಕ್ತತೆಗಳು</string>
+    <string name="calc_prime_title">ಸೀಕೆಮ್ ಪ್ರೈಮ್ (Prime)</string>
+    <string name="calc_prime_subtitle">ಡಿಟಾಕ್ಸಿಫೈಯರ್ ಮತ್ತು ಕಂಡಿಷನರ್</string>
+    <string name="calc_stability_title">ಸೀಕೆಮ್ ಸ್ಟೆಬಿಲಿಟಿ (Stability)</string>
+    <string name="calc_stability_subtitle">ಹೊಸ ಟ್ಯಾಂಕ್ ಸ್ಥಿರೀಕರಣ</string>
+    <string name="calc_water_change_title">ನೀರು ಬದಲಾವಣೆ ಪ್ಲಾನರ್</string>
+    <string name="calc_water_change_subtitle">ಬದಲಿಸಬೇಕಾದ ವಾಲ್ಯೂಮ್ ಲೆಕ್ಕಹಾಕಿ</string>
+    <string name="label_change_percent">ಬದಲಾವಣೆ %</string>
+    <string name="result_change_volume">ಬದಲಿಸಿ %s L</string>
+    
+    <string name="calc_flourish_title">ಸೀಕೆಮ್ ಫ್ಲೋರಿಶ್ (Flourish)</string>
+    <string name="calc_flourish_subtitle">ಸಮಗ್ರ ಪೂರಕ (Comprehensive)</string>
+    <string name="calc_flourish_iron_title">ಸೀಕೆಮ್ ಫ್ಲೋರಿಶ್ ಐರನ್</string>
+    <string name="calc_flourish_iron_subtitle">ಕಬ್ಬಿಣ ಪೂರಕ</string>
+    <string name="calc_flourish_nitrogen_title">ಸೀಕೆಮ್ ಫ್ಲೋರಿಶ್ ನೈಟ್ರೋಜನ್</string>
+    <string name="calc_flourish_nitrogen_subtitle">ನೈಟ್ರೋಜನ್ ಪೂರಕ</string>
+    <string name="calc_flourish_phosphorus_title">ಸೀಕೆಮ್ ಫ್ಲೋರಿಶ್ ರಂಜಕ</string>
+    <string name="calc_flourish_phosphorus_subtitle">ರಂಜಕ ಪೂರಕ</string>
+    <string name="calc_flourish_potassium_title">ಸೀಕೆಮ್ ಫ್ಲೋರಿಶ್ ಪೊಟ್ಯಾಸಿಯಮ್</string>
+    <string name="calc_flourish_potassium_subtitle">ಪೊಟ್ಯಾಸಿಯಮ್ ಪೂರಕ</string>
+    
+    <string name="calc_alkaline_buffer_title">ಸೀಕೆಮ್ ಆಲ್ಕಲೈನ್ ಬಫರ್</string>
+    <string name="calc_alkaline_buffer_subtitle">pH ಬಫರ್</string>
+    <string name="calc_acid_title">ಸೀಕೆಮ್ ಆಸಿಡ್ ಬಫರ್</string>
+    <string name="calc_acid_subtitle">KH ಮತ್ತು pH ಕಡಿಮೆ ಮಾಡುವಿಕೆ</string>
+    <string name="calc_equilibrium_title">ಸೀಕೆಮ್ ಇಕ್ವಿಲಿಬ್ರಿಯಮ್</string>
+    <string name="calc_equilibrium_subtitle">GH ಬೂಸ್ಟರ್</string>
+
+    <string name="label_current">ಪ್ರಸ್ತುತ</string>
+    <string name="label_target">ಗುರಿ</string>
+    <string name="result_no_dose">ಡೋಸ್ ಅಗತ್ಯವಿಲ್ಲ</string>
+    <string name="result_grams">%s g</string>
+    <string name="result_ml">%s ml</string>
+
+    <!-- Settings -->
+    <string name="settings_title">ಸೆಟ್ಟಿಂಗ್‌ಗಳು</string>
+    <string name="settings_subtitle">ಘಟಕಗಳು ಮತ್ತು ನೋಟವನ್ನು ವೈಯಕ್ತೀಕರಿಸಿ</string>
+    <string name="settings_appearance">ನೋಟ (Appearance)</string>
+    <string name="settings_theme">ಥೀಮ್</string>
+    <string name="settings_theme_system">ಸಿಸ್ಟಮ್ ಡೀಫಾಲ್ಟ್</string>
+    <string name="settings_theme_light">ಲೈಟ್ (Light)</string>
+    <string name="settings_theme_dark">ಡಾರ್ಕ್ (Dark)</string>
+    <string name="settings_language">ಭಾಷೆ (Language)</string>
+    <string name="settings_language_en">English</string>
+    <string name="settings_language_kn">ಕನ್ನಡ</string>
+    <string name="settings_defaults">ಡೀಫಾಲ್ಟ್ಗಳು</string>
+    <string name="settings_volume_unit">ವಾಲ್ಯೂಮ್ ಘಟಕ</string>
+    <string name="settings_hardness_unit">ಹಾರ್ಡ್‌ನೆಸ್ ಘಟಕ</string>
+    <string name="settings_water_change">ಡೀಫಾಲ್ಟ್ ನೀರು ಬದಲಾವಣೆ %</string>
+    <string name="settings_water_change_dialog_title">ನೀರು ಬದಲಾವಣೆ ಶೇಕಡಾವಾರು</string>
+    <string name="settings_data">ಡೇಟಾ</string>
+    <string name="settings_export">ಡೇಟಾ ರಫ್ತು ಮಾಡಿ (JSON ನಕಲಿಸಿ)</string>
+    <string name="settings_export_success">ಡೇಟಾ ಕ್ಲಿಪ್‌ಬೋರ್ಡ್‌ಗೆ ನಕಲಿಸಲಾಗಿದೆ</string>
+    <string name="settings_reset">ಎಲ್ಲಾ ಮೌಲ್ಯಗಳನ್ನು ಮರುಹೊಂದಿಸಿ</string>
+    <string name="settings_reset_confirm">ಎಲ್ಲಾ ಮೌಲ್ಯಗಳನ್ನು ಡೀಫಾಲ್ಟ್‌ಗೆ ಮರುಹೊಂದಿಸಬೇಕೇ?</string>
+    <string name="settings_support">ಬೆಂಬಲ</string>
+    <string name="settings_contact">ಡೆವಲಪರ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಿ</string>
+    <string name="settings_source_code">ಮೂಲ ಕೋಡ್ (Source Code)</string>
+    <string name="settings_about">ಕುರಿತು</string>
+    <string name="settings_version">ಆವೃತ್ತಿ %s</string>
+    <string name="settings_developer">ಅಭಿವೃದ್ಧಿಪಡಿಸಿದವರು ಗುರುಚರಣ್.ಎಸ್</string>
+    <string name="settings_source">ಸೀಕೆಮ್ ಡೋಸಿಂಗ್ ಮಾರ್ಗಸೂಚಿಗಳನ್ನು ಆಧರಿಸಿದೆ</string>
+    <string name="settings_special_thanks">ವಿಶೇಷ ಧನ್ಯವಾದಗಳು: Seachem, Bulk Reef Supply.</string>
+
+    <!-- Actions -->
+    <string name="action_calculate">ಲೆಕ್ಕಹಾಕಿ</string>
+    <string name="action_copy">ನಕಲಿಸಿ</string>
+    <string name="action_copied">ನಕಲಿಸಲಾಗಿದೆ!</string>
+    <string name="action_reset">ಮರುಹೊಂದಿಸಿ</string>
+    <string name="action_cancel">ರದ್ದುಮಾಡಿ</string>
+    <string name="action_ok">ಸರಿ</string>
+    <string name="action_edit">ತಿದ್ದು</string>
+    
+    <string name="calc_safe_title">ಸೀಕೆಮ್ ಸೇಫ್ (Safe)</string>
+    <string name="calc_safe_subtitle">ಸಾಂದ್ರೀಕೃತ ಕಂಡಿಷನರ್</string>
+    <string name="calc_khco3_title">ಪೊಟ್ಯಾಸಿಯಮ್ ಬೈಕಾರ್ಬನೇಟ್</string>
+    <string name="calc_khco3_subtitle">ಸಾಮಾನ್ಯ KH ಬೂಸ್ಟರ್</string>
+    <string name="calc_neutral_title">ನ್ಯೂಟ್ರಲ್ ರೆಗ್ಯುಲೇಟರ್</string>
+    <string name="calc_neutral_subtitle">pH ನ್ಯೂಟ್ರಲೈಜರ್</string>
+    
+    <string name="label_current_kh">ಪ್ರಸ್ತುತ KH</string>
+    <string name="label_target_kh">ಗುರಿ KH</string>
+    <string name="label_current_gh_meq">ಪ್ರಸ್ತುತ GH</string>
+    <string name="label_target_gh_meq">ಗುರಿ GH</string>
+    
+    <string name="label_current_fe">ಪ್ರಸ್ತುತ Fe</string>
+    <string name="label_target_fe">ಗುರಿ Fe</string>
+    <string name="label_current_n">ಪ್ರಸ್ತುತ N</string>
+    <string name="label_target_n">ಗುರಿ N</string>
+    <string name="label_current_p">ಪ್ರಸ್ತುತ P</string>
+    <string name="label_target_p">ಗುರಿ P</string>
+    <string name="label_current_k">ಪ್ರಸ್ತುತ K</string>
+    <string name="label_target_k">ಗುರಿ K</string>
+    
+    <string name="label_current_ca">ಪ್ರಸ್ತುತ Ca</string>
+    <string name="label_target_ca">ಬಯಸಿದ Ca</string>
+    <string name="label_current_mg">ಪ್ರಸ್ತುತ Mg</string>
+    <string name="label_target_mg">ಬಯಸಿದ Mg</string>
+    <string name="label_current_alk">ಪ್ರಸ್ತುತ Alk</string>
+    <string name="label_target_alk">ಬಯಸಿದ Alk</string>
+
+</resources>

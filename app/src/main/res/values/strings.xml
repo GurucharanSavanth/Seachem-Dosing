@@ -4,18 +4,18 @@
     <string name="profile_select_title">Choose your aquarium profile</string>
     <string name="profile_select_subtitle">Profiles tailor readings and calculators.</string>
     <string name="profile_select_continue">Continue</string>
-    <string name="profile_freshwater">Freshwater</string>
+    <string name="profile_freshwater">Planted</string>
     <string name="profile_saltwater">Saltwater</string>
-    <string name="profile_pond">Pond</string>
+    <string name="profile_pond">Sand and Gravel</string>
     <string name="profile_freshwater_desc">Plants, community fish, and goldfish tanks.</string>
     <string name="profile_saltwater_desc">Reef and marine stability readings.</string>
-    <string name="profile_pond_desc">Outdoor ponds and large-volume systems.</string>
-    <string name="profile_freshwater_features">Includes GH/KH, planted dosing, and pH buffers.</string>
-    <string name="profile_saltwater_features">Includes salinity, alkalinity, calcium, magnesium, and phosphate.</string>
-    <string name="profile_pond_features">Includes dissolved oxygen, KH, and quick conditioner doses.</string>
-    <string name="profile_badge_freshwater">Freshwater Profile</string>
+    <string name="profile_pond_desc">Misc Utility &amp; Substrate calculations.</string>
+    <string name="profile_freshwater_features">Includes Flourish series dosing.</string>
+    <string name="profile_saltwater_features">Includes Reef series dosing.</string>
+    <string name="profile_pond_features">Includes substrate volume calculators.</string>
+    <string name="profile_badge_freshwater">Planted Profile</string>
     <string name="profile_badge_saltwater">Saltwater Profile</string>
-    <string name="profile_badge_pond">Pond Profile</string>
+    <string name="profile_badge_pond">Sand and Gravel Profile</string>
 
     <!-- Navigation -->
     <string name="nav_dashboard">Dashboard</string>
@@ -29,6 +29,7 @@
     <string name="section_parameters">Water Parameters</string>
     <string name="section_recommendations">Recommendations</string>
     <string name="section_volume">Tank Volume</string>
+    <string name="volume_edit_title">Edit tank volume</string>
 
     <!-- Parameters -->
     <string name="param_ammonia">Ammonia (NH₃/NH₄⁺)</string>
@@ -58,6 +59,12 @@
     <string name="unit_phosphate_ppm">ppm</string>
     <string name="unit_oxygen_mg_l">mg/L</string>
 
+    <string name="param_potassium">Potassium (K)</string>
+    <string name="param_iron">Iron (Fe)</string>
+    <string name="param_strontium">Strontium (Sr)</string>
+    <string name="param_iodide">Iodide (I)</string>
+    <string name="unit_mg_l">mg/L</string>
+    
     <!-- Status Messages -->
     <string name="status_good">Good</string>
     <string name="status_danger">DANGER</string>
@@ -89,10 +96,10 @@
     <string name="calc_volume_label">Tank Volume: %s L</string>
     <string name="calc_quick_doses">Quick Doses</string>
     <string name="calc_utilities">Utilities</string>
-    <string name="calc_prime_title">Prime Detox</string>
-    <string name="calc_prime_subtitle">Seachem Prime</string>
-    <string name="calc_stability_title">Bio Starter</string>
-    <string name="calc_stability_subtitle">Seachem Stability</string>
+    <string name="calc_prime_title">Seachem Prime</string>
+    <string name="calc_prime_subtitle">Detoxifier &amp; Conditioner</string>
+    <string name="calc_stability_title">Seachem Stability</string>
+    <string name="calc_stability_subtitle">New Tank Stabilization</string>
     <string name="calc_water_change_title">Water Change Planner</string>
     <string name="calc_water_change_subtitle">Calculate replacement volume</string>
     <string name="calc_prime_info">Use after ammonia spikes or transport stress.</string>
@@ -100,29 +107,104 @@
     <string name="label_change_percent">Change %</string>
     <string name="result_change_volume">Replace %s L</string>
     <string name="result_change_volume_unit">%1$s L (%2$s %3$s)</string>
-    <string name="calc_khco3_title">KH Booster</string>
-    <string name="calc_khco3_subtitle">Potassium Bicarbonate (KHCO₃)</string>
-    <string name="calc_equilibrium_title">GH Booster</string>
-    <string name="calc_equilibrium_subtitle">Seachem Equilibrium</string>
-    <string name="calc_safe_title">Water Conditioner</string>
-    <string name="calc_safe_subtitle">Seachem Safe</string>
-    <string name="calc_safe_info">Removes chlorine, chloramine &amp; detoxifies ammonia.\nDose: 1g per 200L.</string>
-    <string name="calc_apt_title">Plant Fertilizer</string>
-    <string name="calc_apt_subtitle">APT Complete (80% dose)</string>
+    
+    <string name="calc_khco3_title">Seachem Potassium Bicarbonate</string>
+    <string name="calc_khco3_subtitle">Generic KH Booster (KHCO₃)</string>
+    
+    <string name="calc_equilibrium_title">Seachem Equilibrium</string>
+    <string name="calc_equilibrium_subtitle">GH Booster</string>
+    <string name="calc_safe_title">Seachem Safe</string>
+    <string name="calc_safe_subtitle">Concentrated Conditioner</string>
+    <string name="calc_safe_info">Removes chlorine, chloramine &amp; detoxifies ammonia.
+Dose: 1g per 200L.</string>
+    <string name="calc_apt_title">APT Complete</string>
+    <string name="calc_apt_subtitle">Plant Fertilizer (80% dose)</string>
     <string name="calc_section_buffers">pH Buffers</string>
-    <string name="calc_apt_info">80% of standard 3ml/100L daily dose.\nEstimated NO₃ increase shown below.</string>
-    <string name="calc_neutral_title">pH Neutralizer</string>
-    <string name="calc_neutral_subtitle">Seachem Neutral Regulator</string>
-    <string name="calc_acid_title">KH &amp; pH Reducer</string>
-    <string name="calc_acid_subtitle">Seachem Acid Buffer</string>
-    <string name="calc_gold_title">Goldfish Buffer</string>
-    <string name="calc_gold_subtitle">Seachem Gold Buffer</string>
+    <string name="calc_apt_info">80% of standard 3ml/100L daily dose.
+Estimated NO₃ increase shown below.</string>
+    <string name="calc_neutral_title">Seachem Neutral Regulator</string>
+    <string name="calc_neutral_subtitle">pH Neutralizer</string>
+    <string name="calc_acid_title">Seachem Acid Buffer</string>
+    <string name="calc_acid_subtitle">KH &amp; pH Reducer</string>
+    <string name="calc_gold_title">Seachem Gold Buffer</string>
+    <string name="calc_gold_subtitle">Goldfish Buffer</string>
+
+    <!-- New Planted Products -->
+    <string name="calc_flourish_title">Seachem Flourish</string>
+    <string name="calc_flourish_subtitle">Comprehensive Supplement</string>
+    <string name="calc_flourish_iron_title">Seachem Flourish Iron</string>
+    <string name="calc_flourish_iron_subtitle">Iron Supplement</string>
+    <string name="calc_flourish_nitrogen_title">Seachem Flourish Nitrogen</string>
+    <string name="calc_flourish_nitrogen_subtitle">Nitrogen Supplement</string>
+    <string name="calc_flourish_phosphorus_title">Seachem Flourish Phosphorus</string>
+    <string name="calc_flourish_phosphorus_subtitle">Phosphorus Supplement</string>
+    <string name="calc_flourish_potassium_title">Seachem Flourish Potassium</string>
+    <string name="calc_flourish_potassium_subtitle">Potassium Supplement</string>
+    <string name="calc_flourish_trace_title">Seachem Flourish Trace</string>
+    <string name="calc_flourish_trace_subtitle">Trace Elements</string>
+    <string name="calc_alkaline_buffer_title">Seachem Alkaline Buffer</string>
+    <string name="calc_alkaline_buffer_subtitle">pH Buffer</string>
+
+    <!-- New Saltwater Products -->
+    <string name="calc_reef_adv_calcium_title">Seachem Reef Advantage Calcium</string>
+    <string name="calc_reef_adv_calcium_subtitle">Calcium (Powder)</string>
+    <string name="calc_reef_adv_magnesium_title">Seachem Reef Advantage Magnesium</string>
+    <string name="calc_reef_adv_magnesium_subtitle">Magnesium (Powder)</string>
+    <string name="calc_reef_adv_strontium_title">Seachem Reef Advantage Strontium</string>
+    <string name="calc_reef_adv_strontium_subtitle">Strontium (Powder)</string>
+    <string name="calc_reef_buffer_title">Seachem Reef Buffer</string>
+    <string name="calc_reef_buffer_subtitle">Reef pH Buffer</string>
+    <string name="calc_reef_builder_title">Seachem Reef Builder</string>
+    <string name="calc_reef_builder_subtitle">Alkalinity Builder</string>
+    <string name="calc_reef_calcium_title">Seachem Reef Calcium</string>
+    <string name="calc_reef_calcium_subtitle">Calcium (Liquid)</string>
+    <string name="calc_reef_carbonate_title">Seachem Reef Carbonate</string>
+    <string name="calc_reef_carbonate_subtitle">Carbonate Alkalinity</string>
+    <string name="calc_reef_complete_title">Seachem Reef Complete</string>
+    <string name="calc_reef_complete_subtitle">Calcium Complete</string>
+    <string name="calc_reef_fusion1_title">Seachem Reef Fusion 1</string>
+    <string name="calc_reef_fusion1_subtitle">Calcium Supplement</string>
+    <string name="calc_reef_fusion2_title">Seachem Reef Fusion 2</string>
+    <string name="calc_reef_fusion2_subtitle">Alkalinity Supplement</string>
+    <string name="calc_reef_iodide_title">Seachem Reef Iodide</string>
+    <string name="calc_reef_iodide_subtitle">Iodide</string>
+    <string name="calc_reef_strontium_title">Seachem Reef Strontium</string>
+    <string name="calc_reef_strontium_subtitle">Strontium (Liquid)</string>
+
+    <!-- Units -->
+    <string name="unit_meq_l">meq/L</string>
 
     <!-- Calculator Inputs -->
     <string name="label_current">Current</string>
     <string name="label_target">Target</string>
-    <string name="label_current_kh">Current KH (°dKH)</string>
-    <string name="label_target_kh">Target KH (°dKH)</string>
+    
+    <string name="label_current_ca">Current Ca</string>
+    <string name="label_target_ca">Desired Ca</string>
+    <string name="label_current_mg">Current Mg</string>
+    <string name="label_target_mg">Desired Mg</string>
+    <string name="label_current_alk">Current Alk</string>
+    <string name="label_target_alk">Desired Alk</string>
+    <string name="label_current_sr">Current Sr</string>
+    <string name="label_target_sr">Desired Sr</string>
+    <string name="label_current_i">Current I</string>
+    <string name="label_target_i">Desired I</string>
+    
+    <string name="label_current_kh_meq">Current KH</string>
+    <string name="label_target_kh_meq">Desired KH</string>
+    <string name="label_current_gh_meq">Current GH</string>
+    <string name="label_target_gh_meq">Desired GH</string>
+    
+    <string name="label_current_n">Current N</string>
+    <string name="label_target_n">Desired N</string>
+    <string name="label_current_p">Current P</string>
+    <string name="label_target_p">Desired P</string>
+    <string name="label_current_k">Current K</string>
+    <string name="label_target_k">Desired K</string>
+    <string name="label_current_fe">Current Fe</string>
+    <string name="label_target_fe">Desired Fe</string>
+
+    <string name="label_current_kh">Current KH</string>
+    <string name="label_target_kh">Target KH</string>
     <string name="label_current_gh">Current GH (°dGH)</string>
     <string name="label_target_gh">Target GH (°dGH)</string>
     <string name="label_current_ph">Current pH</string>
@@ -144,14 +226,86 @@
     <!-- Recommendations -->
     <string name="reco_title">Emergency Actions</string>
     <string name="reco_ok">✓ All parameters look good!</string>
-    <string name="reco_ammonia">⚠️ Ammonia detected!\nDose %.2f mL Seachem Prime immediately.</string>
-    <string name="reco_nitrite">⚠️ Nitrite detected!\nAdd %.2f mL Seachem Stability.</string>
-    <string name="reco_nitrate">⚠️ High Nitrates (>50ppm)\nConsider 30-50%% water change.</string>
-    <string name="reco_gh_low">ℹ️ GH is low (&lt;3 dGH)\nConsider adding Seachem Equilibrium.</string>
-    <string name="reco_kh_low">ℹ️ KH is low (&lt;3 dKH)\nLow KH can cause pH swings.</string>
+    <string name="reco_ammonia">⚠️ Ammonia detected!
+Dose %.2f mL Seachem Prime immediately.</string>
+    <string name="reco_nitrite">⚠️ Nitrite detected!
+Add %.2f mL Seachem Stability.</string>
+    <string name="reco_nitrate">⚠️ High Nitrates (>50ppm)
+Consider 30-50%% water change.</string>
+    <string name="reco_gh_low">ℹ️ GH is low (&lt;3 dGH)
+Consider adding Seachem Equilibrium.</string>
+    <string name="reco_kh_low">ℹ️ KH is low (&lt;3 dKH)
+Low KH can cause pH swings.</string>
     <string name="reco_enter_volume">Enter tank volume to calculate doses.</string>
-    <string name="reco_nitrate_salt">⚠️ Nitrate is high for reef systems (>20ppm).\nConsider water change or export media.</string>
-    <string name="reco_phosphate_high">⚠️ Phosphate is high (>0.1ppm).\nConsider water change or phosphate control.</string>
+    <string name="reco_nitrate_salt">⚠️ Nitrate is high for reef systems (>20ppm).
+Consider water change or export media.</string>
+    <string name="reco_phosphate_high">⚠️ Phosphate is high (>0.1ppm).
+Consider water change or phosphate control.</string>
+    <string name="reco_section_actions">Immediate actions</string>
+    <string name="reco_section_interpretation">Reading interpretation</string>
+    <string name="reco_line_format">%1$s: %2$s - %3$s</string>
+    <string name="reco_action_ammonia">Ammonia detected: dose %.2f mL Seachem Prime and increase aeration.</string>
+    <string name="reco_action_ammonia_generic">Ammonia detected: detoxify immediately and increase aeration.</string>
+    <string name="reco_action_nitrite">Nitrite detected: add %.2f mL Seachem Stability and reduce feeding.</string>
+    <string name="reco_action_nitrite_generic">Nitrite detected: add bacteria support and reduce feeding.</string>
+    <string name="reco_action_nitrate_high">High nitrate: plan a 30-50%% water change (~ %s L).</string>
+    <string name="reco_action_nitrate_high_generic">High nitrate: plan a 30-50%% water change.</string>
+    <string name="reco_action_nitrate_reef_high">High nitrate for reef systems: target &lt;20 ppm; plan a water change (~ %s L).</string>
+    <string name="reco_action_nitrate_reef_high_generic">High nitrate for reef systems: target &lt;20 ppm; plan a water change.</string>
+    <string name="reco_action_phosphate_high">High phosphate: consider export media and a water change (~ %s L).</string>
+    <string name="reco_action_phosphate_high_generic">High phosphate: consider export media and a water change.</string>
+    <string name="reco_action_kh_low">Low KH: buffer to reduce pH swings.</string>
+    <string name="reco_action_oxygen_low">Low dissolved oxygen: increase aeration immediately.</string>
+    <string name="reco_action_volume_needed">Enter tank volume to compute dosing and water-change amounts.</string>
+    <string name="reco_msg_ammonia_ok">Ideal is 0 ppm; biofilter looks stable.</string>
+    <string name="reco_msg_ammonia_high">Any detectable level is harmful; check filtration and feeding.</string>
+    <string name="reco_msg_nitrite_ok">Ideal is 0 ppm; nitrification looks stable.</string>
+    <string name="reco_msg_nitrite_high">Any detectable level is harmful; add bacteria support.</string>
+    <string name="reco_msg_nitrate_low">Lower is better; keep under 20-40 ppm.</string>
+    <string name="reco_msg_nitrate_moderate">Elevated; plan routine maintenance.</string>
+    <string name="reco_msg_nitrate_high">High; schedule a larger water change.</string>
+    <string name="reco_msg_nitrate_reef_low">Lower is better; aim for &lt;20 ppm in reef systems.</string>
+    <string name="reco_msg_nitrate_reef_moderate">Elevated for reef systems; increase export and maintenance.</string>
+    <string name="reco_msg_nitrate_reef_high">High for reef systems; schedule water change and export.</string>
+    <string name="reco_msg_gh_low">Soft water; add minerals if livestock needs harder water.</string>
+    <string name="reco_msg_gh_ok">Within a typical community range.</string>
+    <string name="reco_msg_gh_high">Hard water; confirm livestock tolerance.</string>
+    <string name="reco_msg_kh_low">Low buffering; pH can swing more easily.</string>
+    <string name="reco_msg_kh_ok">Buffering looks stable.</string>
+    <string name="reco_msg_kh_high">High buffering; pH will resist changes.</string>
+    <string name="reco_msg_ph_low">Acidic; stability matters more than chasing a number.</string>
+    <string name="reco_msg_ph_ok">Stable range for many freshwater species.</string>
+    <string name="reco_msg_ph_high">Alkaline; ensure livestock matches.</string>
+    <string name="reco_msg_temp_low">Cool for most tropical fish; raise gradually.</string>
+    <string name="reco_msg_temp_ok">Typical tropical range.</string>
+    <string name="reco_msg_temp_high">Warm; increase aeration and reduce heat sources.</string>
+    <string name="reco_msg_salinity_low">Low salinity; top off with saltwater to reach 34-35 ppt.</string>
+    <string name="reco_msg_salinity_ok">Stable reef range around 34-35 ppt.</string>
+    <string name="reco_msg_salinity_high">High salinity; top off with fresh RO/DI water.</string>
+    <string name="reco_msg_alkalinity_low">Low alkalinity; stability risk for coral.</string>
+    <string name="reco_msg_alkalinity_ok">Stable buffering range.</string>
+    <string name="reco_msg_alkalinity_high">High alkalinity; avoid rapid corrections.</string>
+    <string name="reco_msg_calcium_low">Low calcium; support growth with supplementation.</string>
+    <string name="reco_msg_calcium_ok">Within a typical reef range.</string>
+    <string name="reco_msg_calcium_high">High calcium; watch for precipitation.</string>
+    <string name="reco_msg_magnesium_low">Low magnesium; can destabilize alkalinity and calcium.</string>
+    <string name="reco_msg_magnesium_ok">Within a typical reef range.</string>
+    <string name="reco_msg_magnesium_high">High magnesium; adjust slowly.</string>
+    <string name="reco_msg_phosphate_low">Low phosphate; avoid stripping nutrients too far.</string>
+    <string name="reco_msg_phosphate_ok">Balanced range for most reefs.</string>
+    <string name="reco_msg_phosphate_high">High phosphate; consider export media.</string>
+    <string name="reco_msg_ph_salt_low">Low pH; check gas exchange and alkalinity.</string>
+    <string name="reco_msg_ph_salt_ok">Normal reef pH range.</string>
+    <string name="reco_msg_ph_salt_high">High pH; verify test accuracy.</string>
+    <string name="reco_msg_temp_salt_low">Cool for marine livestock.</string>
+    <string name="reco_msg_temp_salt_ok">Typical reef range.</string>
+    <string name="reco_msg_temp_salt_high">Warm; increase aeration and cooling.</string>
+    <string name="reco_msg_oxygen_critical">Critically low oxygen; add aeration immediately.</string>
+    <string name="reco_msg_oxygen_low">Low oxygen; increase surface agitation or aeration.</string>
+    <string name="reco_msg_oxygen_ok">Oxygen levels look healthy.</string>
+    <string name="reco_msg_temp_pond_low">Cold water slows metabolism; reduce feeding.</string>
+    <string name="reco_msg_temp_pond_ok">Within a typical pond range.</string>
+    <string name="reco_msg_temp_pond_high">Warm; increase aeration and shade.</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
@@ -161,15 +315,29 @@
     <string name="settings_theme_system">System default</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
-    <string name="settings_defaults">Default Units</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_en">English</string>
+    <string name="settings_language_kn">ಕನ್ನಡ (Kannada)</string>
+    <string name="settings_defaults">Defaults</string>
     <string name="settings_volume_unit">Volume Unit</string>
     <string name="settings_hardness_unit">Hardness Unit</string>
+    <string name="settings_water_change">Default Water Change %</string>
+    <string name="settings_water_change_dialog_title">Default Water Change Percentage</string>
     <string name="settings_data">Data</string>
+    <string name="settings_export">Export Data (Copy JSON)</string>
+    <string name="settings_export_success">Data copied to clipboard</string>
     <string name="settings_reset">Reset All Values</string>
     <string name="settings_reset_confirm">Reset all values to defaults?</string>
+    <string name="settings_support">Support</string>
+    <string name="settings_contact">Contact Developer</string>
+    <string name="settings_share">Share App</string>
+    <string name="settings_source_code">Source Code</string>
+    <string name="settings_source_url">https://github.com/GurucharanSavanth/Seachem-Dosing</string>
+    <string name="settings_developer">Developed by Gurucharan.S</string>
     <string name="settings_about">About</string>
     <string name="settings_version">Version %s</string>
     <string name="settings_source">Based on Seachem dosing guidelines</string>
+    <string name="settings_special_thanks">Special thanks: Seachem, Bulk Reef Supply.</string>
 
     <!-- Actions -->
     <string name="action_calculate">Calculate</string>

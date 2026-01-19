@@ -6,7 +6,4 @@
     <item
         android:id="@+id/action_share_recommendations"
         android:title="@string/menu_share_recommendations" />
-    <item
-        android:id="@+id/action_switch_profile"
-        android:title="@string/menu_switch_profile" />
 </menu>

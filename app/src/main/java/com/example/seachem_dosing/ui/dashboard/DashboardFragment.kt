@@ -5,32 +5,27 @@ import android.content.ClipboardManager
 import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import android.widget.LinearLayout
 import android.widget.ArrayAdapter
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.app.ShareCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import com.example.seachem_dosing.R
-import com.example.seachem_dosing.ai.ChatMessage
-import com.example.seachem_dosing.ai.ChatRole
 import com.example.seachem_dosing.databinding.FragmentDashboardBinding
 import com.example.seachem_dosing.databinding.ItemParameterBinding
 import com.example.seachem_dosing.databinding.ItemParameterHardnessBinding
 import com.example.seachem_dosing.logic.Calculations
 import com.example.seachem_dosing.ui.MainViewModel
-import com.google.android.material.color.MaterialColors
 import com.google.android.material.transition.MaterialFadeThrough
 
 class DashboardFragment : Fragment() {
@@ -41,6 +36,13 @@ class DashboardFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
     private var ghBinding: ItemParameterHardnessBinding? = null
     private var khBinding: ItemParameterHardnessBinding? = null
+    private var ghFreshwaterBinding: ItemParameterHardnessBinding? = null
+    private var khFreshwaterBinding: ItemParameterHardnessBinding? = null
+    // Removed khPondBinding
+    private val configuredProfiles = mutableSetOf<MainViewModel.AquariumProfile>()
+    private val recommendationsHandler = Handler(Looper.getMainLooper())
+    private val recommendationsUpdateDelayMs = 200L
+    private val recommendationsRunnable = Runnable { updateRecommendations() }
     private var isGhUpdating = false
     private var isKhUpdating = false
     private val logTag = "DashboardFragment"
@@ -65,10 +67,10 @@ class DashboardFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupVolumeSection()
-        applyProfileUi()
-        setupParameters()
         setupRecommendationsMenu()
-        setupAiSection()
+        val currentProfile = viewModel.profile.value ?: MainViewModel.AquariumProfile.FRESHWATER
+        setupParameters(currentProfile)
+        applyProfileUi(currentProfile)
         observeViewModel()
         updateRecommendations()
     }
@@ -115,7 +117,7 @@ class DashboardFragment : Fragment() {
                 else -> "US"
             }
             viewModel.setVolumeUnit(unit)
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         }
 
         // Dimension unit dropdown
@@ -137,7 +139,7 @@ class DashboardFragment : Fragment() {
         binding.etVolume.setText(viewModel.volume.value?.toString() ?: "10")
         binding.etVolume.addTextChangedListener(createTextWatcher { value ->
             viewModel.setVolume(value)
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         })
 
         // Dimension inputs
@@ -164,22 +166,29 @@ class DashboardFragment : Fragment() {
     private fun updateCalculatedVolume() {
         val litres = viewModel.getEffectiveVolumeLitres()
         binding.tvCalculatedVolume.text = getString(R.string.calculated_volume, String.format("%.1f", litres))
-        updateRecommendations()
+        scheduleRecommendationsUpdate()
     }
 
-    private fun setupParameters() {
-        when (viewModel.profile.value ?: MainViewModel.AquariumProfile.FRESHWATER) {
-            MainViewModel.AquariumProfile.FRESHWATER -> setupFreshwaterParameters()
-            MainViewModel.AquariumProfile.SALTWATER -> setupSaltwaterParameters()
-            MainViewModel.AquariumProfile.POND -> setupPondParameters()
+    private fun setupParameters(profile: MainViewModel.AquariumProfile) {
+        if (configuredProfiles.add(profile)) {
+            when (profile) {
+                MainViewModel.AquariumProfile.FRESHWATER -> setupFreshwaterParameters()
+                MainViewModel.AquariumProfile.SALTWATER -> setupSaltwaterParameters()
+                MainViewModel.AquariumProfile.POND -> { /* No parameters for Utility profile */ }
+            }
         }
+        updateActiveHardnessBindings(profile)
     }
 
-    private fun applyProfileUi() {
-        val profile = viewModel.profile.value ?: MainViewModel.AquariumProfile.FRESHWATER
+    private fun applyProfileUi(profile: MainViewModel.AquariumProfile) {
+        val isUtility = profile == MainViewModel.AquariumProfile.POND
+        
         binding.groupFreshwater.visibility = if (profile == MainViewModel.AquariumProfile.FRESHWATER) View.VISIBLE else View.GONE
         binding.groupSaltwater.visibility = if (profile == MainViewModel.AquariumProfile.SALTWATER) View.VISIBLE else View.GONE
-        binding.groupPond.visibility = if (profile == MainViewModel.AquariumProfile.POND) View.VISIBLE else View.GONE
+        binding.groupPond.visibility = View.GONE // Always hide, parameters removed
+        
+        // Hide "Water Parameters" header if utility profile
+        binding.tvParametersHeader.visibility = if (isUtility) View.GONE else View.VISIBLE
 
         val badgeText = when (profile) {
             MainViewModel.AquariumProfile.FRESHWATER -> R.string.profile_badge_freshwater
@@ -195,6 +204,14 @@ class DashboardFragment : Fragment() {
         binding.tvProfileBadge.backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(requireContext(), badgeColor))
         binding.tvProfileBadge.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+
+        updateActiveHardnessBindings(profile)
+        val ghUnit = viewModel.ghUnit.value ?: "dh"
+        val khUnit = viewModel.khUnit.value ?: "dh"
+        applyHardnessToggleState(ghBinding, ghUnit)
+        applyHardnessToggleState(khBinding, khUnit)
+        syncGhInput(ghUnit)
+        syncKhInput(khUnit)
     }
 
     private fun setupFreshwaterParameters() {
@@ -206,7 +223,7 @@ class DashboardFragment : Fragment() {
         ammoniaBinding.etValue.addTextChangedListener(createTextWatcher { value ->
             viewModel.setAmmonia(value)
             updateParameterStatus(ammoniaBinding, viewModel.getAmmoniaStatus())
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         })
         updateParameterStatus(ammoniaBinding, viewModel.getAmmoniaStatus())
 
@@ -218,7 +235,7 @@ class DashboardFragment : Fragment() {
         nitriteBinding.etValue.addTextChangedListener(createTextWatcher { value ->
             viewModel.setNitrite(value)
             updateParameterStatus(nitriteBinding, viewModel.getNitriteStatus())
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         })
         updateParameterStatus(nitriteBinding, viewModel.getNitriteStatus())
 
@@ -230,36 +247,37 @@ class DashboardFragment : Fragment() {
         nitrateBinding.etValue.addTextChangedListener(createTextWatcher { value ->
             viewModel.setNitrate(value)
             updateParameterStatus(nitrateBinding, viewModel.getNitrateStatus())
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         })
         updateParameterStatus(nitrateBinding, viewModel.getNitrateStatus())
 
         // GH
-        ghBinding = ItemParameterHardnessBinding.bind(binding.paramGh.root)
-        ghBinding?.tvParamName?.text = getString(R.string.param_gh)
-        ghBinding?.btnDh?.text = getString(R.string.unit_dgh_short)
-        ghBinding?.btnPpm?.text = getString(R.string.unit_ppm_caps)
-        ghBinding?.etValue?.setText(viewModel.gh.value?.toString() ?: "4")
-        applyHardnessToggleState(ghBinding, viewModel.ghUnit.value ?: "dh")
-        ghBinding?.toggleUnit?.addOnButtonCheckedListener { _, checkedId, isChecked ->
+        val ghBindingLocal = ItemParameterHardnessBinding.bind(binding.paramGh.root)
+        ghFreshwaterBinding = ghBindingLocal
+        ghBindingLocal.tvParamName.text = getString(R.string.param_gh)
+        ghBindingLocal.btnDh.text = getString(R.string.unit_dgh_short)
+        ghBindingLocal.btnPpm.text = getString(R.string.unit_ppm_caps)
+        ghBindingLocal.etValue.setText(viewModel.gh.value?.toString() ?: "4")
+        applyHardnessToggleState(ghBindingLocal, viewModel.ghUnit.value ?: "dh")
+        ghBindingLocal.toggleUnit.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
                 val newUnit = if (checkedId == R.id.btnDh) "dh" else "ppm"
                 val oldUnit = viewModel.ghUnit.value ?: "dh"
                 if (newUnit != oldUnit) {
-                    val currentValue = ghBinding?.etValue?.text?.toString()?.toDoubleOrNull() ?: 0.0
+                    val currentValue = viewModel.gh.value ?: 0.0
                     val convertedValue = convertHardnessValue(currentValue, oldUnit, newUnit)
                     isGhUpdating = true
-                    ghBinding?.etValue?.setText(formatHardnessInput(convertedValue, newUnit))
+                    ghBindingLocal.etValue.setText(formatHardnessInput(convertedValue, newUnit))
                     isGhUpdating = false
-                    viewModel.setGhUnit(newUnit)
                     viewModel.setGh(convertedValue)
+                    viewModel.setGhUnit(newUnit)
                     viewModel.syncGhFromParams()
                     Log.d(logTag, "GH unit changed $oldUnit -> $newUnit, $currentValue -> $convertedValue")
                 }
-                updateRecommendations()
+                scheduleRecommendationsUpdate()
             }
         }
-        ghBinding?.etValue?.addTextChangedListener(object : TextWatcher {
+        ghBindingLocal.etValue.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
@@ -267,36 +285,37 @@ class DashboardFragment : Fragment() {
                 val value = s?.toString()?.toDoubleOrNull() ?: 0.0
                 viewModel.setGh(value)
                 viewModel.syncGhFromParams()
-                updateRecommendations()
+                scheduleRecommendationsUpdate()
             }
         })
 
         // KH
-        khBinding = ItemParameterHardnessBinding.bind(binding.paramKh.root)
-        khBinding?.tvParamName?.text = getString(R.string.param_kh)
-        khBinding?.btnDh?.text = getString(R.string.unit_dkh_short)
-        khBinding?.btnPpm?.text = getString(R.string.unit_ppm_caps)
-        khBinding?.etValue?.setText(viewModel.kh.value?.toString() ?: "6")
-        applyHardnessToggleState(khBinding, viewModel.khUnit.value ?: "dh")
-        khBinding?.toggleUnit?.addOnButtonCheckedListener { _, checkedId, isChecked ->
+        val khBindingLocal = ItemParameterHardnessBinding.bind(binding.paramKh.root)
+        khFreshwaterBinding = khBindingLocal
+        khBindingLocal.tvParamName.text = getString(R.string.param_kh)
+        khBindingLocal.btnDh.text = getString(R.string.unit_dkh_short)
+        khBindingLocal.btnPpm.text = getString(R.string.unit_ppm_caps)
+        khBindingLocal.etValue.setText(viewModel.kh.value?.toString() ?: "6")
+        applyHardnessToggleState(khBindingLocal, viewModel.khUnit.value ?: "dh")
+        khBindingLocal.toggleUnit.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
                 val newUnit = if (checkedId == R.id.btnDh) "dh" else "ppm"
                 val oldUnit = viewModel.khUnit.value ?: "dh"
                 if (newUnit != oldUnit) {
-                    val currentValue = khBinding?.etValue?.text?.toString()?.toDoubleOrNull() ?: 0.0
+                    val currentValue = viewModel.kh.value ?: 0.0
                     val convertedValue = convertHardnessValue(currentValue, oldUnit, newUnit)
                     isKhUpdating = true
-                    khBinding?.etValue?.setText(formatHardnessInput(convertedValue, newUnit))
+                    khBindingLocal.etValue.setText(formatHardnessInput(convertedValue, newUnit))
                     isKhUpdating = false
-                    viewModel.setKhUnit(newUnit)
                     viewModel.setKh(convertedValue)
+                    viewModel.setKhUnit(newUnit)
                     viewModel.syncKhFromParams()
                     Log.d(logTag, "KH unit changed $oldUnit -> $newUnit, $currentValue -> $convertedValue")
                 }
-                updateRecommendations()
+                scheduleRecommendationsUpdate()
             }
         }
-        khBinding?.etValue?.addTextChangedListener(object : TextWatcher {
+        khBindingLocal.etValue.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
@@ -304,7 +323,7 @@ class DashboardFragment : Fragment() {
                 val value = s?.toString()?.toDoubleOrNull() ?: 0.0
                 viewModel.setKh(value)
                 viewModel.syncKhFromParams()
-                updateRecommendations()
+                scheduleRecommendationsUpdate()
             }
         })
 
@@ -317,9 +336,35 @@ class DashboardFragment : Fragment() {
             viewModel.setPh(value)
             viewModel.syncPhFromParams()
             setStatusIndicator(phBinding, MainViewModel.Status.INFO)
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         })
         setStatusIndicator(phBinding, MainViewModel.Status.INFO)
+        
+        // Potassium
+        val potassiumBinding = ItemParameterBinding.bind(binding.paramPotassium.root)
+        potassiumBinding.tvParamName.text = getString(R.string.param_potassium)
+        potassiumBinding.tvUnit.text = getString(R.string.unit_mg_l)
+        potassiumBinding.etValue.setText(viewModel.potassium.value?.toString() ?: "15")
+        potassiumBinding.etValue.addTextChangedListener(createTextWatcher { value ->
+            viewModel.setPotassium(value)
+            viewModel.syncNewParams()
+            setStatusIndicator(potassiumBinding, MainViewModel.Status.INFO)
+            scheduleRecommendationsUpdate()
+        })
+        setStatusIndicator(potassiumBinding, MainViewModel.Status.INFO)
+        
+        // Iron
+        val ironBinding = ItemParameterBinding.bind(binding.paramIron.root)
+        ironBinding.tvParamName.text = getString(R.string.param_iron)
+        ironBinding.tvUnit.text = getString(R.string.unit_mg_l)
+        ironBinding.etValue.setText(viewModel.iron.value?.toString() ?: "0.1")
+        ironBinding.etValue.addTextChangedListener(createTextWatcher { value ->
+            viewModel.setIron(value)
+            viewModel.syncNewParams()
+            setStatusIndicator(ironBinding, MainViewModel.Status.INFO)
+            scheduleRecommendationsUpdate()
+        })
+        setStatusIndicator(ironBinding, MainViewModel.Status.INFO)
 
         // Temperature
         val tempBinding = ItemParameterBinding.bind(binding.paramTemp.root)
@@ -329,19 +374,17 @@ class DashboardFragment : Fragment() {
         tempBinding.etValue.addTextChangedListener(createTextWatcher { value ->
             viewModel.setTemperature(value)
             setStatusIndicator(tempBinding, MainViewModel.Status.INFO)
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         })
         setStatusIndicator(tempBinding, MainViewModel.Status.INFO)
 
         viewModel.syncGhFromParams()
         viewModel.syncKhFromParams()
         viewModel.syncPhFromParams()
+        viewModel.syncNewParams()
     }
 
     private fun setupSaltwaterParameters() {
-        ghBinding = null
-        khBinding = null
-
         val salinityBinding = ItemParameterBinding.bind(binding.paramSalinity.root)
         salinityBinding.tvParamName.text = getString(R.string.param_salinity)
         salinityBinding.tvUnit.text = getString(R.string.unit_salinity_ppt)
@@ -349,7 +392,7 @@ class DashboardFragment : Fragment() {
         salinityBinding.etValue.addTextChangedListener(createTextWatcher { value ->
             viewModel.setSalinity(value)
             setStatusIndicator(salinityBinding, MainViewModel.Status.INFO)
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         })
         setStatusIndicator(salinityBinding, MainViewModel.Status.INFO)
 
@@ -360,7 +403,7 @@ class DashboardFragment : Fragment() {
         alkalinityBinding.etValue.addTextChangedListener(createTextWatcher { value ->
             viewModel.setAlkalinity(value)
             setStatusIndicator(alkalinityBinding, MainViewModel.Status.INFO)
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         })
         setStatusIndicator(alkalinityBinding, MainViewModel.Status.INFO)
 
@@ -370,8 +413,9 @@ class DashboardFragment : Fragment() {
         calciumBinding.etValue.setText(viewModel.calcium.value?.toString() ?: "420")
         calciumBinding.etValue.addTextChangedListener(createTextWatcher { value ->
             viewModel.setCalcium(value)
+            viewModel.syncNewParams()
             setStatusIndicator(calciumBinding, MainViewModel.Status.INFO)
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         })
         setStatusIndicator(calciumBinding, MainViewModel.Status.INFO)
 
@@ -381,8 +425,9 @@ class DashboardFragment : Fragment() {
         magnesiumBinding.etValue.setText(viewModel.magnesium.value?.toString() ?: "1300")
         magnesiumBinding.etValue.addTextChangedListener(createTextWatcher { value ->
             viewModel.setMagnesium(value)
+            viewModel.syncNewParams()
             setStatusIndicator(magnesiumBinding, MainViewModel.Status.INFO)
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         })
         setStatusIndicator(magnesiumBinding, MainViewModel.Status.INFO)
 
@@ -393,7 +438,7 @@ class DashboardFragment : Fragment() {
         nitrateBinding.etValue.addTextChangedListener(createTextWatcher { value ->
             viewModel.setNitrate(value)
             setStatusIndicator(nitrateBinding, MainViewModel.Status.INFO)
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         })
         setStatusIndicator(nitrateBinding, MainViewModel.Status.INFO)
 
@@ -403,8 +448,9 @@ class DashboardFragment : Fragment() {
         phosphateBinding.etValue.setText(viewModel.phosphate.value?.toString() ?: "0.05")
         phosphateBinding.etValue.addTextChangedListener(createTextWatcher { value ->
             viewModel.setPhosphate(value)
+            viewModel.syncNewParams()
             setStatusIndicator(phosphateBinding, MainViewModel.Status.INFO)
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         })
         setStatusIndicator(phosphateBinding, MainViewModel.Status.INFO)
 
@@ -416,9 +462,35 @@ class DashboardFragment : Fragment() {
             viewModel.setPh(value)
             viewModel.syncPhFromParams()
             setStatusIndicator(phBinding, MainViewModel.Status.INFO)
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         })
         setStatusIndicator(phBinding, MainViewModel.Status.INFO)
+        
+        // Strontium
+        val strontiumBinding = ItemParameterBinding.bind(binding.paramStrontium.root)
+        strontiumBinding.tvParamName.text = getString(R.string.param_strontium)
+        strontiumBinding.tvUnit.text = getString(R.string.unit_mg_l)
+        strontiumBinding.etValue.setText(viewModel.strontium.value?.toString() ?: "8.0")
+        strontiumBinding.etValue.addTextChangedListener(createTextWatcher { value ->
+            viewModel.setStrontium(value)
+            viewModel.syncNewParams()
+            setStatusIndicator(strontiumBinding, MainViewModel.Status.INFO)
+            scheduleRecommendationsUpdate()
+        })
+        setStatusIndicator(strontiumBinding, MainViewModel.Status.INFO)
+        
+        // Iodide
+        val iodideBinding = ItemParameterBinding.bind(binding.paramIodide.root)
+        iodideBinding.tvParamName.text = getString(R.string.param_iodide)
+        iodideBinding.tvUnit.text = getString(R.string.unit_mg_l)
+        iodideBinding.etValue.setText(viewModel.iodide.value?.toString() ?: "0.06")
+        iodideBinding.etValue.addTextChangedListener(createTextWatcher { value ->
+            viewModel.setIodide(value)
+            viewModel.syncNewParams()
+            setStatusIndicator(iodideBinding, MainViewModel.Status.INFO)
+            scheduleRecommendationsUpdate()
+        })
+        setStatusIndicator(iodideBinding, MainViewModel.Status.INFO)
 
         val tempBinding = ItemParameterBinding.bind(binding.paramTempSalt.root)
         tempBinding.tvParamName.text = getString(R.string.param_temp)
@@ -427,118 +499,9 @@ class DashboardFragment : Fragment() {
         tempBinding.etValue.addTextChangedListener(createTextWatcher { value ->
             viewModel.setTemperature(value)
             setStatusIndicator(tempBinding, MainViewModel.Status.INFO)
-            updateRecommendations()
+            scheduleRecommendationsUpdate()
         })
         setStatusIndicator(tempBinding, MainViewModel.Status.INFO)
-    }
-
-    private fun setupPondParameters() {
-        ghBinding = null
-
-        val ammoniaBinding = ItemParameterBinding.bind(binding.paramAmmoniaPond.root)
-        ammoniaBinding.tvParamName.text = getString(R.string.param_ammonia)
-        ammoniaBinding.tvUnit.text = getString(R.string.unit_ppm)
-        ammoniaBinding.etValue.setText(viewModel.ammonia.value?.toString() ?: "0")
-        ammoniaBinding.etValue.addTextChangedListener(createTextWatcher { value ->
-            viewModel.setAmmonia(value)
-            updateParameterStatus(ammoniaBinding, viewModel.getAmmoniaStatus())
-            updateRecommendations()
-        })
-        updateParameterStatus(ammoniaBinding, viewModel.getAmmoniaStatus())
-
-        val nitriteBinding = ItemParameterBinding.bind(binding.paramNitritePond.root)
-        nitriteBinding.tvParamName.text = getString(R.string.param_nitrite)
-        nitriteBinding.tvUnit.text = getString(R.string.unit_ppm)
-        nitriteBinding.etValue.setText(viewModel.nitrite.value?.toString() ?: "0")
-        nitriteBinding.etValue.addTextChangedListener(createTextWatcher { value ->
-            viewModel.setNitrite(value)
-            updateParameterStatus(nitriteBinding, viewModel.getNitriteStatus())
-            updateRecommendations()
-        })
-        updateParameterStatus(nitriteBinding, viewModel.getNitriteStatus())
-
-        val nitrateBinding = ItemParameterBinding.bind(binding.paramNitratePond.root)
-        nitrateBinding.tvParamName.text = getString(R.string.param_nitrate)
-        nitrateBinding.tvUnit.text = getString(R.string.unit_ppm)
-        nitrateBinding.etValue.setText(viewModel.nitrate.value?.toString() ?: "20")
-        nitrateBinding.etValue.addTextChangedListener(createTextWatcher { value ->
-            viewModel.setNitrate(value)
-            updateParameterStatus(nitrateBinding, viewModel.getNitrateStatus())
-            updateRecommendations()
-        })
-        updateParameterStatus(nitrateBinding, viewModel.getNitrateStatus())
-
-        khBinding = ItemParameterHardnessBinding.bind(binding.paramKhPond.root)
-        khBinding?.tvParamName?.text = getString(R.string.param_kh)
-        khBinding?.btnDh?.text = getString(R.string.unit_dkh_short)
-        khBinding?.btnPpm?.text = getString(R.string.unit_ppm_caps)
-        khBinding?.etValue?.setText(viewModel.kh.value?.toString() ?: "5")
-        applyHardnessToggleState(khBinding, viewModel.khUnit.value ?: "dh")
-        khBinding?.toggleUnit?.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (isChecked) {
-                val newUnit = if (checkedId == R.id.btnDh) "dh" else "ppm"
-                val oldUnit = viewModel.khUnit.value ?: "dh"
-                if (newUnit != oldUnit) {
-                    val currentValue = khBinding?.etValue?.text?.toString()?.toDoubleOrNull() ?: 0.0
-                    val convertedValue = convertHardnessValue(currentValue, oldUnit, newUnit)
-                    isKhUpdating = true
-                    khBinding?.etValue?.setText(formatHardnessInput(convertedValue, newUnit))
-                    isKhUpdating = false
-                    viewModel.setKhUnit(newUnit)
-                    viewModel.setKh(convertedValue)
-                    viewModel.syncKhFromParams()
-                }
-                updateRecommendations()
-            }
-        }
-        khBinding?.etValue?.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                if (isKhUpdating) return
-                val value = s?.toString()?.toDoubleOrNull() ?: 0.0
-                viewModel.setKh(value)
-                viewModel.syncKhFromParams()
-                updateRecommendations()
-            }
-        })
-
-        val phBinding = ItemParameterBinding.bind(binding.paramPhPond.root)
-        phBinding.tvParamName.text = getString(R.string.param_ph)
-        phBinding.tvUnit.text = getString(R.string.unit_ph)
-        phBinding.etValue.setText(viewModel.ph.value?.toString() ?: "7.4")
-        phBinding.etValue.addTextChangedListener(createTextWatcher { value ->
-            viewModel.setPh(value)
-            viewModel.syncPhFromParams()
-            setStatusIndicator(phBinding, MainViewModel.Status.INFO)
-            updateRecommendations()
-        })
-        setStatusIndicator(phBinding, MainViewModel.Status.INFO)
-
-        val tempBinding = ItemParameterBinding.bind(binding.paramTempPond.root)
-        tempBinding.tvParamName.text = getString(R.string.param_temp)
-        tempBinding.tvUnit.text = getString(R.string.unit_temp_c)
-        tempBinding.etValue.setText(viewModel.temperature.value?.toString() ?: "22")
-        tempBinding.etValue.addTextChangedListener(createTextWatcher { value ->
-            viewModel.setTemperature(value)
-            setStatusIndicator(tempBinding, MainViewModel.Status.INFO)
-            updateRecommendations()
-        })
-        setStatusIndicator(tempBinding, MainViewModel.Status.INFO)
-
-        val oxygenBinding = ItemParameterBinding.bind(binding.paramOxygenPond.root)
-        oxygenBinding.tvParamName.text = getString(R.string.param_oxygen)
-        oxygenBinding.tvUnit.text = getString(R.string.unit_oxygen_mg_l)
-        oxygenBinding.etValue.setText(viewModel.dissolvedOxygen.value?.toString() ?: "7.5")
-        oxygenBinding.etValue.addTextChangedListener(createTextWatcher { value ->
-            viewModel.setDissolvedOxygen(value)
-            setStatusIndicator(oxygenBinding, MainViewModel.Status.INFO)
-            updateRecommendations()
-        })
-        setStatusIndicator(oxygenBinding, MainViewModel.Status.INFO)
-
-        viewModel.syncKhFromParams()
-        viewModel.syncPhFromParams()
     }
 
     private fun updateFreshwaterRecommendations() {
@@ -548,40 +511,126 @@ class DashboardFragment : Fragment() {
         val nitrate = viewModel.nitrate.value ?: 0.0
         val gh = viewModel.getGhInDegrees()
         val kh = viewModel.getKhInDegrees()
+        val ph = viewModel.ph.value ?: 0.0
+        val temp = viewModel.temperature.value ?: 0.0
+        val k = viewModel.potassium.value ?: 0.0
+        val fe = viewModel.iron.value ?: 0.0
 
-        val recommendations = StringBuilder()
-
+        val actions = mutableListOf<String>()
         if (litres <= 0) {
-            recommendations.append(getString(R.string.reco_enter_volume))
-        } else {
-            if (ammonia > 0) {
-                val primeDose = viewModel.calculatePrimeDose()
-                recommendations.append(String.format(getString(R.string.reco_ammonia), primeDose))
-                recommendations.append("\n\n")
-            }
-            if (nitrite > 0) {
-                val stabilityDose = viewModel.calculateStabilityDose()
-                recommendations.append(String.format(getString(R.string.reco_nitrite), stabilityDose))
-                recommendations.append("\n\n")
-            }
-            if (nitrate > 50) {
-                recommendations.append(getString(R.string.reco_nitrate))
-                recommendations.append("\n\n")
-            }
-            if (gh < 3) {
-                recommendations.append(getString(R.string.reco_gh_low))
-                recommendations.append("\n\n")
-            }
-            if (kh < 3) {
-                recommendations.append(getString(R.string.reco_kh_low))
-                recommendations.append("\n\n")
-            }
-            if (recommendations.isEmpty()) {
-                recommendations.append(getString(R.string.reco_ok))
+            actions.add(getString(R.string.reco_action_volume_needed))
+        }
+        if (ammonia > 0) {
+            if (litres > 0) {
+                actions.add(getString(R.string.reco_action_ammonia, viewModel.calculatePrimeDose()))
+            } else {
+                actions.add(getString(R.string.reco_action_ammonia_generic))
             }
         }
+        if (nitrite > 0) {
+            if (litres > 0) {
+                actions.add(getString(R.string.reco_action_nitrite, viewModel.calculateStabilityDose()))
+            } else {
+                actions.add(getString(R.string.reco_action_nitrite_generic))
+            }
+        }
+        if (nitrate > 50) {
+            if (litres > 0) {
+                val changeLitres = formatValue(viewModel.calculateWaterChangeLitres(30.0), 1)
+                actions.add(getString(R.string.reco_action_nitrate_high, changeLitres))
+            } else {
+                actions.add(getString(R.string.reco_action_nitrate_high_generic))
+            }
+        }
+        if (kh < 3) {
+            actions.add(getString(R.string.reco_action_kh_low))
+        }
+        
+        // New recommendations
+        if (k < 10) actions.add("Low Potassium: Consider dosing Flourish Potassium.")
+        if (fe < 0.05) actions.add("Low Iron: Consider dosing Flourish Iron.")
 
-        binding.tvRecommendations.text = recommendations.toString().trim()
+        val details = mutableListOf<String>()
+        details.add(
+            buildRecommendationLine(
+                R.string.param_ammonia,
+                formatValueWithUnit(ammonia, 2, getString(R.string.unit_ppm)),
+                if (ammonia > 0) R.string.reco_msg_ammonia_high else R.string.reco_msg_ammonia_ok
+            )
+        )
+        details.add(
+            buildRecommendationLine(
+                R.string.param_nitrite,
+                formatValueWithUnit(nitrite, 2, getString(R.string.unit_ppm)),
+                if (nitrite > 0) R.string.reco_msg_nitrite_high else R.string.reco_msg_nitrite_ok
+            )
+        )
+        val nitrateMessage = when {
+            nitrate > 50 -> R.string.reco_msg_nitrate_high
+            nitrate > 20 -> R.string.reco_msg_nitrate_moderate
+            else -> R.string.reco_msg_nitrate_low
+        }
+        details.add(
+            buildRecommendationLine(
+                R.string.param_nitrate,
+                formatValueWithUnit(nitrate, 0, getString(R.string.unit_ppm)),
+                nitrateMessage
+            )
+        )
+        val ghMessage = when {
+            gh > 12 -> R.string.reco_msg_gh_high
+            gh < 3 -> R.string.reco_msg_gh_low
+            else -> R.string.reco_msg_gh_ok
+        }
+        details.add(
+            buildRecommendationLine(
+                R.string.param_gh,
+                formatValueWithUnit(gh, 1, getString(R.string.unit_dgh_short)),
+                ghMessage
+            )
+        )
+        val khMessage = when {
+            kh > 10 -> R.string.reco_msg_kh_high
+            kh < 3 -> R.string.reco_msg_kh_low
+            else -> R.string.reco_msg_kh_ok
+        }
+        details.add(
+            buildRecommendationLine(
+                R.string.param_kh,
+                formatValueWithUnit(kh, 1, getString(R.string.unit_dkh_short)),
+                khMessage
+            )
+        )
+        val phMessage = when {
+            ph < 6.5 -> R.string.reco_msg_ph_low
+            ph > 8.2 -> R.string.reco_msg_ph_high
+            else -> R.string.reco_msg_ph_ok
+        }
+        details.add(
+            buildRecommendationLine(
+                R.string.param_ph,
+                formatValueWithUnit(ph, 2, getString(R.string.unit_ph)),
+                phMessage
+            )
+        )
+        
+        details.add(getString(R.string.reco_line_format, "Potassium", "$k mg/L", if(k<15) "Low" else "Good"))
+        details.add(getString(R.string.reco_line_format, "Iron", "$fe mg/L", if(fe<0.1) "Low" else "Good"))
+        
+        val tempMessage = when {
+            temp < 22 -> R.string.reco_msg_temp_low
+            temp > 30 -> R.string.reco_msg_temp_high
+            else -> R.string.reco_msg_temp_ok
+        }
+        details.add(
+            buildRecommendationLine(
+                R.string.param_temp,
+                formatValueWithUnit(temp, 1, getString(R.string.unit_temp_c)),
+                tempMessage
+            )
+        )
+
+        setRecommendationsText(buildRecommendationsText(actions, details))
 
         ghBinding?.let { updateHardnessStatus(it, viewModel.getGhInDegrees()) }
         khBinding?.let { updateHardnessStatus(it, viewModel.getKhInDegrees()) }
@@ -589,67 +638,156 @@ class DashboardFragment : Fragment() {
 
     private fun updateSaltwaterRecommendations() {
         val litres = viewModel.getEffectiveVolumeLitres()
+        val salinity = viewModel.salinity.value ?: 0.0
+        val alkalinity = viewModel.alkalinity.value ?: 0.0
+        val calcium = viewModel.calcium.value ?: 0.0
+        val magnesium = viewModel.magnesium.value ?: 0.0
         val nitrate = viewModel.nitrate.value ?: 0.0
         val phosphate = viewModel.phosphate.value ?: 0.0
+        val ph = viewModel.ph.value ?: 0.0
+        val temp = viewModel.temperature.value ?: 0.0
+        val sr = viewModel.strontium.value ?: 0.0
+        val i = viewModel.iodide.value ?: 0.0
 
-        val recommendations = StringBuilder()
-
+        val actions = mutableListOf<String>()
         if (litres <= 0) {
-            recommendations.append(getString(R.string.reco_enter_volume))
-        } else {
-            if (nitrate > 20) {
-                recommendations.append(getString(R.string.reco_nitrate_salt))
-                recommendations.append("\n\n")
-            }
-            if (phosphate > 0.1) {
-                recommendations.append(getString(R.string.reco_phosphate_high))
-                recommendations.append("\n\n")
-            }
-            if (recommendations.isEmpty()) {
-                recommendations.append(getString(R.string.reco_ok))
+            actions.add(getString(R.string.reco_action_volume_needed))
+        }
+        if (nitrate > 20) {
+            if (litres > 0) {
+                val changeLitres = formatValue(viewModel.calculateWaterChangeLitres(20.0), 1)
+                actions.add(getString(R.string.reco_action_nitrate_reef_high, changeLitres))
+            } else {
+                actions.add(getString(R.string.reco_action_nitrate_reef_high_generic))
             }
         }
+        if (phosphate > 0.1) {
+            if (litres > 0) {
+                val changeLitres = formatValue(viewModel.calculateWaterChangeLitres(15.0), 1)
+                actions.add(getString(R.string.reco_action_phosphate_high, changeLitres))
+            } else {
+                actions.add(getString(R.string.reco_action_phosphate_high_generic))
+            }
+        }
+        if (sr < 8) actions.add("Low Strontium: Dose Reef Strontium.")
+        if (i < 0.06) actions.add("Low Iodide: Dose Reef Iodide.")
 
-        binding.tvRecommendations.text = recommendations.toString().trim()
+        val details = mutableListOf<String>()
+        val salinityMessage = when {
+            salinity > 36 -> R.string.reco_msg_salinity_high
+            salinity < 33 -> R.string.reco_msg_salinity_low
+            else -> R.string.reco_msg_salinity_ok
+        }
+        details.add(
+            buildRecommendationLine(
+                R.string.param_salinity,
+                formatValueWithUnit(salinity, 1, getString(R.string.unit_salinity_ppt)),
+                salinityMessage
+            )
+        )
+        val alkMessage = when {
+            alkalinity > 11 -> R.string.reco_msg_alkalinity_high
+            alkalinity < 7 -> R.string.reco_msg_alkalinity_low
+            else -> R.string.reco_msg_alkalinity_ok
+        }
+        details.add(
+            buildRecommendationLine(
+                R.string.param_alkalinity,
+                formatValueWithUnit(alkalinity, 1, getString(R.string.unit_dkh_short)),
+                alkMessage
+            )
+        )
+        val calciumMessage = when {
+            calcium > 450 -> R.string.reco_msg_calcium_high
+            calcium < 380 -> R.string.reco_msg_calcium_low
+            else -> R.string.reco_msg_calcium_ok
+        }
+        details.add(
+            buildRecommendationLine(
+                R.string.param_calcium,
+                formatValueWithUnit(calcium, 0, getString(R.string.unit_calcium_ppm)),
+                calciumMessage
+            )
+        )
+        val magnesiumMessage = when {
+            magnesium > 1450 -> R.string.reco_msg_magnesium_high
+            magnesium < 1200 -> R.string.reco_msg_magnesium_low
+            else -> R.string.reco_msg_magnesium_ok
+        }
+        details.add(
+            buildRecommendationLine(
+                R.string.param_magnesium,
+                formatValueWithUnit(magnesium, 0, getString(R.string.unit_magnesium_ppm)),
+                magnesiumMessage
+            )
+        )
+        val nitrateMessage = when {
+            nitrate > 20 -> R.string.reco_msg_nitrate_reef_high
+            nitrate > 5 -> R.string.reco_msg_nitrate_reef_moderate
+            else -> R.string.reco_msg_nitrate_reef_low
+        }
+        details.add(
+            buildRecommendationLine(
+                R.string.param_nitrate,
+                formatValueWithUnit(nitrate, 1, getString(R.string.unit_ppm)),
+                nitrateMessage
+            )
+        )
+        val phosphateMessage = when {
+            phosphate > 0.1 -> R.string.reco_msg_phosphate_high
+            phosphate < 0.03 -> R.string.reco_msg_phosphate_low
+            else -> R.string.reco_msg_phosphate_ok
+        }
+        details.add(
+            buildRecommendationLine(
+                R.string.param_phosphate,
+                formatValueWithUnit(phosphate, 3, getString(R.string.unit_phosphate_ppm)),
+                phosphateMessage
+            )
+        )
+        val phMessage = when {
+            ph > 8.5 -> R.string.reco_msg_ph_salt_high
+            ph < 7.8 -> R.string.reco_msg_ph_salt_low
+            else -> R.string.reco_msg_ph_salt_ok
+        }
+        details.add(
+            buildRecommendationLine(
+                R.string.param_ph,
+                formatValueWithUnit(ph, 2, getString(R.string.unit_ph)),
+                phMessage
+            )
+        )
+        details.add(getString(R.string.reco_line_format, "Strontium", "$sr mg/L", if(sr<8) "Low" else "Good"))
+        details.add(getString(R.string.reco_line_format, "Iodide", "$i mg/L", if(i<0.06) "Low" else "Good"))
+        
+        val tempMessage = when {
+            temp > 27 -> R.string.reco_msg_temp_salt_high
+            temp < 24 -> R.string.reco_msg_temp_salt_low
+            else -> R.string.reco_msg_temp_salt_ok
+        }
+        details.add(
+            buildRecommendationLine(
+                R.string.param_temp,
+                formatValueWithUnit(temp, 1, getString(R.string.unit_temp_c)),
+                tempMessage
+            )
+        )
+
+        setRecommendationsText(buildRecommendationsText(actions, details))
     }
 
     private fun updatePondRecommendations() {
+        // Minimal recommendations for utility profile
         val litres = viewModel.getEffectiveVolumeLitres()
-        val ammonia = viewModel.ammonia.value ?: 0.0
-        val nitrite = viewModel.nitrite.value ?: 0.0
-        val nitrate = viewModel.nitrate.value ?: 0.0
-        val kh = viewModel.getKhInDegrees()
-
-        val recommendations = StringBuilder()
-
+        val actions = mutableListOf<String>()
+        
         if (litres <= 0) {
-            recommendations.append(getString(R.string.reco_enter_volume))
-        } else {
-            if (ammonia > 0) {
-                val primeDose = viewModel.calculatePrimeDose()
-                recommendations.append(String.format(getString(R.string.reco_ammonia), primeDose))
-                recommendations.append("\n\n")
-            }
-            if (nitrite > 0) {
-                val stabilityDose = viewModel.calculateStabilityDose()
-                recommendations.append(String.format(getString(R.string.reco_nitrite), stabilityDose))
-                recommendations.append("\n\n")
-            }
-            if (nitrate > 50) {
-                recommendations.append(getString(R.string.reco_nitrate))
-                recommendations.append("\n\n")
-            }
-            if (kh < 3) {
-                recommendations.append(getString(R.string.reco_kh_low))
-                recommendations.append("\n\n")
-            }
-            if (recommendations.isEmpty()) {
-                recommendations.append(getString(R.string.reco_ok))
-            }
+            actions.add(getString(R.string.reco_action_volume_needed))
         }
-
-        binding.tvRecommendations.text = recommendations.toString().trim()
-        khBinding?.let { updateHardnessStatus(it, viewModel.getKhInDegrees()) }
+        // No parameters to check
+        
+        val details = listOf("Misc Utility Profile: No parameters tracked.")
+        setRecommendationsText(buildRecommendationsText(actions, details))
     }
 
     private fun updateParameterStatus(binding: ItemParameterBinding, status: MainViewModel.ParameterStatus) {
@@ -668,6 +806,7 @@ class DashboardFragment : Fragment() {
     }
 
     private fun updateRecommendations() {
+        if (_binding == null) return
         when (viewModel.profile.value ?: MainViewModel.AquariumProfile.FRESHWATER) {
             MainViewModel.AquariumProfile.FRESHWATER -> updateFreshwaterRecommendations()
             MainViewModel.AquariumProfile.SALTWATER -> updateSaltwaterRecommendations()
@@ -678,25 +817,13 @@ class DashboardFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.ghUnit.observe(viewLifecycleOwner) { unit ->
             applyHardnessToggleState(ghBinding, unit)
-            ghBinding?.etValue?.let { editText ->
-                if (!editText.isFocused) {
-                    isGhUpdating = true
-                    editText.setText(formatHardnessInput(viewModel.gh.value ?: 0.0, unit))
-                    isGhUpdating = false
-                }
-            }
-            updateRecommendations()
+            syncGhInput(unit)
+            scheduleRecommendationsUpdate()
         }
         viewModel.khUnit.observe(viewLifecycleOwner) { unit ->
             applyHardnessToggleState(khBinding, unit)
-            khBinding?.etValue?.let { editText ->
-                if (!editText.isFocused) {
-                    isKhUpdating = true
-                    editText.setText(formatHardnessInput(viewModel.kh.value ?: 0.0, unit))
-                    isKhUpdating = false
-                }
-            }
-            updateRecommendations()
+            syncKhInput(unit)
+            scheduleRecommendationsUpdate()
         }
         viewModel.volumeUnit.observe(viewLifecycleOwner) { unit ->
             val volumeUnits = getVolumeUnitOptions()
@@ -709,17 +836,9 @@ class DashboardFragment : Fragment() {
             updateCalculatedVolume()
         }
         viewModel.profile.observe(viewLifecycleOwner) {
-            applyProfileUi()
-        }
-        viewModel.aiInsight.observe(viewLifecycleOwner) { state ->
-            binding.progressAiInsight.isVisible = state.isLoading
-            binding.btnAiInsight.isEnabled = !state.isLoading
-            binding.tvAiInsightError.isVisible = !state.error.isNullOrBlank()
-            binding.tvAiInsightError.text = state.error ?: ""
-            binding.tvAiInsight.text = state.text ?: getString(R.string.ai_insight_placeholder)
-        }
-        viewModel.chatMessages.observe(viewLifecycleOwner) { messages ->
-            renderChatMessages(messages)
+            setupParameters(it)
+            applyProfileUi(it)
+            scheduleRecommendationsUpdate()
         }
     }
 
@@ -734,8 +853,80 @@ class DashboardFragment : Fragment() {
         }
     }
 
+    private fun updateActiveHardnessBindings(profile: MainViewModel.AquariumProfile) {
+        ghBinding = when (profile) {
+            MainViewModel.AquariumProfile.FRESHWATER -> ghFreshwaterBinding
+            else -> null
+        }
+        khBinding = when (profile) {
+            MainViewModel.AquariumProfile.FRESHWATER -> khFreshwaterBinding
+            else -> null
+        }
+    }
+
+    private fun syncGhInput(unit: String) {
+        ghBinding?.etValue?.let { editText ->
+            if (!editText.isFocused) {
+                isGhUpdating = true
+                editText.setText(formatHardnessInput(viewModel.gh.value ?: 0.0, unit))
+                isGhUpdating = false
+            }
+        }
+    }
+
+    private fun syncKhInput(unit: String) {
+        khBinding?.etValue?.let { editText ->
+            if (!editText.isFocused) {
+                isKhUpdating = true
+                editText.setText(formatHardnessInput(viewModel.kh.value ?: 0.0, unit))
+                isKhUpdating = false
+            }
+        }
+    }
+
     private fun applyHardnessToggleState(binding: ItemParameterHardnessBinding?, unit: String) {
         binding?.toggleUnit?.check(if (unit == "ppm") R.id.btnPpm else R.id.btnDh)
+    }
+
+    private fun scheduleRecommendationsUpdate() {
+        recommendationsHandler.removeCallbacks(recommendationsRunnable)
+        recommendationsHandler.postDelayed(recommendationsRunnable, recommendationsUpdateDelayMs)
+    }
+
+    private fun setRecommendationsText(text: String) {
+        if (binding.tvRecommendations.text?.toString() != text) {
+            binding.tvRecommendations.text = text
+        }
+    }
+
+    private fun buildRecommendationLine(labelRes: Int, value: String, messageRes: Int): String {
+        return getString(R.string.reco_line_format, getString(labelRes), value, getString(messageRes))
+    }
+
+    private fun formatValue(value: Double, decimals: Int): String {
+        return String.format("%.${decimals}f", value)
+    }
+
+    private fun formatValueWithUnit(value: Double, decimals: Int, unit: String): String {
+        return "${formatValue(value, decimals)} $unit"
+    }
+
+    private fun appendSection(builder: StringBuilder, title: String, lines: List<String>) {
+        if (lines.isEmpty()) return
+        if (builder.isNotEmpty()) {
+            builder.append("\n\n")
+        }
+        builder.append(title)
+        lines.forEach { line ->
+            builder.append("\n- ").append(line)
+        }
+    }
+
+    private fun buildRecommendationsText(actions: List<String>, details: List<String>): String {
+        val builder = StringBuilder()
+        appendSection(builder, getString(R.string.reco_section_actions), actions)
+        appendSection(builder, getString(R.string.reco_section_interpretation), details)
+        return builder.toString().trim()
     }
 
     private fun getVolumeUnitOptions(): Array<String> {
@@ -787,57 +978,6 @@ class DashboardFragment : Fragment() {
         }
     }
 
-    private fun setupAiSection() {
-        binding.btnAiInsight.setOnClickListener {
-            viewModel.requestAiInsight()
-        }
-        binding.btnChatSend.setOnClickListener {
-            sendChatMessage()
-        }
-        binding.etChatInput.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEND) {
-                sendChatMessage()
-                true
-            } else {
-                false
-            }
-        }
-    }
-
-    private fun sendChatMessage() {
-        val message = binding.etChatInput.text?.toString().orEmpty()
-        if (message.isBlank()) return
-        binding.etChatInput.setText("")
-        viewModel.sendChatMessage(message)
-    }
-
-    private fun renderChatMessages(messages: List<ChatMessage>) {
-        val container = binding.chatMessagesContainer
-        container.removeAllViews()
-        messages.forEach { message ->
-            val item = layoutInflater.inflate(R.layout.item_chat_message, container, false) as LinearLayout
-            val textView = item.findViewById<android.widget.TextView>(R.id.tvMessage)
-            textView.text = message.text
-            if (message.role == ChatRole.USER) {
-                item.gravity = android.view.Gravity.END
-                textView.setBackgroundResource(R.drawable.bg_chat_user)
-                textView.setTextColor(
-                    MaterialColors.getColor(textView, com.google.android.material.R.attr.colorOnPrimary)
-                )
-            } else {
-                item.gravity = android.view.Gravity.START
-                textView.setBackgroundResource(R.drawable.bg_chat_assistant)
-                textView.setTextColor(
-                    MaterialColors.getColor(textView, com.google.android.material.R.attr.colorOnSurface)
-                )
-            }
-            container.addView(item)
-        }
-        binding.chatScroll.post {
-            binding.chatScroll.fullScroll(View.FOCUS_DOWN)
-        }
-    }
-
     private fun showRecommendationsMenu(anchor: View) {
         val popup = PopupMenu(requireContext(), anchor)
         popup.menuInflater.inflate(R.menu.context_recommendations, popup.menu)
@@ -849,14 +989,6 @@ class DashboardFragment : Fragment() {
                 }
                 R.id.action_share_recommendations -> {
                     shareRecommendations()
-                    true
-                }
-                R.id.action_switch_profile -> {
-                    val navController = findNavController()
-                    val popped = navController.popBackStack(R.id.navigation_profile, false)
-                    if (!popped) {
-                        navController.navigate(R.id.navigation_profile)
-                    }
                     true
                 }
                 else -> false
@@ -885,11 +1017,9 @@ class DashboardFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        applyProfileUi()
-        val ghUnit = viewModel.ghUnit.value ?: "dh"
-        val khUnit = viewModel.khUnit.value ?: "dh"
-        applyHardnessToggleState(ghBinding, ghUnit)
-        applyHardnessToggleState(khBinding, khUnit)
+        val profile = viewModel.profile.value ?: MainViewModel.AquariumProfile.FRESHWATER
+        setupParameters(profile)
+        applyProfileUi(profile)
         val volumeUnits = getVolumeUnitOptions()
         val volumeIndex = when (viewModel.volumeUnit.value ?: "US") {
             "L" -> 1
@@ -904,27 +1034,18 @@ class DashboardFragment : Fragment() {
             else -> 0
         }
         binding.spinnerDimUnit.setText(dimUnits[dimIndex], false)
-        ghBinding?.etValue?.let { editText ->
-            if (!editText.isFocused) {
-                isGhUpdating = true
-                editText.setText(formatHardnessInput(viewModel.gh.value ?: 0.0, ghUnit))
-                isGhUpdating = false
-            }
-        }
-        khBinding?.etValue?.let { editText ->
-            if (!editText.isFocused) {
-                isKhUpdating = true
-                editText.setText(formatHardnessInput(viewModel.kh.value ?: 0.0, khUnit))
-                isKhUpdating = false
-            }
-        }
         updateRecommendations()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        recommendationsHandler.removeCallbacks(recommendationsRunnable)
         _binding = null
         ghBinding = null
         khBinding = null
+        ghFreshwaterBinding = null
+        khFreshwaterBinding = null
+        // Removed khPondBinding
+        configuredProfiles.clear()
     }
 }
