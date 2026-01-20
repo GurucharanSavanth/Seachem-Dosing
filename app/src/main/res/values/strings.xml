@@ -108,7 +108,7 @@
     <string name="result_change_volume">Replace %s L</string>
     <string name="result_change_volume_unit">%1$s L (%2$s %3$s)</string>
     
-    <string name="calc_khco3_title">Seachem Potassium Bicarbonate</string>
+    <string name="calc_khco3_title">Potassium Bicarbonate</string>
     <string name="calc_khco3_subtitle">Generic KH Booster (KHCO₃)</string>
     
     <string name="calc_equilibrium_title">Seachem Equilibrium</string>
@@ -306,8 +306,22 @@ Consider water change or phosphate control.</string>
     <string name="reco_msg_temp_pond_low">Cold water slows metabolism; reduce feeding.</string>
     <string name="reco_msg_temp_pond_ok">Within a typical pond range.</string>
     <string name="reco_msg_temp_pond_high">Warm; increase aeration and shade.</string>
+    <string name="reco_action_potassium_low">Low Potassium: Consider dosing Flourish Potassium.</string>
+    <string name="reco_action_iron_low">Low Iron: Consider dosing Flourish Iron.</string>
+    <string name="reco_action_strontium_low">Low Strontium: Dose Reef Strontium.</string>
+    <string name="reco_action_iodide_low">Low Iodide: Dose Reef Iodide.</string>
+    <string name="reco_msg_potassium_low">Low</string>
+    <string name="reco_msg_potassium_ok">Good</string>
+    <string name="reco_msg_iron_low">Low</string>
+    <string name="reco_msg_iron_ok">Good</string>
+    <string name="reco_msg_strontium_low">Low</string>
+    <string name="reco_msg_strontium_ok">Good</string>
+    <string name="reco_msg_iodide_low">Low</string>
+    <string name="reco_msg_iodide_ok">Good</string>
 
     <!-- Settings -->
+    <!-- Todo list
+    update the memory leak in the dashboard and memory operation -->
     <string name="settings_title">Settings</string>
     <string name="settings_subtitle">Personalize units and appearance</string>
     <string name="settings_appearance">Appearance</string>
@@ -332,7 +346,7 @@ Consider water change or phosphate control.</string>
     <string name="settings_contact">Contact Developer</string>
     <string name="settings_share">Share App</string>
     <string name="settings_source_code">Source Code</string>
-    <string name="settings_source_url">https://github.com/GurucharanSavanth/Seachem-Dosing</string>
+    <string name="settings_source_url">https://github.com/GurucharanSavanth/Seachem-Calculatore</string>
     <string name="settings_developer">Developed by Gurucharan.S</string>
     <string name="settings_about">About</string>
     <string name="settings_version">Version %s</string>

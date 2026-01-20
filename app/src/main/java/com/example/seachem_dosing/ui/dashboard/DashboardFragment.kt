@@ -26,6 +26,7 @@ import com.example.seachem_dosing.databinding.ItemParameterBinding
 import com.example.seachem_dosing.databinding.ItemParameterHardnessBinding
 import com.example.seachem_dosing.logic.Calculations
 import com.example.seachem_dosing.ui.MainViewModel
+import com.example.seachem_dosing.util.TextWatcherManager
 import com.google.android.material.transition.MaterialFadeThrough
 
 class DashboardFragment : Fragment() {
@@ -38,14 +39,21 @@ class DashboardFragment : Fragment() {
     private var khBinding: ItemParameterHardnessBinding? = null
     private var ghFreshwaterBinding: ItemParameterHardnessBinding? = null
     private var khFreshwaterBinding: ItemParameterHardnessBinding? = null
-    // Removed khPondBinding
     private val configuredProfiles = mutableSetOf<MainViewModel.AquariumProfile>()
     private val recommendationsHandler = Handler(Looper.getMainLooper())
-    private val recommendationsUpdateDelayMs = 200L
+    private val recommendationsUpdateDelayMs = 500L
     private val recommendationsRunnable = Runnable { updateRecommendations() }
     private var isGhUpdating = false
     private var isKhUpdating = false
     private val logTag = "DashboardFragment"
+
+    // TextWatcher manager for proper cleanup to prevent memory leaks
+    private val textWatcherManager = TextWatcherManager()
+
+    // Debounce delay for text input calculations (ms)
+    private companion object {
+        const val INPUT_DEBOUNCE_MS = 250L
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -101,7 +109,7 @@ class DashboardFragment : Fragment() {
 
         // Volume unit dropdown
         val volumeUnits = getVolumeUnitOptions()
-        val volumeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, volumeUnits)
+        val volumeAdapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_menu, volumeUnits)
         binding.spinnerVolumeUnit.setAdapter(volumeAdapter)
         val initialVolumeUnit = when (viewModel.volumeUnit.value ?: "US") {
             "L" -> 1
@@ -122,7 +130,7 @@ class DashboardFragment : Fragment() {
 
         // Dimension unit dropdown
         val dimUnits = getDimUnitOptions()
-        val dimAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, dimUnits)
+        val dimAdapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_menu, dimUnits)
         binding.spinnerDimUnit.setAdapter(dimAdapter)
         val initialDimUnit = when (viewModel.dimUnit.value ?: "cm") {
             "in" -> 1
@@ -547,8 +555,8 @@ class DashboardFragment : Fragment() {
         }
         
         // New recommendations
-        if (k < 10) actions.add("Low Potassium: Consider dosing Flourish Potassium.")
-        if (fe < 0.05) actions.add("Low Iron: Consider dosing Flourish Iron.")
+        if (k < 10) actions.add(getString(R.string.reco_action_potassium_low))
+        if (fe < 0.05) actions.add(getString(R.string.reco_action_iron_low))
 
         val details = mutableListOf<String>()
         details.add(
@@ -614,8 +622,10 @@ class DashboardFragment : Fragment() {
             )
         )
         
-        details.add(getString(R.string.reco_line_format, "Potassium", "$k mg/L", if(k<15) "Low" else "Good"))
-        details.add(getString(R.string.reco_line_format, "Iron", "$fe mg/L", if(fe<0.1) "Low" else "Good"))
+        val potassiumStatus = if (k < 15) getString(R.string.reco_msg_potassium_low) else getString(R.string.reco_msg_potassium_ok)
+        val ironStatus = if (fe < 0.1) getString(R.string.reco_msg_iron_low) else getString(R.string.reco_msg_iron_ok)
+        details.add(getString(R.string.reco_line_format, getString(R.string.param_potassium), "$k ${getString(R.string.unit_mg_l)}", potassiumStatus))
+        details.add(getString(R.string.reco_line_format, getString(R.string.param_iron), "$fe ${getString(R.string.unit_mg_l)}", ironStatus))
         
         val tempMessage = when {
             temp < 22 -> R.string.reco_msg_temp_low
@@ -669,8 +679,8 @@ class DashboardFragment : Fragment() {
                 actions.add(getString(R.string.reco_action_phosphate_high_generic))
             }
         }
-        if (sr < 8) actions.add("Low Strontium: Dose Reef Strontium.")
-        if (i < 0.06) actions.add("Low Iodide: Dose Reef Iodide.")
+        if (sr < 8) actions.add(getString(R.string.reco_action_strontium_low))
+        if (i < 0.06) actions.add(getString(R.string.reco_action_iodide_low))
 
         val details = mutableListOf<String>()
         val salinityMessage = when {
@@ -757,8 +767,10 @@ class DashboardFragment : Fragment() {
                 phMessage
             )
         )
-        details.add(getString(R.string.reco_line_format, "Strontium", "$sr mg/L", if(sr<8) "Low" else "Good"))
-        details.add(getString(R.string.reco_line_format, "Iodide", "$i mg/L", if(i<0.06) "Low" else "Good"))
+        val strontiumStatus = if (sr < 8) getString(R.string.reco_msg_strontium_low) else getString(R.string.reco_msg_strontium_ok)
+        val iodideStatus = if (i < 0.06) getString(R.string.reco_msg_iodide_low) else getString(R.string.reco_msg_iodide_ok)
+        details.add(getString(R.string.reco_line_format, getString(R.string.param_strontium), "$sr ${getString(R.string.unit_mg_l)}", strontiumStatus))
+        details.add(getString(R.string.reco_line_format, getString(R.string.param_iodide), "$i ${getString(R.string.unit_mg_l)}", iodideStatus))
         
         val tempMessage = when {
             temp > 27 -> R.string.reco_msg_temp_salt_high
@@ -786,7 +798,7 @@ class DashboardFragment : Fragment() {
         }
         // No parameters to check
         
-        val details = listOf("Misc Utility Profile: No parameters tracked.")
+        val details = listOf(getString(R.string.profile_pond_desc))
         setRecommendationsText(buildRecommendationsText(actions, details))
     }
 
@@ -797,8 +809,13 @@ class DashboardFragment : Fragment() {
             MainViewModel.Status.DANGER -> R.color.status_danger
             MainViewModel.Status.INFO -> R.color.status_info
         }
-        val drawable = binding.statusIndicator.background as? GradientDrawable
-        drawable?.setColor(ContextCompat.getColor(requireContext(), color))
+        (binding.statusIndicator.background as? GradientDrawable)?.setColor(
+            ContextCompat.getColor(requireContext(), color)
+        ) ?: run {
+            // Fallback: set background tint if drawable is not GradientDrawable
+            binding.statusIndicator.backgroundTintList =
+                android.content.res.ColorStateList.valueOf(ContextCompat.getColor(requireContext(), color))
+        }
     }
 
     private fun setStatusIndicator(binding: ItemParameterBinding, status: MainViewModel.Status) {
@@ -843,14 +860,12 @@ class DashboardFragment : Fragment() {
     }
 
     private fun createTextWatcher(onTextChanged: (Double) -> Unit): TextWatcher {
-        return object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                val value = s?.toString()?.toDoubleOrNull() ?: 0.0
-                onTextChanged(value)
-            }
-        }
+        // Use debounced watcher to prevent rapid-fire calculations that cause frame drops
+        return com.example.seachem_dosing.util.DebouncedTextWatcher(
+            debounceMs = INPUT_DEBOUNCE_MS,
+            lifecycleOwner = viewLifecycleOwner,
+            onTextChanged = onTextChanged
+        )
     }
 
     private fun updateActiveHardnessBindings(profile: MainViewModel.AquariumProfile) {
@@ -947,8 +962,13 @@ class DashboardFragment : Fragment() {
 
     private fun updateHardnessStatus(binding: ItemParameterHardnessBinding, valueDh: Double) {
         val statusColor = if (valueDh in 0.1..2.99) R.color.status_warning else R.color.status_info
-        val drawable = binding.statusIndicator.background as? GradientDrawable
-        drawable?.setColor(ContextCompat.getColor(requireContext(), statusColor))
+        (binding.statusIndicator.background as? GradientDrawable)?.setColor(
+            ContextCompat.getColor(requireContext(), statusColor)
+        ) ?: run {
+            // Fallback: set background tint if drawable is not GradientDrawable
+            binding.statusIndicator.backgroundTintList =
+                android.content.res.ColorStateList.valueOf(ContextCompat.getColor(requireContext(), statusColor))
+        }
     }
 
     private fun convertHardnessValue(value: Double, fromUnit: String, toUnit: String): Double {
@@ -1039,13 +1059,14 @@ class DashboardFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Clean up all handlers and watchers to prevent memory leaks
         recommendationsHandler.removeCallbacks(recommendationsRunnable)
+        textWatcherManager.cleanup()
         _binding = null
         ghBinding = null
         khBinding = null
         ghFreshwaterBinding = null
         khFreshwaterBinding = null
-        // Removed khPondBinding
         configuredProfiles.clear()
     }
 }

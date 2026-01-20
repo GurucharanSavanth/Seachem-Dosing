@@ -31,6 +31,9 @@ object Calculations {
     const val PRIME_ML_PER_L = 5.0 / 200.0
     const val STABILITY_ML_PER_L = 5.0 / 40.0
 
+    // Minimum purity threshold to prevent division issues
+    private const val MIN_PURITY = 0.01
+
     // --- CONVERSIONS ---
 
     fun toLitres(volume: Double, unit: String): Double {
@@ -65,19 +68,24 @@ object Calculations {
     // --- CALCULATORS ---
 
     fun calculateKhco3Grams(currentKh: Double, targetKh: Double, litres: Double, purity: Double): Double {
-        if (purity <= 0) return 0.0
-        val grams = (targetKh - currentKh) * COEFF_KHCO3_STOICH * litres / purity
+        if (litres <= 0) return 0.0
+        // Use minimum purity to prevent division by very small numbers
+        val safePurity = max(purity, MIN_PURITY)
+        val grams = (targetKh - currentKh) * COEFF_KHCO3_STOICH * litres / safePurity
         return max(0.0, grams)
     }
 
     fun calculateEquilibriumGrams(deltaGh: Double, litres: Double): Double {
+        if (litres <= 0 || deltaGh <= 0) return 0.0
         val grams = deltaGh * COEFF_EQUILIBRIUM * litres
         return max(0.0, grams)
     }
 
     fun calculateNeutralRegulatorGrams(litres: Double, currentPh: Double, targetPh: Double, currentKh: Double): Double {
+        if (litres <= 0) return 0.0
         if (targetPh >= currentPh) return 0.0
-        val khEffectFactor = min(currentKh, 4.0) / 4.0
+        val safeKh = max(0.0, currentKh)
+        val khEffectFactor = min(safeKh, 4.0) / 4.0
         val baseGramsPerLitre = GPL_MIN_NR + (GPL_MAX_NR - GPL_MIN_NR) * khEffectFactor
         val phSteps = (currentPh - targetPh) / 0.5
         if (phSteps <= 0) return 0.0
@@ -87,7 +95,9 @@ object Calculations {
     }
 
     fun calculateAcidBufferGrams(litres: Double, currentKh: Double, targetKh: Double): Double {
+        if (litres <= 0) return 0.0
         val deltaKh = currentKh - targetKh
+        if (deltaKh <= 0) return 0.0
         val grams = deltaKh * COEFF_ACID * litres
         return max(0.0, grams)
     }
@@ -95,6 +105,7 @@ object Calculations {
     data class GoldBufferResult(val grams: Double, val fullDose: Boolean)
 
     fun calculateGoldBufferGrams(litres: Double, currentPh: Double, targetPh: Double): GoldBufferResult {
+        if (litres <= 0) return GoldBufferResult(0.0, false)
         val deltaPh = targetPh - currentPh
         if (deltaPh <= 0) return GoldBufferResult(0.0, false)
         val fullDoseRecommended = deltaPh >= 0.3
@@ -104,23 +115,26 @@ object Calculations {
     }
 
     fun calculateSafeGrams(litres: Double): Double {
+        if (litres <= 0) return 0.0
         val grams = litres * COEFF_SAFE
         return max(0.0, grams)
     }
 
-    fun calculatePrimeDose(litres: Double): Double = litres * PRIME_ML_PER_L
-    fun calculateStabilityDose(litres: Double): Double = litres * STABILITY_ML_PER_L
+    fun calculatePrimeDose(litres: Double): Double = max(0.0, litres * PRIME_ML_PER_L)
+    fun calculateStabilityDose(litres: Double): Double = max(0.0, litres * STABILITY_ML_PER_L)
 
     data class AptResult(val ml: Double, val estimatedNitrateIncrease: Double, val estimatedFinalNitrate: Double)
 
     fun calculateAptCompleteDose(litres: Double, currentNitrate: Double = 0.0): AptResult {
+        if (litres <= 0) return AptResult(0.0, 0.0, max(0.0, currentNitrate))
         val ml = litres * COEFF_APT_80PCT
-        val estimatedNitrateIncrease = (ml / 100.0) * APT_NITRATE_EST_PER_ML * 100.0
-        val perLiterContribution = ml * 0.015
-        val estimatedFinalNitrate = currentNitrate + perLiterContribution
+        // Nitrate contribution: approximately 0.015 ppm per ml dosed
+        val nitrateContribution = ml * 0.015
+        val safeCurrentNitrate = max(0.0, currentNitrate)
+        val estimatedFinalNitrate = safeCurrentNitrate + nitrateContribution
         return AptResult(
             max(0.0, ml),
-            max(0.0, perLiterContribution), // Using perLiterContribution to match JS logic's return value usage
+            max(0.0, nitrateContribution),
             max(0.0, estimatedFinalNitrate)
         )
     }

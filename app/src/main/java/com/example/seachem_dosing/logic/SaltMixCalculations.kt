@@ -51,14 +51,22 @@ object SaltMixCalculations {
         currentPpt: Double,
         desiredPpt: Double
     ): SaltMixResult? {
-        if (volumeGallons <= 0 || currentPpt < 0 || desiredPpt < 0 || desiredPpt <= currentPpt) {
-            return null
-        }
+        // Validate inputs with clear conditions
+        if (volumeGallons <= 0) return null
+        if (currentPpt < 0) return null
+        if (desiredPpt < 0) return null
+        if (desiredPpt <= currentPpt) return null
+        // Reasonable salinity range check (0-50 PPT)
+        if (desiredPpt > 50) return null
 
         val factor = SALT_MIX_PRODUCTS[productName] ?: return null
 
         val deltaPpt = desiredPpt - currentPpt
         val gramsRaw = deltaPpt * volumeGallons * factor
+
+        // Sanity check: grams should be reasonable
+        if (gramsRaw.isNaN() || gramsRaw.isInfinite() || gramsRaw < 0) return null
+
         val kilogramsRaw = gramsRaw / 1000.0
         val poundsRaw = gramsRaw * GRAMS_TO_POUNDS
 

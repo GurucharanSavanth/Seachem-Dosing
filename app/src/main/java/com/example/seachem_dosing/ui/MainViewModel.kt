@@ -2,34 +2,40 @@ package com.example.seachem_dosing.ui
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import com.example.seachem_dosing.ai.AiInsightState
 import com.example.seachem_dosing.ai.ChatMessage
-import com.example.seachem_dosing.ai.ChatRole
 import com.example.seachem_dosing.logic.Calculations
 import com.example.seachem_dosing.logic.SeachemCalculations
 import java.math.BigDecimal
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Main ViewModel for the Seachem Dosing app.
  * Manages all water parameters, volume settings, and calculation results.
+ * Uses SavedStateHandle to persist data across process death.
  */
-class MainViewModel : ViewModel() {
+class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
 
     enum class AquariumProfile(val id: String) {
         FRESHWATER("freshwater"),
         SALTWATER("saltwater"),
         POND("pond"); // Strings kept for compatibility, UI renamed to "Sand and Gravel"
-        
+
         companion object {
             fun fromId(id: String): AquariumProfile? {
-                return values().firstOrNull { it.id == id }
+                return entries.firstOrNull { it.id == id }
             }
         }
     }
 
-    private val _profile = MutableLiveData(AquariumProfile.FRESHWATER)
-    val profile: LiveData<AquariumProfile> = _profile
+    // Persist Profile ID, expose as Enum
+    private val _profileId: MutableLiveData<String> = savedStateHandle.getLiveData("profile_id", AquariumProfile.FRESHWATER.id)
+    val profile: LiveData<AquariumProfile> = _profileId.map { id ->
+        AquariumProfile.fromId(id) ?: AquariumProfile.FRESHWATER
+    }
 
     private val _aiInsight = MutableLiveData(AiInsightState())
     val aiInsight: LiveData<AiInsightState> = _aiInsight
@@ -39,90 +45,46 @@ class MainViewModel : ViewModel() {
 
     // ==================== Volume Settings ====================
 
-    private val _volume = MutableLiveData(10.0)
-    val volume: LiveData<Double> = _volume
-
-    private val _volumeUnit = MutableLiveData("US") // L, US, UK
-    val volumeUnit: LiveData<String> = _volumeUnit
-
-    private val _volumeMode = MutableLiveData("direct") // direct or lbh
-    val volumeMode: LiveData<String> = _volumeMode
-
-    private val _dimLength = MutableLiveData(60.0)
-    val dimLength: LiveData<Double> = _dimLength
-
-    private val _dimBreadth = MutableLiveData(30.0)
-    val dimBreadth: LiveData<Double> = _dimBreadth
-
-    private val _dimHeight = MutableLiveData(40.0)
-    val dimHeight: LiveData<Double> = _dimHeight
-
-    private val _dimUnit = MutableLiveData("cm") // cm, in, ft
-    val dimUnit: LiveData<String> = _dimUnit
+    val volume: MutableLiveData<Double> = savedStateHandle.getLiveData("volume", 10.0)
+    val volumeUnit: MutableLiveData<String> = savedStateHandle.getLiveData("volume_unit", "US") // L, US, UK
+    val volumeMode: MutableLiveData<String> = savedStateHandle.getLiveData("volume_mode", "direct") // direct or lbh
+    val dimLength: MutableLiveData<Double> = savedStateHandle.getLiveData("dim_length", 60.0)
+    val dimBreadth: MutableLiveData<Double> = savedStateHandle.getLiveData("dim_breadth", 30.0)
+    val dimHeight: MutableLiveData<Double> = savedStateHandle.getLiveData("dim_height", 40.0)
+    val dimUnit: MutableLiveData<String> = savedStateHandle.getLiveData("dim_unit", "cm") // cm, in, ft
 
     // ==================== Water Parameters (Restored) ====================
 
-    private val _ammonia = MutableLiveData(0.0)
-    val ammonia: LiveData<Double> = _ammonia
-
-    private val _nitrite = MutableLiveData(0.0)
-    val nitrite: LiveData<Double> = _nitrite
-
-    private val _nitrate = MutableLiveData(15.0)
-    val nitrate: LiveData<Double> = _nitrate
-
-    private val _gh = MutableLiveData(4.0)
-    val gh: LiveData<Double> = _gh
-
-    private val _kh = MutableLiveData(6.0)
-    val kh: LiveData<Double> = _kh
-
-    private val _ph = MutableLiveData(7.2)
-    val ph: LiveData<Double> = _ph
-
-    private val _temperature = MutableLiveData(26.0)
-    val temperature: LiveData<Double> = _temperature
-
-    private val _salinity = MutableLiveData(35.0)
-    val salinity: LiveData<Double> = _salinity
-
-    private val _alkalinity = MutableLiveData(8.0)
-    val alkalinity: LiveData<Double> = _alkalinity
-
-    private val _calcium = MutableLiveData(420.0)
-    val calcium: LiveData<Double> = _calcium
-
-    private val _magnesium = MutableLiveData(1300.0)
-    val magnesium: LiveData<Double> = _magnesium
-
-    private val _phosphate = MutableLiveData(0.05)
-    val phosphate: LiveData<Double> = _phosphate
-
-    private val _dissolvedOxygen = MutableLiveData(7.5)
-    val dissolvedOxygen: LiveData<Double> = _dissolvedOxygen
+    val ammonia: MutableLiveData<Double> = savedStateHandle.getLiveData("ammonia", 0.0)
+    val nitrite: MutableLiveData<Double> = savedStateHandle.getLiveData("nitrite", 0.0)
+    val nitrate: MutableLiveData<Double> = savedStateHandle.getLiveData("nitrate", 15.0)
+    val gh: MutableLiveData<Double> = savedStateHandle.getLiveData("gh", 4.0)
+    val kh: MutableLiveData<Double> = savedStateHandle.getLiveData("kh", 6.0)
+    val ph: MutableLiveData<Double> = savedStateHandle.getLiveData("ph", 7.2)
+    val temperature: MutableLiveData<Double> = savedStateHandle.getLiveData("temperature", 26.0)
+    val salinity: MutableLiveData<Double> = savedStateHandle.getLiveData("salinity", 35.0)
+    val alkalinity: MutableLiveData<Double> = savedStateHandle.getLiveData("alkalinity", 8.0)
+    val calcium: MutableLiveData<Double> = savedStateHandle.getLiveData("calcium", 420.0)
+    val magnesium: MutableLiveData<Double> = savedStateHandle.getLiveData("magnesium", 1300.0)
+    val phosphate: MutableLiveData<Double> = savedStateHandle.getLiveData("phosphate", 0.05)
+    val dissolvedOxygen: MutableLiveData<Double> = savedStateHandle.getLiveData("dissolved_oxygen", 7.5)
     
     // New Parameters
-    private val _potassium = MutableLiveData(15.0) // mg/L
-    val potassium: LiveData<Double> = _potassium
-    
-    private val _iron = MutableLiveData(0.1) // mg/L
-    val iron: LiveData<Double> = _iron
-    
-    private val _strontium = MutableLiveData(8.0) // mg/L (Saltwater)
-    val strontium: LiveData<Double> = _strontium
-    
-    private val _iodide = MutableLiveData(0.06) // mg/L (Saltwater)
-    val iodide: LiveData<Double> = _iodide
+    val potassium: MutableLiveData<Double> = savedStateHandle.getLiveData("potassium", 15.0) // mg/L
+    val iron: MutableLiveData<Double> = savedStateHandle.getLiveData("iron", 0.1) // mg/L
+    val strontium: MutableLiveData<Double> = savedStateHandle.getLiveData("strontium", 8.0) // mg/L (Saltwater)
+    val iodide: MutableLiveData<Double> = savedStateHandle.getLiveData("iodide", 0.06) // mg/L (Saltwater)
 
-    private val _ghUnit = MutableLiveData("dh") // dh or ppm
-    val ghUnit: LiveData<String> = _ghUnit
-
-    private val _khUnit = MutableLiveData("dh") // dh or ppm
-    val khUnit: LiveData<String> = _khUnit
+    val ghUnit: MutableLiveData<String> = savedStateHandle.getLiveData("gh_unit", "dh") // dh or ppm
+    val khUnit: MutableLiveData<String> = savedStateHandle.getLiveData("kh_unit", "dh") // dh or ppm
 
     // ==================== Calculator Inputs (Universal) ====================
-    
-    private val _calcInputs = mutableMapOf<String, MutableLiveData<Double>>()
+    // We use a separate map for calculator inputs, but backing them with SavedStateHandle
+    // requires dynamic keys. For simplicity and since these are "scratchpad" values,
+    // we'll keep them in memory for now, but ensure key parameters sync TO them.
+    // Using ConcurrentHashMap for thread-safety with coroutines.
+
+    private val _calcInputs = ConcurrentHashMap<String, MutableLiveData<Double>>()
     
     fun getInput(id: String): LiveData<Double> {
         return _calcInputs.getOrPut(id) { MutableLiveData(0.0) }
@@ -133,39 +95,36 @@ class MainViewModel : ViewModel() {
     }
 
     // Substrate Inputs
-    private val _subLength = MutableLiveData(0.0)
-    val subLength: LiveData<Double> = _subLength
-    private val _subWidth = MutableLiveData(0.0)
-    val subWidth: LiveData<Double> = _subWidth
-    private val _subDepth = MutableLiveData(0.0)
-    val subDepth: LiveData<Double> = _subDepth
-    private val _subProduct = MutableLiveData(0) // Index
-    val subProduct: LiveData<Int> = _subProduct
-    private val _subUnit = MutableLiveData("cm")
-    val subUnit: LiveData<String> = _subUnit
+    val subLength: MutableLiveData<Double> = savedStateHandle.getLiveData("sub_length", 0.0)
+    val subWidth: MutableLiveData<Double> = savedStateHandle.getLiveData("sub_width", 0.0)
+    val subDepth: MutableLiveData<Double> = savedStateHandle.getLiveData("sub_depth", 0.0)
+    val subProduct: MutableLiveData<Int> = savedStateHandle.getLiveData("sub_product", 0) // Index
+    val subUnit: MutableLiveData<String> = savedStateHandle.getLiveData("sub_unit", "cm")
 
     // ==================== App Settings ====================
-    private val _defaultWaterChangePercent = MutableLiveData(20.0)
-    val defaultWaterChangePercent: LiveData<Double> = _defaultWaterChangePercent
+    val defaultWaterChangePercent: MutableLiveData<Double> = savedStateHandle.getLiveData("default_wc_percent", 20.0)
 
     fun setDefaultWaterChangePercent(value: Double) {
-        _defaultWaterChangePercent.value = value
+        defaultWaterChangePercent.value = value
     }
 
     fun generateExportData(): String {
+        // Safe JSON string escaping
+        fun escapeJson(s: String?): String = s?.replace("\\", "\\\\")?.replace("\"", "\\\"") ?: ""
+
         val sb = StringBuilder()
         sb.append("{\n")
-        sb.append("  \"profile\": \"${_profile.value?.id}\",\n")
-        sb.append("  \"volume\": ${_volume.value},\n")
-        sb.append("  \"volumeUnit\": \"${_volumeUnit.value}\",\n")
+        sb.append("  \"profile\": \"${escapeJson(_profileId.value)}\",\n")
+        sb.append("  \"volume\": ${volume.value ?: 0.0},\n")
+        sb.append("  \"volumeUnit\": \"${escapeJson(volumeUnit.value)}\",\n")
         sb.append("  \"parameters\": {\n")
-        sb.append("    \"ammonia\": ${_ammonia.value},\n")
-        sb.append("    \"nitrite\": ${_nitrite.value},\n")
-        sb.append("    \"nitrate\": ${_nitrate.value},\n")
-        sb.append("    \"ph\": ${_ph.value},\n")
-        sb.append("    \"gh\": ${_gh.value},\n")
-        sb.append("    \"kh\": ${_kh.value},\n")
-        sb.append("    \"temperature\": ${_temperature.value}\n")
+        sb.append("    \"ammonia\": ${ammonia.value ?: 0.0},\n")
+        sb.append("    \"nitrite\": ${nitrite.value ?: 0.0},\n")
+        sb.append("    \"nitrate\": ${nitrate.value ?: 0.0},\n")
+        sb.append("    \"ph\": ${ph.value ?: 0.0},\n")
+        sb.append("    \"gh\": ${gh.value ?: 0.0},\n")
+        sb.append("    \"kh\": ${kh.value ?: 0.0},\n")
+        sb.append("    \"temperature\": ${temperature.value ?: 0.0}\n")
         sb.append("  }\n")
         sb.append("}")
         return sb.toString()
@@ -188,15 +147,15 @@ class MainViewModel : ViewModel() {
     // ==================== Calculation Methods ====================
 
     fun getEffectiveVolumeLitres(): Double {
-        return if (_volumeMode.value == "lbh") {
+        return if (volumeMode.value == "lbh") {
             Calculations.dimensionsToLitres(
-                _dimLength.value ?: 0.0,
-                _dimBreadth.value ?: 0.0,
-                _dimHeight.value ?: 0.0,
-                _dimUnit.value ?: "cm"
+                dimLength.value ?: 0.0,
+                dimBreadth.value ?: 0.0,
+                dimHeight.value ?: 0.0,
+                dimUnit.value ?: "cm"
             )
         } else {
-            Calculations.toLitres(_volume.value ?: 0.0, _volumeUnit.value ?: "L")
+            Calculations.toLitres(volume.value ?: 0.0, volumeUnit.value ?: "L")
         }
     }
     
@@ -300,10 +259,10 @@ class MainViewModel : ViewModel() {
         val (div, divSmall) = specs[safeIndex]
         
         return SeachemCalculations.calculateGravel(
-            BigDecimal.valueOf(_subLength.value ?: 0.0),
-            BigDecimal.valueOf(_subWidth.value ?: 0.0),
-            BigDecimal.valueOf(_subDepth.value ?: 0.0),
-            _subUnit.value ?: "cm",
+            BigDecimal.valueOf(subLength.value ?: 0.0),
+            BigDecimal.valueOf(subWidth.value ?: 0.0),
+            BigDecimal.valueOf(subDepth.value ?: 0.0),
+            subUnit.value ?: "cm",
             BigDecimal(div),
             BigDecimal(divSmall)
         )
@@ -313,13 +272,15 @@ class MainViewModel : ViewModel() {
 
     fun calculatePrimeDose(): Double = Calculations.calculatePrimeDose(getEffectiveVolumeLitres())
     fun calculateStabilityDose(): Double = Calculations.calculateStabilityDose(getEffectiveVolumeLitres())
-    fun calculateSafe(): Calculations.GoldBufferResult { 
-        return Calculations.GoldBufferResult(0.0, false)
+    fun calculateSafe(): Calculations.GoldBufferResult {
+        val litres = getEffectiveVolumeLitres()
+        val grams = Calculations.calculateSafeGrams(litres)
+        return Calculations.GoldBufferResult(grams, grams > 0)
     }
     fun calculateSafeSimple(): Double = Calculations.calculateSafeGrams(getEffectiveVolumeLitres())
     fun calculateAptComplete(): Calculations.AptResult {
         val litres = getEffectiveVolumeLitres()
-        return Calculations.calculateAptCompleteDose(litres, _nitrate.value ?: 0.0)
+        return Calculations.calculateAptCompleteDose(litres, nitrate.value ?: 0.0)
     }
     
     fun calculateWaterChangeLitres(percent: Double): Double {
@@ -331,41 +292,41 @@ class MainViewModel : ViewModel() {
     enum class Status { GOOD, WARNING, DANGER, INFO }
 
     fun getAmmoniaStatus(): ParameterStatus {
-        val value = _ammonia.value ?: 0.0
+        val value = ammonia.value ?: 0.0
         return ParameterStatus(if (value > 0) Status.DANGER else Status.GOOD, "${value} ppm")
     }
     fun getNitriteStatus(): ParameterStatus {
-        val value = _nitrite.value ?: 0.0
+        val value = nitrite.value ?: 0.0
         return ParameterStatus(if (value > 0) Status.DANGER else Status.GOOD, "${value} ppm")
     }
     fun getNitrateStatus(): ParameterStatus {
-        val value = _nitrate.value ?: 0.0
+        val value = nitrate.value ?: 0.0
         return ParameterStatus(if (value > 50) Status.WARNING else Status.GOOD, "${value.toInt()} ppm")
     }
 
     // ==================== Missing Helper Methods (Restored) ====================
     
     fun getGhInDegrees(): Double {
-        val value = _gh.value ?: 0.0
-        return if (_ghUnit.value == "ppm") Calculations.ppmToDh(value) else value
+        val value = gh.value ?: 0.0
+        return if (ghUnit.value == "ppm") Calculations.ppmToDh(value) else value
     }
 
     fun getKhInDegrees(): Double {
-        val value = _kh.value ?: 0.0
-        return if (_khUnit.value == "ppm") Calculations.ppmToDh(value) else value
+        val value = kh.value ?: 0.0
+        return if (khUnit.value == "ppm") Calculations.ppmToDh(value) else value
     }
     
     fun updateHardnessUnit(unit: String) {
         val targetUnit = if (unit == "ppm") "ppm" else "dh"
-        val currentGhUnit = _ghUnit.value ?: "dh"
-        val currentKhUnit = _khUnit.value ?: "dh"
+        val currentGhUnit = ghUnit.value ?: "dh"
+        val currentKhUnit = khUnit.value ?: "dh"
         if (currentGhUnit != targetUnit) {
-            _gh.value = convertHardness(_gh.value ?: 0.0, currentGhUnit, targetUnit)
-            _ghUnit.value = targetUnit
+            gh.value = convertHardness(gh.value ?: 0.0, currentGhUnit, targetUnit)
+            ghUnit.value = targetUnit
         }
         if (currentKhUnit != targetUnit) {
-            _kh.value = convertHardness(_kh.value ?: 0.0, currentKhUnit, targetUnit)
-            _khUnit.value = targetUnit
+            kh.value = convertHardness(kh.value ?: 0.0, currentKhUnit, targetUnit)
+            khUnit.value = targetUnit
         }
         syncGhFromParams()
         syncKhFromParams()
@@ -381,214 +342,223 @@ class MainViewModel : ViewModel() {
     }
 
     fun syncKhFromParams() {
-        val kh = getKhInDegrees()
-        setInput("alkaline_buffer_current", kh)
-        setInput("acid_buffer_current", kh)
-        setInput("reef_builder_current", kh)
-        setInput("reef_buffer_current", kh)
-        setInput("reef_carbonate_current", kh)
-        setInput("khco3_current", kh) // For Potassium Bicarbonate
+        val khVal = getKhInDegrees()
+        setInput("alkaline_buffer_current", khVal)
+        setInput("acid_buffer_current", khVal)
+        setInput("reef_builder_current", khVal)
+        setInput("reef_buffer_current", khVal)
+        setInput("reef_carbonate_current", khVal)
+        setInput("khco3_current", khVal) // For Potassium Bicarbonate
         // Legacy
-        _khCurrent.value = kh
-        _nrKh.value = kh
-        _acidCurrentKh.value = kh
+        _khCurrent.value = khVal
+        _nrKh.value = khVal
+        _acidCurrentKh.value = khVal
     }
 
     fun syncGhFromParams() {
-        val gh = getGhInDegrees()
-        setInput("equilibrium_current", gh)
-        _ghCurrent.value = gh
+        val ghVal = getGhInDegrees()
+        setInput("equilibrium_current", ghVal)
+        _ghCurrent.value = ghVal
     }
 
     fun syncPhFromParams() {
-        val currentPh = _ph.value ?: 7.0
+        val currentPh = ph.value ?: 7.0
         setInput("neutral_regulator_current", currentPh)
         _phCurrent.value = currentPh
         _goldPhCurrent.value = currentPh
     }
     
     fun syncNewParams() {
-        setInput("flourish_potassium_current", _potassium.value ?: 0.0)
-        setInput("flourish_iron_current", _iron.value ?: 0.0)
+        setInput("flourish_potassium_current", potassium.value ?: 0.0)
+        setInput("flourish_iron_current", iron.value ?: 0.0)
         // Nitrogen often uses Nitrate as proxy if not specific N test
         // setInput("flourish_nitrogen_current", ...) 
         // Phosphate
-        setInput("flourish_phosphorus_current", _phosphate.value ?: 0.0)
+        setInput("flourish_phosphorus_current", phosphate.value ?: 0.0)
         
         // Saltwater
-        setInput("reef_adv_calcium_current", _calcium.value ?: 0.0)
-        setInput("reef_calcium_current", _calcium.value ?: 0.0)
-        setInput("reef_complete_current", _calcium.value ?: 0.0)
-        setInput("reef_fusion1_current", _calcium.value ?: 0.0)
+        setInput("reef_adv_calcium_current", calcium.value ?: 0.0)
+        setInput("reef_calcium_current", calcium.value ?: 0.0)
+        setInput("reef_complete_current", calcium.value ?: 0.0)
+        setInput("reef_fusion1_current", calcium.value ?: 0.0)
         
-        setInput("reef_adv_magnesium_current", _magnesium.value ?: 0.0)
+        setInput("reef_adv_magnesium_current", magnesium.value ?: 0.0)
         
-        setInput("reef_adv_strontium_current", _strontium.value ?: 0.0)
-        setInput("reef_strontium_current", _strontium.value ?: 0.0)
+        setInput("reef_adv_strontium_current", strontium.value ?: 0.0)
+        setInput("reef_strontium_current", strontium.value ?: 0.0)
         
-        setInput("reef_iodide_current", _iodide.value ?: 0.0)
+        setInput("reef_iodide_current", iodide.value ?: 0.0)
         
         // Alkalinity handled by syncKhFromParams
     }
     
     fun resetAll() {
-        _volume.value = 10.0
-        _volumeUnit.value = "US"
-        _volumeMode.value = "direct"
-        _dimLength.value = 60.0
-        _dimBreadth.value = 30.0
-        _dimHeight.value = 40.0
-        _dimUnit.value = "cm"
-        _ammonia.value = 0.0
-        _nitrite.value = 0.0
-        _nitrate.value = 15.0
-        _gh.value = 4.0
-        _kh.value = 6.0
-        _ph.value = 7.2
-        _temperature.value = 26.0
-        _salinity.value = 35.0
-        _alkalinity.value = 8.0
-        _calcium.value = 420.0
-        _magnesium.value = 1300.0
-        _phosphate.value = 0.05
-        _dissolvedOxygen.value = 7.5
-        _potassium.value = 15.0
-        _iron.value = 0.1
-        _strontium.value = 8.0
-        _iodide.value = 0.06
-        _ghUnit.value = "dh"
-        _khUnit.value = "dh"
-        _defaultWaterChangePercent.value = 20.0
+        // Reset directly to SavedStateHandle backed values
+        volume.value = 10.0
+        volumeUnit.value = "US"
+        volumeMode.value = "direct"
+        dimLength.value = 60.0
+        dimBreadth.value = 30.0
+        dimHeight.value = 40.0
+        dimUnit.value = "cm"
+        ammonia.value = 0.0
+        nitrite.value = 0.0
+        nitrate.value = 15.0
+        gh.value = 4.0
+        kh.value = 6.0
+        ph.value = 7.2
+        temperature.value = 26.0
+        salinity.value = 35.0
+        alkalinity.value = 8.0
+        calcium.value = 420.0
+        magnesium.value = 1300.0
+        phosphate.value = 0.05
+        dissolvedOxygen.value = 7.5
+        potassium.value = 15.0
+        iron.value = 0.1
+        strontium.value = 8.0
+        iodide.value = 0.06
+        ghUnit.value = "dh"
+        khUnit.value = "dh"
+        defaultWaterChangePercent.value = 20.0
         _aiInsight.value = AiInsightState()
         _chatMessages.value = emptyList()
         // Reset calc inputs
         _calcInputs.clear()
         
-        applyProfileDefaults(_profile.value ?: AquariumProfile.FRESHWATER)
+        applyProfileDefaults(profile.value ?: AquariumProfile.FRESHWATER)
     }
+
+    // ==================== Input Validation ====================
+
+    private fun coerceNonNegative(value: Double): Double = if (value < 0) 0.0 else value
+
+    private fun coercePh(value: Double): Double = value.coerceIn(0.0, 14.0)
+
+    private fun coerceTemperature(value: Double): Double = value.coerceIn(-5.0, 50.0)
+
+    private fun coercePercentage(value: Double): Double = value.coerceIn(0.0, 100.0)
+
+    private fun coerceSalinity(value: Double): Double = value.coerceIn(0.0, 50.0)
 
     // ==================== Setters ====================
 
-    fun setVolume(value: Double) { _volume.value = value }
-    fun setVolumeUnit(unit: String) { _volumeUnit.value = unit }
-    fun setVolumeMode(mode: String) { _volumeMode.value = mode }
-    fun setDimLength(value: Double) { _dimLength.value = value }
-    fun setDimBreadth(value: Double) { _dimBreadth.value = value }
-    fun setDimHeight(value: Double) { _dimHeight.value = value }
-    fun setDimUnit(unit: String) { _dimUnit.value = unit }
+    fun setVolume(value: Double) { volume.value = coerceNonNegative(value) }
+    fun setVolumeUnit(unit: String) { volumeUnit.value = unit }
+    fun setVolumeMode(mode: String) { volumeMode.value = mode }
+    fun setDimLength(value: Double) { dimLength.value = coerceNonNegative(value) }
+    fun setDimBreadth(value: Double) { dimBreadth.value = coerceNonNegative(value) }
+    fun setDimHeight(value: Double) { dimHeight.value = coerceNonNegative(value) }
+    fun setDimUnit(unit: String) { dimUnit.value = unit }
     
-    fun setSubLength(value: Double) { _subLength.value = value }
-    fun setSubWidth(value: Double) { _subWidth.value = value }
-    fun setSubDepth(value: Double) { _subDepth.value = value }
-    fun setSubProduct(index: Int) { _subProduct.value = index }
-    fun setSubUnit(unit: String) { _subUnit.value = unit }
+    fun setSubLength(value: Double) { subLength.value = value }
+    fun setSubWidth(value: Double) { subWidth.value = value }
+    fun setSubDepth(value: Double) { subDepth.value = value }
+    fun setSubProduct(index: Int) { subProduct.value = index }
+    fun setSubUnit(unit: String) { subUnit.value = unit }
 
     // Salt Mix Inputs
-    private val _saltMixProduct = MutableLiveData(0) // Index in list
-    val saltMixProduct: LiveData<Int> = _saltMixProduct
-    
-    private val _saltMixVolume = MutableLiveData(5.0) // US Gallons default
-    val saltMixVolume: LiveData<Double> = _saltMixVolume
-    
-    private val _saltMixCurrentPpt = MutableLiveData(0.0)
-    val saltMixCurrentPpt: LiveData<Double> = _saltMixCurrentPpt
-    
-    private val _saltMixDesiredPpt = MutableLiveData(35.0)
-    val saltMixDesiredPpt: LiveData<Double> = _saltMixDesiredPpt
+    // Persist salt mix inputs if desired, or keep ephemeral. 
+    // User requested "any value input in calculator under the drop down...". 
+    // Best to persist.
+    val saltMixProduct: MutableLiveData<Int> = savedStateHandle.getLiveData("salt_mix_product", 0)
+    val saltMixVolume: MutableLiveData<Double> = savedStateHandle.getLiveData("salt_mix_volume", 5.0)
+    val saltMixCurrentPpt: MutableLiveData<Double> = savedStateHandle.getLiveData("salt_mix_current_ppt", 0.0)
+    val saltMixDesiredPpt: MutableLiveData<Double> = savedStateHandle.getLiveData("salt_mix_desired_ppt", 35.0)
 
-    fun setSaltMixProduct(index: Int) { _saltMixProduct.value = index }
-    fun setSaltMixVolume(value: Double) { _saltMixVolume.value = value }
-    fun setSaltMixCurrentPpt(value: Double) { _saltMixCurrentPpt.value = value }
-    fun setSaltMixDesiredPpt(value: Double) { _saltMixDesiredPpt.value = value }
+    fun setSaltMixProduct(index: Int) { saltMixProduct.value = index }
+    fun setSaltMixVolume(value: Double) { saltMixVolume.value = value }
+    fun setSaltMixCurrentPpt(value: Double) { saltMixCurrentPpt.value = value }
+    fun setSaltMixDesiredPpt(value: Double) { saltMixDesiredPpt.value = value }
     
     fun calculateSaltMix(): com.example.seachem_dosing.logic.SaltMixCalculations.SaltMixResult? {
         val products = com.example.seachem_dosing.logic.SaltMixCalculations.SALT_MIX_PRODUCTS.keys.toList()
-        val index = _saltMixProduct.value ?: 0
+        val index = saltMixProduct.value ?: 0
         if (index !in products.indices) return null
         
         return com.example.seachem_dosing.logic.SaltMixCalculations.calculateSaltMix(
             products[index],
-            _saltMixVolume.value ?: 0.0,
-            _saltMixCurrentPpt.value ?: 0.0,
-            _saltMixDesiredPpt.value ?: 0.0
+            saltMixVolume.value ?: 0.0,
+            saltMixCurrentPpt.value ?: 0.0,
+            saltMixDesiredPpt.value ?: 0.0
         )
     }
 
     fun setProfile(profile: AquariumProfile) {
-        _profile.value = profile
+        _profileId.value = profile.id
         applyProfileDefaults(profile)
     }
     
     private fun applyProfileDefaults(profile: AquariumProfile) {
         when (profile) {
             AquariumProfile.FRESHWATER -> {
-                _ammonia.value = 0.0
-                _nitrite.value = 0.0
-                _nitrate.value = 15.0
-                _gh.value = 4.0
-                _kh.value = 6.0
-                _ph.value = 7.2
-                _temperature.value = 26.0
-                _ghUnit.value = "dh"
-                _khUnit.value = "dh"
+                ammonia.value = 0.0
+                nitrite.value = 0.0
+                nitrate.value = 15.0
+                gh.value = 4.0
+                kh.value = 6.0
+                ph.value = 7.2
+                temperature.value = 26.0
+                ghUnit.value = "dh"
+                khUnit.value = "dh"
                 syncGhFromParams()
                 syncKhFromParams()
                 syncPhFromParams()
                 syncNewParams()
             }
             AquariumProfile.SALTWATER -> {
-                _ammonia.value = 0.0
-                _nitrite.value = 0.0
-                _gh.value = 0.0
-                _kh.value = 0.0
-                _dissolvedOxygen.value = 0.0
-                _salinity.value = 35.0
-                _alkalinity.value = 8.0
-                _calcium.value = 420.0
-                _magnesium.value = 1300.0
-                _nitrate.value = 10.0
-                _phosphate.value = 0.05
-                _ph.value = 8.2
-                _temperature.value = 26.0
+                ammonia.value = 0.0
+                nitrite.value = 0.0
+                gh.value = 0.0
+                kh.value = 0.0
+                dissolvedOxygen.value = 0.0
+                salinity.value = 35.0
+                alkalinity.value = 8.0
+                calcium.value = 420.0
+                magnesium.value = 1300.0
+                nitrate.value = 10.0
+                phosphate.value = 0.05
+                ph.value = 8.2
+                temperature.value = 26.0
                 syncPhFromParams()
                 syncNewParams()
             }
             AquariumProfile.POND -> {
-                _ammonia.value = 0.0
-                _nitrite.value = 0.0
-                _nitrate.value = 20.0
-                _gh.value = 0.0
-                _kh.value = 5.0
-                _ph.value = 7.4
-                _temperature.value = 22.0
-                _dissolvedOxygen.value = 7.5
-                _khUnit.value = "dh"
+                ammonia.value = 0.0
+                nitrite.value = 0.0
+                nitrate.value = 20.0
+                gh.value = 0.0
+                kh.value = 5.0
+                ph.value = 7.4
+                temperature.value = 22.0
+                dissolvedOxygen.value = 7.5
+                khUnit.value = "dh"
                 syncKhFromParams()
                 syncPhFromParams()
             }
         }
     }
     
-    // Parameter setters
-    fun setAmmonia(value: Double) { _ammonia.value = value }
-    fun setNitrite(value: Double) { _nitrite.value = value }
-    fun setNitrate(value: Double) { _nitrate.value = value }
-    fun setGh(value: Double) { _gh.value = value }
-    fun setKh(value: Double) { _kh.value = value }
-    fun setPh(value: Double) { _ph.value = value }
-    fun setTemperature(value: Double) { _temperature.value = value }
-    fun setSalinity(value: Double) { _salinity.value = value }
-    fun setAlkalinity(value: Double) { _alkalinity.value = value }
-    fun setCalcium(value: Double) { _calcium.value = value }
-    fun setMagnesium(value: Double) { _magnesium.value = value }
-    fun setPhosphate(value: Double) { _phosphate.value = value }
-    fun setDissolvedOxygen(value: Double) { _dissolvedOxygen.value = value }
-    fun setPotassium(value: Double) { _potassium.value = value }
-    fun setIron(value: Double) { _iron.value = value }
-    fun setStrontium(value: Double) { _strontium.value = value }
-    fun setIodide(value: Double) { _iodide.value = value }
-    fun setGhUnit(unit: String) { _ghUnit.value = unit }
-    fun setKhUnit(unit: String) { _khUnit.value = unit }
+    // Parameter setters with validation
+    fun setAmmonia(value: Double) { ammonia.value = coerceNonNegative(value) }
+    fun setNitrite(value: Double) { nitrite.value = coerceNonNegative(value) }
+    fun setNitrate(value: Double) { nitrate.value = coerceNonNegative(value) }
+    fun setGh(value: Double) { gh.value = coerceNonNegative(value) }
+    fun setKh(value: Double) { kh.value = coerceNonNegative(value) }
+    fun setPh(value: Double) { ph.value = coercePh(value) }
+    fun setTemperature(value: Double) { temperature.value = coerceTemperature(value) }
+    fun setSalinity(value: Double) { salinity.value = coerceSalinity(value) }
+    fun setAlkalinity(value: Double) { alkalinity.value = coerceNonNegative(value) }
+    fun setCalcium(value: Double) { calcium.value = coerceNonNegative(value) }
+    fun setMagnesium(value: Double) { magnesium.value = coerceNonNegative(value) }
+    fun setPhosphate(value: Double) { phosphate.value = coerceNonNegative(value) }
+    fun setDissolvedOxygen(value: Double) { dissolvedOxygen.value = coerceNonNegative(value) }
+    fun setPotassium(value: Double) { potassium.value = coerceNonNegative(value) }
+    fun setIron(value: Double) { iron.value = coerceNonNegative(value) }
+    fun setStrontium(value: Double) { strontium.value = coerceNonNegative(value) }
+    fun setIodide(value: Double) { iodide.value = coerceNonNegative(value) }
+    fun setGhUnit(unit: String) { ghUnit.value = unit }
+    fun setKhUnit(unit: String) { khUnit.value = unit }
     
     // Legacy setters (kept for compatibility if referenced)
     fun setKhCurrent(value: Double) { _khCurrent.value = value }

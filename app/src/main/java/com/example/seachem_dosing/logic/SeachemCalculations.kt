@@ -372,26 +372,35 @@ object SeachemCalculations {
     
     // Sand and Gravel
     fun calculateGravel(length: BigDecimal, width: BigDecimal, depth: BigDecimal, unit: String, divisor: BigDecimal, smallDivisor: BigDecimal): CalculationResult {
+        // Validate inputs
+        if (length.compareTo(BigDecimal.ZERO) <= 0 ||
+            width.compareTo(BigDecimal.ZERO) <= 0 ||
+            depth.compareTo(BigDecimal.ZERO) <= 0) {
+            return CalculationResult(BigDecimal.ZERO, "bags (Standard)", BigDecimal.ZERO, "bags (Small/7kg)")
+        }
+
         var l = length
         var w = width
         var d = depth
-        
+
         if (unit == "cm") {
             val inch = BigDecimal("2.54")
             l = l.divide(inch, MC)
             w = w.divide(inch, MC)
             d = d.divide(inch, MC)
         }
-        
+
         val volume = l.multiply(w, MC).multiply(d, MC)
-        
-        if (divisor.compareTo(BigDecimal.ZERO) == 0) return CalculationResult(BigDecimal.ZERO, "bags", BigDecimal.ZERO, "bags")
+
+        if (divisor.compareTo(BigDecimal.ZERO) <= 0) {
+            return CalculationResult(BigDecimal.ZERO, "bags (Standard)", BigDecimal.ZERO, "bags (Small/7kg)")
+        }
 
         val bags = volume.divide(divisor, MC).setScale(0, RoundingMode.CEILING)
-        val bagsSmall = if (smallDivisor.compareTo(BigDecimal.ZERO) > 0) 
-            volume.divide(smallDivisor, MC).setScale(0, RoundingMode.CEILING) 
-            else BigDecimal.ZERO
-            
+        val bagsSmall = if (smallDivisor.compareTo(BigDecimal.ZERO) > 0)
+            volume.divide(smallDivisor, MC).setScale(0, RoundingMode.CEILING)
+        else BigDecimal.ZERO
+
         return CalculationResult(bags, "bags (Standard)", bagsSmall, "bags (Small/7kg)")
     }
 }

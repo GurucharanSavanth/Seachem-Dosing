@@ -23,11 +23,19 @@ import com.example.seachem_dosing.databinding.FragmentCalculatorsBinding
 import com.example.seachem_dosing.logic.Calculations
 import com.example.seachem_dosing.logic.SeachemCalculations
 import com.example.seachem_dosing.ui.MainViewModel
+import com.example.seachem_dosing.util.DebouncedTextWatcher
+import com.example.seachem_dosing.util.TextWatcherManager
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.transition.MaterialFadeThrough
+
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 
 class CalculatorsFragment : Fragment() {
 
@@ -35,6 +43,13 @@ class CalculatorsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MainViewModel by activityViewModels()
+
+    // TextWatcher manager for proper cleanup to prevent memory leaks
+    private val textWatcherManager = TextWatcherManager()
+
+    private companion object {
+        const val INPUT_DEBOUNCE_MS = 250L
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,93 +72,127 @@ class CalculatorsFragment : Fragment() {
 
         applyProfileUi()
         setupVolumeDisplay()
-        
-        // --- Planted (Freshwater) ---
-        setupUniversalCard(binding.cardFlourish.root, "flourish", SeachemCalculations.Product.FLOURISH, R.string.calc_flourish_title, R.string.calc_flourish_subtitle, showInputs = false)
-        setupUniversalCard(binding.cardFlourishTrace.root, "flourish_trace", SeachemCalculations.Product.FLOURISH_TRACE, R.string.calc_flourish_trace_title, R.string.calc_flourish_trace_subtitle, showInputs = false)
-        
-        setupUniversalCard(binding.cardFlourishIron.root, "flourish_iron", SeachemCalculations.Product.FLOURISH_IRON, R.string.calc_flourish_iron_title, R.string.calc_flourish_iron_subtitle, 
-            showScale = true, currentLabelRes = R.string.label_current_fe, targetLabelRes = R.string.label_target_fe)
-            
-        setupUniversalCard(binding.cardFlourishNitrogen.root, "flourish_nitrogen", SeachemCalculations.Product.FLOURISH_NITROGEN, R.string.calc_flourish_nitrogen_title, R.string.calc_flourish_nitrogen_subtitle,
-            showScale = true, currentLabelRes = R.string.label_current_n, targetLabelRes = R.string.label_target_n)
-            
-        setupUniversalCard(binding.cardFlourishPhosphorus.root, "flourish_phosphorus", SeachemCalculations.Product.FLOURISH_PHOSPHORUS, R.string.calc_flourish_phosphorus_title, R.string.calc_flourish_phosphorus_subtitle,
-            showScale = true, currentLabelRes = R.string.label_current_p, targetLabelRes = R.string.label_target_p)
-            
-        setupUniversalCard(binding.cardFlourishPotassium.root, "flourish_potassium", SeachemCalculations.Product.FLOURISH_POTASSIUM, R.string.calc_flourish_potassium_title, R.string.calc_flourish_potassium_subtitle,
-            showScale = true, currentLabelRes = R.string.label_current_k, targetLabelRes = R.string.label_target_k)
-            
-        setupUniversalCard(binding.cardAlkalineBuffer.root, "alkaline_buffer", SeachemCalculations.Product.ALKALINE_BUFFER, R.string.calc_alkaline_buffer_title, R.string.calc_alkaline_buffer_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
-            currentLabelRes = R.string.label_current_kh_meq, targetLabelRes = R.string.label_target_kh_meq)
-            
-        setupUniversalCard(binding.cardAcidBuffer.root, "acid_buffer", SeachemCalculations.Product.ACID_BUFFER, R.string.calc_acid_title, R.string.calc_acid_subtitle, SeachemCalculations.UnitScale.DKH, true,
-            currentLabelRes = R.string.label_current_kh, targetLabelRes = R.string.label_target_kh)
-            
-        setupUniversalCard(binding.cardPotassiumBicarbonate.root, "khco3", SeachemCalculations.Product.POTASSIUM_BICARBONATE, R.string.calc_khco3_title, R.string.calc_khco3_subtitle, SeachemCalculations.UnitScale.DKH, true,
-            currentLabelRes = R.string.label_current_kh, targetLabelRes = R.string.label_target_kh)
-        
-        setupUniversalCard(binding.cardEquilibrium.root, "equilibrium", SeachemCalculations.Product.EQUILIBRIUM, R.string.calc_equilibrium_title, R.string.calc_equilibrium_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
-            currentLabelRes = R.string.label_current_gh_meq, targetLabelRes = R.string.label_target_gh_meq)
-            
-        setupUniversalCard(binding.cardNeutralRegulator.root, "neutral_regulator", SeachemCalculations.Product.NEUTRAL_REGULATOR, R.string.calc_neutral_title, R.string.calc_neutral_subtitle,
-            showScale = false, currentLabelRes = R.string.label_current_ph, targetLabelRes = R.string.label_target_ph) 
-        
-        // --- Saltwater ---
-        setupUniversalCard(binding.cardReefAdvCalcium.root, "reef_adv_calcium", SeachemCalculations.Product.REEF_ADVANTAGE_CALCIUM, R.string.calc_reef_adv_calcium_title, R.string.calc_reef_adv_calcium_subtitle,
-            showScale = true, currentLabelRes = R.string.label_current_ca, targetLabelRes = R.string.label_target_ca)
-            
-        setupUniversalCard(binding.cardReefAdvMagnesium.root, "reef_adv_magnesium", SeachemCalculations.Product.REEF_ADVANTAGE_MAGNESIUM, R.string.calc_reef_adv_magnesium_title, R.string.calc_reef_adv_magnesium_subtitle,
-            showScale = true, currentLabelRes = R.string.label_current_mg, targetLabelRes = R.string.label_target_mg)
-            
-        setupUniversalCard(binding.cardReefAdvStrontium.root, "reef_adv_strontium", SeachemCalculations.Product.REEF_ADVANTAGE_STRONTIUM, R.string.calc_reef_adv_strontium_title, R.string.calc_reef_adv_strontium_subtitle,
-            showScale = true, currentLabelRes = R.string.label_current_sr, targetLabelRes = R.string.label_target_sr)
-        
-        setupUniversalCard(binding.cardReefBuffer.root, "reef_buffer", SeachemCalculations.Product.REEF_BUFFER, R.string.calc_reef_buffer_title, R.string.calc_reef_buffer_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
-            currentLabelRes = R.string.label_current_alk, targetLabelRes = R.string.label_target_alk)
-            
-        setupUniversalCard(binding.cardReefBuilder.root, "reef_builder", SeachemCalculations.Product.REEF_BUILDER, R.string.calc_reef_builder_title, R.string.calc_reef_builder_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
-            currentLabelRes = R.string.label_current_alk, targetLabelRes = R.string.label_target_alk)
-            
-        setupUniversalCard(binding.cardReefCalcium.root, "reef_calcium", SeachemCalculations.Product.REEF_CALCIUM, R.string.calc_reef_calcium_title, R.string.calc_reef_calcium_subtitle,
-            showScale = true, currentLabelRes = R.string.label_current_ca, targetLabelRes = R.string.label_target_ca)
-            
-        setupUniversalCard(binding.cardReefCarbonate.root, "reef_carbonate", SeachemCalculations.Product.REEF_CARBONATE, R.string.calc_reef_carbonate_title, R.string.calc_reef_carbonate_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
-            currentLabelRes = R.string.label_current_alk, targetLabelRes = R.string.label_target_alk)
-            
-        setupUniversalCard(binding.cardReefComplete.root, "reef_complete", SeachemCalculations.Product.REEF_COMPLETE, R.string.calc_reef_complete_title, R.string.calc_reef_complete_subtitle,
-            showScale = true, currentLabelRes = R.string.label_current_ca, targetLabelRes = R.string.label_target_ca)
-            
-        setupUniversalCard(binding.cardReefFusion1.root, "reef_fusion1", SeachemCalculations.Product.REEF_FUSION_1, R.string.calc_reef_fusion1_title, R.string.calc_reef_fusion1_subtitle,
-            showScale = true, currentLabelRes = R.string.label_current_ca, targetLabelRes = R.string.label_target_ca)
-            
-        setupUniversalCard(binding.cardReefFusion2.root, "reef_fusion2", SeachemCalculations.Product.REEF_FUSION_2, R.string.calc_reef_fusion2_title, R.string.calc_reef_fusion2_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
-            currentLabelRes = R.string.label_current_alk, targetLabelRes = R.string.label_target_alk)
-            
-        setupUniversalCard(binding.cardReefIodide.root, "reef_iodide", SeachemCalculations.Product.REEF_IODIDE, R.string.calc_reef_iodide_title, R.string.calc_reef_iodide_subtitle,
-            showScale = true, currentLabelRes = R.string.label_current_i, targetLabelRes = R.string.label_target_i)
-            
-        setupUniversalCard(binding.cardReefStrontium.root, "reef_strontium", SeachemCalculations.Product.REEF_STRONTIUM, R.string.calc_reef_strontium_title, R.string.calc_reef_strontium_subtitle,
-            showScale = true, currentLabelRes = R.string.label_current_sr, targetLabelRes = R.string.label_target_sr)
 
-        // --- Sand and Gravel ---
-        setupSubstrateCard()
-        setupSaltMixCard()
+        // Offload heavy initialization to a coroutine with better frame pacing
+        // Use Default dispatcher for setup work to avoid blocking main thread
+        viewLifecycleOwner.lifecycleScope.launch {
+            // Setup cards in smaller batches with yields between to prevent frame drops
+            // Batch 1: Planted basics
+            setupCardBatch {
+                setupUniversalCard(binding.cardFlourish.root, "flourish", SeachemCalculations.Product.FLOURISH, R.string.calc_flourish_title, R.string.calc_flourish_subtitle, showInputs = false)
+                setupUniversalCard(binding.cardFlourishTrace.root, "flourish_trace", SeachemCalculations.Product.FLOURISH_TRACE, R.string.calc_flourish_trace_title, R.string.calc_flourish_trace_subtitle, showInputs = false)
+            }
 
-        // --- Quick Doses ---
-        setupPrimeCard(binding.cardPrimeFresh.root)
-        setupPrimeCard(binding.cardPrimeSalt.root)
-        
-        setupStabilityCard(binding.cardStabilityFresh.root)
-        setupStabilityCard(binding.cardStabilitySalt.root)
-        
-        setupSafeCard(binding.cardSafeFresh.root)
-        setupSafeCard(binding.cardSafeSalt.root)
+            // Batch 2: Planted nutrients
+            setupCardBatch {
+                setupUniversalCard(binding.cardFlourishIron.root, "flourish_iron", SeachemCalculations.Product.FLOURISH_IRON, R.string.calc_flourish_iron_title, R.string.calc_flourish_iron_subtitle,
+                    showScale = true, currentLabelRes = R.string.label_current_fe, targetLabelRes = R.string.label_target_fe)
+                setupUniversalCard(binding.cardFlourishNitrogen.root, "flourish_nitrogen", SeachemCalculations.Product.FLOURISH_NITROGEN, R.string.calc_flourish_nitrogen_title, R.string.calc_flourish_nitrogen_subtitle,
+                    showScale = true, currentLabelRes = R.string.label_current_n, targetLabelRes = R.string.label_target_n)
+            }
 
-        setupWaterChangeCard(binding.cardWaterChangeFresh.root)
-        setupWaterChangeCard(binding.cardWaterChangeSalt.root)
+            setupCardBatch {
+                setupUniversalCard(binding.cardFlourishPhosphorus.root, "flourish_phosphorus", SeachemCalculations.Product.FLOURISH_PHOSPHORUS, R.string.calc_flourish_phosphorus_title, R.string.calc_flourish_phosphorus_subtitle,
+                    showScale = true, currentLabelRes = R.string.label_current_p, targetLabelRes = R.string.label_target_p)
+                setupUniversalCard(binding.cardFlourishPotassium.root, "flourish_potassium", SeachemCalculations.Product.FLOURISH_POTASSIUM, R.string.calc_flourish_potassium_title, R.string.calc_flourish_potassium_subtitle,
+                    showScale = true, currentLabelRes = R.string.label_current_k, targetLabelRes = R.string.label_target_k)
+            }
+
+            // Batch 3: Buffers
+            setupCardBatch {
+                setupUniversalCard(binding.cardAlkalineBuffer.root, "alkaline_buffer", SeachemCalculations.Product.ALKALINE_BUFFER, R.string.calc_alkaline_buffer_title, R.string.calc_alkaline_buffer_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
+                    currentLabelRes = R.string.label_current_kh_meq, targetLabelRes = R.string.label_target_kh_meq)
+                setupUniversalCard(binding.cardAcidBuffer.root, "acid_buffer", SeachemCalculations.Product.ACID_BUFFER, R.string.calc_acid_title, R.string.calc_acid_subtitle, SeachemCalculations.UnitScale.DKH, true,
+                    currentLabelRes = R.string.label_current_kh, targetLabelRes = R.string.label_target_kh)
+            }
+
+            setupCardBatch {
+                setupUniversalCard(binding.cardPotassiumBicarbonate.root, "khco3", SeachemCalculations.Product.POTASSIUM_BICARBONATE, R.string.calc_khco3_title, R.string.calc_khco3_subtitle, SeachemCalculations.UnitScale.DKH, true,
+                    currentLabelRes = R.string.label_current_kh, targetLabelRes = R.string.label_target_kh)
+                setupUniversalCard(binding.cardEquilibrium.root, "equilibrium", SeachemCalculations.Product.EQUILIBRIUM, R.string.calc_equilibrium_title, R.string.calc_equilibrium_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
+                    currentLabelRes = R.string.label_current_gh_meq, targetLabelRes = R.string.label_target_gh_meq)
+                setupUniversalCard(binding.cardNeutralRegulator.root, "neutral_regulator", SeachemCalculations.Product.NEUTRAL_REGULATOR, R.string.calc_neutral_title, R.string.calc_neutral_subtitle,
+                    showScale = false, currentLabelRes = R.string.label_current_ph, targetLabelRes = R.string.label_target_ph)
+            }
+
+            // Batch 4: Saltwater basics
+            setupCardBatch {
+                setupUniversalCard(binding.cardReefAdvCalcium.root, "reef_adv_calcium", SeachemCalculations.Product.REEF_ADVANTAGE_CALCIUM, R.string.calc_reef_adv_calcium_title, R.string.calc_reef_adv_calcium_subtitle,
+                    showScale = true, currentLabelRes = R.string.label_current_ca, targetLabelRes = R.string.label_target_ca)
+                setupUniversalCard(binding.cardReefAdvMagnesium.root, "reef_adv_magnesium", SeachemCalculations.Product.REEF_ADVANTAGE_MAGNESIUM, R.string.calc_reef_adv_magnesium_title, R.string.calc_reef_adv_magnesium_subtitle,
+                    showScale = true, currentLabelRes = R.string.label_current_mg, targetLabelRes = R.string.label_target_mg)
+                setupUniversalCard(binding.cardReefAdvStrontium.root, "reef_adv_strontium", SeachemCalculations.Product.REEF_ADVANTAGE_STRONTIUM, R.string.calc_reef_adv_strontium_title, R.string.calc_reef_adv_strontium_subtitle,
+                    showScale = true, currentLabelRes = R.string.label_current_sr, targetLabelRes = R.string.label_target_sr)
+            }
+
+            // Batch 5: Reef buffers
+            setupCardBatch {
+                setupUniversalCard(binding.cardReefBuffer.root, "reef_buffer", SeachemCalculations.Product.REEF_BUFFER, R.string.calc_reef_buffer_title, R.string.calc_reef_buffer_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
+                    currentLabelRes = R.string.label_current_alk, targetLabelRes = R.string.label_target_alk)
+                setupUniversalCard(binding.cardReefBuilder.root, "reef_builder", SeachemCalculations.Product.REEF_BUILDER, R.string.calc_reef_builder_title, R.string.calc_reef_builder_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
+                    currentLabelRes = R.string.label_current_alk, targetLabelRes = R.string.label_target_alk)
+                setupUniversalCard(binding.cardReefCalcium.root, "reef_calcium", SeachemCalculations.Product.REEF_CALCIUM, R.string.calc_reef_calcium_title, R.string.calc_reef_calcium_subtitle,
+                    showScale = true, currentLabelRes = R.string.label_current_ca, targetLabelRes = R.string.label_target_ca)
+            }
+
+            // Batch 6: More reef
+            setupCardBatch {
+                setupUniversalCard(binding.cardReefCarbonate.root, "reef_carbonate", SeachemCalculations.Product.REEF_CARBONATE, R.string.calc_reef_carbonate_title, R.string.calc_reef_carbonate_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
+                    currentLabelRes = R.string.label_current_alk, targetLabelRes = R.string.label_target_alk)
+                setupUniversalCard(binding.cardReefComplete.root, "reef_complete", SeachemCalculations.Product.REEF_COMPLETE, R.string.calc_reef_complete_title, R.string.calc_reef_complete_subtitle,
+                    showScale = true, currentLabelRes = R.string.label_current_ca, targetLabelRes = R.string.label_target_ca)
+            }
+
+            // Batch 7: Reef fusion
+            setupCardBatch {
+                setupUniversalCard(binding.cardReefFusion1.root, "reef_fusion1", SeachemCalculations.Product.REEF_FUSION_1, R.string.calc_reef_fusion1_title, R.string.calc_reef_fusion1_subtitle,
+                    showScale = true, currentLabelRes = R.string.label_current_ca, targetLabelRes = R.string.label_target_ca)
+                setupUniversalCard(binding.cardReefFusion2.root, "reef_fusion2", SeachemCalculations.Product.REEF_FUSION_2, R.string.calc_reef_fusion2_title, R.string.calc_reef_fusion2_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
+                    currentLabelRes = R.string.label_current_alk, targetLabelRes = R.string.label_target_alk)
+            }
+
+            // Batch 8: Reef trace elements
+            setupCardBatch {
+                setupUniversalCard(binding.cardReefIodide.root, "reef_iodide", SeachemCalculations.Product.REEF_IODIDE, R.string.calc_reef_iodide_title, R.string.calc_reef_iodide_subtitle,
+                    showScale = true, currentLabelRes = R.string.label_current_i, targetLabelRes = R.string.label_target_i)
+                setupUniversalCard(binding.cardReefStrontium.root, "reef_strontium", SeachemCalculations.Product.REEF_STRONTIUM, R.string.calc_reef_strontium_title, R.string.calc_reef_strontium_subtitle,
+                    showScale = true, currentLabelRes = R.string.label_current_sr, targetLabelRes = R.string.label_target_sr)
+            }
+
+            // Batch 9: Substrate and Salt Mix
+            setupCardBatch {
+                setupSubstrateCard()
+                setupSaltMixCard()
+            }
+
+            // Batch 10: Quick doses
+            setupCardBatch {
+                setupPrimeCard(binding.cardPrimeFresh.root)
+                setupPrimeCard(binding.cardPrimeSalt.root)
+                setupStabilityCard(binding.cardStabilityFresh.root)
+                setupStabilityCard(binding.cardStabilitySalt.root)
+            }
+
+            setupCardBatch {
+                setupSafeCard(binding.cardSafeFresh.root)
+                setupSafeCard(binding.cardSafeSalt.root)
+                setupWaterChangeCard(binding.cardWaterChangeFresh.root)
+                setupWaterChangeCard(binding.cardWaterChangeSalt.root)
+            }
+        }
 
         observeViewModel()
+    }
+
+    /**
+     * Helper function to setup cards in a batch with proper frame pacing.
+     * Yields after each batch to allow the UI to render frames.
+     */
+    private suspend fun setupCardBatch(block: () -> Unit) {
+        // Check if view is still valid
+        if (_binding == null) return
+        block()
+        yield() // Allow UI to render frames
     }
 
     private fun setupUniversalCard(
@@ -188,7 +237,7 @@ class CalculatorsFragment : Fragment() {
         val degreeLabel = if (isGh) "dGH" else "dKH"
         
         val scales = if (showScale) arrayOf("meq/L", degreeLabel, "ppm") else emptyArray()
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, scales)
+        val adapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_menu, scales)
         spinnerScale.setAdapter(adapter)
         
         if (showScale) {
@@ -247,14 +296,12 @@ class CalculatorsFragment : Fragment() {
             }
         }
 
-        val watcher = object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) = calculate()
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        }
-        
-        etCurrent.addTextChangedListener(watcher)
-        etTarget.addTextChangedListener(watcher)
+        // Use debounced watchers to prevent frame drops from rapid calculations
+        val currentWatcher = DebouncedTextWatcher(INPUT_DEBOUNCE_MS, viewLifecycleOwner) { calculate() }
+        val targetWatcher = DebouncedTextWatcher(INPUT_DEBOUNCE_MS, viewLifecycleOwner) { calculate() }
+
+        etCurrent.addTextChangedListener(currentWatcher)
+        etTarget.addTextChangedListener(targetWatcher)
         spinnerScale.setOnItemClickListener { _, _, _, _ -> calculate() }
         
         // Restore Inputs from ViewModel
@@ -286,7 +333,7 @@ class CalculatorsFragment : Fragment() {
         setupExpandableCard(header, content, expandIcon)
 
         val products = listOf("Flourite", "Flourite Black", "Flourite Black Sand", "Flourite Dark", "Flourite Red", "Flourite Sand", "Gray Coast", "Meridian", "Onyx", "Onyx Sand", "Pearl Beach")
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, products)
+        val adapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_menu, products)
         spinner.setAdapter(adapter)
         spinner.setText(products[0], false)
         
@@ -311,14 +358,13 @@ class CalculatorsFragment : Fragment() {
             result.text = "${res.primaryValue.toPlainString()} Bags (~${String.format("%.1f", weight)} kg)"
         }
 
-        val watcher = object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) = calculate()
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        }
-        etL.addTextChangedListener(watcher)
-        etW.addTextChangedListener(watcher)
-        etD.addTextChangedListener(watcher)
+        // Use debounced watchers
+        val watcherL = DebouncedTextWatcher(INPUT_DEBOUNCE_MS, viewLifecycleOwner) { calculate() }
+        val watcherW = DebouncedTextWatcher(INPUT_DEBOUNCE_MS, viewLifecycleOwner) { calculate() }
+        val watcherD = DebouncedTextWatcher(INPUT_DEBOUNCE_MS, viewLifecycleOwner) { calculate() }
+        etL.addTextChangedListener(watcherL)
+        etW.addTextChangedListener(watcherW)
+        etD.addTextChangedListener(watcherD)
         spinner.setOnItemClickListener { _, _, _, _ -> calculate() }
         toggleUnit.addOnButtonCheckedListener { _, _, _ -> calculate() }
     }
@@ -373,13 +419,8 @@ class CalculatorsFragment : Fragment() {
         
         setupExpandableCard(header, content, expandIcon)
         
-        val watcher = object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                val p = s.toString().toDoubleOrNull() ?: 0.0
-                result.text = String.format("%.1f L", viewModel.calculateWaterChangeLitres(p))
-            }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        val watcher = DebouncedTextWatcher(INPUT_DEBOUNCE_MS, viewLifecycleOwner) { p ->
+            result.text = String.format("%.1f L", viewModel.calculateWaterChangeLitres(p))
         }
         percentInput.addTextChangedListener(watcher)
         // Initial calc
@@ -399,7 +440,7 @@ class CalculatorsFragment : Fragment() {
         val dialogBinding = DialogEditVolumeBinding.inflate(layoutInflater)
 
         val volumeUnits = arrayOf(getString(R.string.unit_us_gallon), getString(R.string.unit_litre), getString(R.string.unit_uk_gallon))
-        val volumeAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, volumeUnits)
+        val volumeAdapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_menu, volumeUnits)
         dialogBinding.dialogSpinnerVolumeUnit.setAdapter(volumeAdapter)
         val currentVolumeUnit = viewModel.volumeUnit.value ?: "US"
         val volumeIndex = when (currentVolumeUnit) {
@@ -419,7 +460,7 @@ class CalculatorsFragment : Fragment() {
         }
 
         val dimUnits = arrayOf(getString(R.string.unit_cm), getString(R.string.unit_in), getString(R.string.unit_ft))
-        val dimAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, dimUnits)
+        val dimAdapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_menu, dimUnits)
         dialogBinding.dialogSpinnerDimUnit.setAdapter(dimAdapter)
         val currentDimUnit = viewModel.dimUnit.value ?: "cm"
         val dimIndex = when (currentDimUnit) {
@@ -524,7 +565,7 @@ class CalculatorsFragment : Fragment() {
 
         // Setup Spinner
         val products = com.example.seachem_dosing.logic.SaltMixCalculations.SALT_MIX_PRODUCTS.keys.toList()
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, products)
+        val adapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_menu, products)
         spinner.setAdapter(adapter)
         
         // Restore/Init
@@ -567,17 +608,16 @@ class CalculatorsFragment : Fragment() {
             }
         }
 
-        val watcher = object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) = calculate()
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        }
-        
-        etVol.addTextChangedListener(watcher)
-        etCur.addTextChangedListener(watcher)
-        etTar.addTextChangedListener(watcher)
+        // Use debounced watchers
+        val volWatcher = DebouncedTextWatcher(INPUT_DEBOUNCE_MS, viewLifecycleOwner) { calculate() }
+        val curWatcher = DebouncedTextWatcher(INPUT_DEBOUNCE_MS, viewLifecycleOwner) { calculate() }
+        val tarWatcher = DebouncedTextWatcher(INPUT_DEBOUNCE_MS, viewLifecycleOwner) { calculate() }
+
+        etVol.addTextChangedListener(volWatcher)
+        etCur.addTextChangedListener(curWatcher)
+        etTar.addTextChangedListener(tarWatcher)
         spinner.setOnItemClickListener { _, _, _, _ -> calculate() }
-        
+
         calculate()
     }
 
@@ -604,5 +644,12 @@ class CalculatorsFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.volume.observe(viewLifecycleOwner) { updateVolumeDisplay() }
         viewModel.profile.observe(viewLifecycleOwner) { applyProfileUi() }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Clean up text watchers to prevent memory leaks
+        textWatcherManager.cleanup()
+        _binding = null
     }
 }

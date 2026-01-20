@@ -28,8 +28,6 @@ class SettingsFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
 
     private var currentThemeMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-    private var currentVolumeUnit = "US"
-    private var currentHardnessUnit = "dh"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -164,22 +162,29 @@ class SettingsFragment : Fragment() {
         val settingVolumeUnit = view.findViewById<LinearLayout>(R.id.settingVolumeUnit)
         val tvCurrentVolumeUnit = view.findViewById<TextView>(R.id.tvCurrentVolumeUnit)
 
-        currentVolumeUnit = viewModel.volumeUnit.value ?: "US"
-        updateVolumeUnitText(tvCurrentVolumeUnit)
+        viewModel.volumeUnit.observe(viewLifecycleOwner) { unit ->
+            tvCurrentVolumeUnit.text = when (unit) {
+                "US" -> getString(R.string.unit_us_gallon)
+                "L" -> getString(R.string.unit_litre)
+                "UK" -> getString(R.string.unit_uk_gallon)
+                else -> getString(R.string.unit_us_gallon)
+            }
+        }
 
         settingVolumeUnit.setOnClickListener {
-            showVolumeUnitDialog(tvCurrentVolumeUnit)
+            showVolumeUnitDialog()
         }
     }
 
-    private fun showVolumeUnitDialog(tvCurrentVolumeUnit: TextView) {
+    private fun showVolumeUnitDialog() {
         val units = arrayOf(
             getString(R.string.unit_us_gallon),
             getString(R.string.unit_litre),
             getString(R.string.unit_uk_gallon)
         )
 
-        val currentSelection = when (currentVolumeUnit) {
+        val currentUnit = viewModel.volumeUnit.value ?: "US"
+        val currentSelection = when (currentUnit) {
             "US" -> 0
             "L" -> 1
             "UK" -> 2
@@ -189,70 +194,54 @@ class SettingsFragment : Fragment() {
         AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.settings_volume_unit))
             .setSingleChoiceItems(units, currentSelection) { dialog, which ->
-                currentVolumeUnit = when (which) {
+                val newUnit = when (which) {
                     0 -> "US"
                     1 -> "L"
                     2 -> "UK"
                     else -> "US"
                 }
-                viewModel.setVolumeUnit(currentVolumeUnit)
-                updateVolumeUnitText(tvCurrentVolumeUnit)
+                viewModel.setVolumeUnit(newUnit)
                 dialog.dismiss()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
-    }
-
-    private fun updateVolumeUnitText(tvCurrentVolumeUnit: TextView) {
-        tvCurrentVolumeUnit.text = when (currentVolumeUnit) {
-            "US" -> getString(R.string.unit_us_gallon)
-            "L" -> getString(R.string.unit_litre)
-            "UK" -> getString(R.string.unit_uk_gallon)
-            else -> getString(R.string.unit_us_gallon)
-        }
     }
 
     private fun setupHardnessUnitSetting(view: View) {
         val settingHardnessUnit = view.findViewById<LinearLayout>(R.id.settingHardnessUnit)
         val tvCurrentHardnessUnit = view.findViewById<TextView>(R.id.tvCurrentHardnessUnit)
 
-        currentHardnessUnit = viewModel.ghUnit.value ?: "dh"
-        updateHardnessUnitText(tvCurrentHardnessUnit)
+        viewModel.ghUnit.observe(viewLifecycleOwner) { unit ->
+            tvCurrentHardnessUnit.text = if (unit == "dh") {
+                getString(R.string.unit_dgh)
+            } else {
+                getString(R.string.unit_ppm)
+            }
+        }
 
         settingHardnessUnit.setOnClickListener {
-            showHardnessUnitDialog(tvCurrentHardnessUnit)
+            showHardnessUnitDialog()
         }
     }
 
-    private fun showHardnessUnitDialog(tvCurrentHardnessUnit: TextView) {
+    private fun showHardnessUnitDialog() {
         val units = arrayOf(
             getString(R.string.unit_dgh),
             getString(R.string.unit_ppm)
         )
 
-        val currentSelection = if (currentHardnessUnit == "dh") 0 else 1
+        val currentUnit = viewModel.ghUnit.value ?: "dh"
+        val currentSelection = if (currentUnit == "dh") 0 else 1
 
         AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.settings_hardness_unit))
             .setSingleChoiceItems(units, currentSelection) { dialog, which ->
-                val oldUnit = currentHardnessUnit
-                currentHardnessUnit = if (which == 0) "dh" else "ppm"
-                if (currentHardnessUnit != oldUnit) {
-                    viewModel.updateHardnessUnit(currentHardnessUnit)
-                }
-                updateHardnessUnitText(tvCurrentHardnessUnit)
+                val newUnit = if (which == 0) "dh" else "ppm"
+                viewModel.updateHardnessUnit(newUnit)
                 dialog.dismiss()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
-    }
-
-    private fun updateHardnessUnitText(tvCurrentHardnessUnit: TextView) {
-        tvCurrentHardnessUnit.text = if (currentHardnessUnit == "dh") {
-            getString(R.string.unit_dgh)
-        } else {
-            getString(R.string.unit_ppm)
-        }
     }
 
     private fun setupWaterChangeSetting(view: View) {
@@ -314,10 +303,10 @@ class SettingsFragment : Fragment() {
                 // Reset theme to system default
                 currentThemeMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                 AppCompatDelegate.setDefaultNightMode(currentThemeMode)
-                // Refresh UI
-                view?.let { setupThemeSetting(it) }
-                view?.let { setupVolumeUnitSetting(it) }
-                view?.let { setupHardnessUnitSetting(it) }
+                // Safely find the theme text view
+                view?.findViewById<TextView>(R.id.tvCurrentTheme)?.let { tvCurrentTheme ->
+                    updateThemeText(tvCurrentTheme)
+                }
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
