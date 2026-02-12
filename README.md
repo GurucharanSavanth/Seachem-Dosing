@@ -119,7 +119,6 @@ SeachemDosing/
 │       └── uiHandlers.js
 │
 └── docs/
-    ├── CLAUDE.md      # AI assistant context
     ├── MEMORY.md      # Project history
     └── AGENTS.md      # Dev guidelines
 ```
