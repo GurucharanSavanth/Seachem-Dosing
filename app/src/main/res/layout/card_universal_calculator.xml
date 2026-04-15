@@ -25,6 +25,8 @@
             android:paddingEnd="24dp"
             android:paddingBottom="24dp"
             android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
             android:background="?attr/selectableItemBackground">
 
             <LinearLayout
@@ -40,7 +42,9 @@
                     tools:text="Seachem Flourish"
                     android:textAppearance="?attr/textAppearanceHeadlineSmall"
                     android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface" />
+                    android:textColor="?attr/colorOnSurface"
+                    android:maxLines="2"
+                    android:ellipsize="end" />
 
                 <TextView
                     android:id="@+id/tvSubtitle"
@@ -49,7 +53,9 @@
                     android:layout_marginTop="4dp"
                     tools:text="Comprehensive Supplement"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?attr/colorOnSurfaceVariant" />
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:maxLines="2"
+                    android:ellipsize="end" />
 
             </LinearLayout>
 
@@ -57,9 +63,14 @@
                 android:id="@+id/tvResult"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:layout_marginStart="12dp"
+                android:gravity="end"
+                android:textAlignment="viewEnd"
+                android:textAppearance="?attr/textAppearanceTitleLarge"
                 android:textColor="?attr/colorPrimary"
                 android:textStyle="bold"
+                android:maxLines="2"
+                android:ellipsize="end"
                 tools:text="2.5 mL" />
 
             <ImageView
@@ -69,7 +80,7 @@
                 android:layout_marginStart="12dp"
                 android:src="@drawable/ic_expand_more"
                 app:tint="?attr/colorOnSurfaceVariant"
-                android:contentDescription="@null" />
+                android:contentDescription="@string/cd_expand_card" />
 
         </LinearLayout>
 
@@ -91,7 +102,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="Measurement Scale">
+                android:hint="@string/label_measurement_scale">
 
                 <AutoCompleteTextView
                     android:id="@+id/spinnerUnitScale"

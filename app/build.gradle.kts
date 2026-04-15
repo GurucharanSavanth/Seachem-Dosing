@@ -3,6 +3,21 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
+val releaseStoreFile = providers.gradleProperty("SEACHEM_RELEASE_STORE_FILE")
+    .orElse(providers.environmentVariable("SEACHEM_RELEASE_STORE_FILE"))
+val releaseStorePassword = providers.gradleProperty("SEACHEM_RELEASE_STORE_PASSWORD")
+    .orElse(providers.environmentVariable("SEACHEM_RELEASE_STORE_PASSWORD"))
+val releaseKeyAlias = providers.gradleProperty("SEACHEM_RELEASE_KEY_ALIAS")
+    .orElse(providers.environmentVariable("SEACHEM_RELEASE_KEY_ALIAS"))
+val releaseKeyPassword = providers.gradleProperty("SEACHEM_RELEASE_KEY_PASSWORD")
+    .orElse(providers.environmentVariable("SEACHEM_RELEASE_KEY_PASSWORD"))
+val hasReleaseSigning = listOf(
+    releaseStoreFile,
+    releaseStorePassword,
+    releaseKeyAlias,
+    releaseKeyPassword
+).all { it.isPresent }
+
 android {
     namespace = "com.example.seachem_dosing"
     compileSdk = 34
@@ -18,13 +33,13 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            // For GitHub release, you can use debug keystore initially
-            // Or create your own keystore for production
-            storeFile = file("${System.getProperty("user.home")}/.android/debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(releaseStoreFile.get())
+                storePassword = releaseStorePassword.get()
+                keyAlias = releaseKeyAlias.get()
+                keyPassword = releaseKeyPassword.get()
+            }
         }
     }
 
@@ -37,7 +52,9 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -103,6 +120,8 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("org.json:json:20240303")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Aquarium Dosing</string>
     <string name="app_tagline">Dose smarter, keep water stable.</string>
     <string name="profile_select_title">Choose your aquarium profile</string>
@@ -96,6 +96,9 @@
     <string name="calc_volume_label">Tank Volume: %s L</string>
     <string name="calc_quick_doses">Quick Doses</string>
     <string name="calc_utilities">Utilities</string>
+    <string name="calc_section_supplements">Supplements</string>
+    <string name="calc_section_buffers_minerals">Buffers &amp; Minerals</string>
+    <string name="calc_section_reef_supplements">Reef Supplements</string>
     <string name="calc_prime_title">Seachem Prime</string>
     <string name="calc_prime_subtitle">Detoxifier &amp; Conditioner</string>
     <string name="calc_stability_title">Seachem Stability</string>
@@ -217,7 +220,7 @@ Estimated NO₃ increase shown below.</string>
     <!-- Results -->
     <string name="result_grams">%s g</string>
     <string name="result_ml">%s ml</string>
-    <string name="result_no_dose">No dose needed</string>
+    <string name="result_no_dose">NA</string>
     <string name="result_gh_above_target">GH already at or above target</string>
     <string name="result_full_dose">Full Dose</string>
     <string name="result_half_dose">Half Dose</string>
@@ -347,6 +350,7 @@ Consider water change or phosphate control.</string>
     <string name="settings_share">Share App</string>
     <string name="settings_source_code">Source Code</string>
     <string name="settings_source_url">https://github.com/GurucharanSavanth/Seachem-Calculatore</string>
+    <string name="settings_no_app_available">No app available to open this action.</string>
     <string name="settings_developer">Developed by Gurucharan.S</string>
     <string name="settings_about">About</string>
     <string name="settings_version">Version %s</string>
@@ -384,4 +388,24 @@ Consider water change or phosphate control.</string>
     <string name="cd_status_icon">Status indicator</string>
     <string name="cd_copy_result">Copy result to clipboard</string>
     <string name="cd_recommendations_menu">Recommendations menu</string>
+    <string name="cd_expand_card">Expand or collapse card</string>
+    <string name="cd_card_expanded">Card expanded. Double tap to collapse.</string>
+    <string name="cd_card_collapsed">Card collapsed. Double tap to expand.</string>
+
+    <!-- Utility calculator strings -->
+    <string name="label_measurement_scale">Measurement Scale</string>
+    <string name="calc_substrate_title">Substrate Calculator</string>
+    <string name="calc_substrate_subtitle">Calculate required bags</string>
+    <string name="label_product">Product</string>
+    <string name="label_depth">Depth</string>
+    <string name="calc_salt_mix_title">Salt Mix Calculator</string>
+    <string name="calc_salt_mix_subtitle">Calculate mix for water changes</string>
+    <string name="label_salt_product">Salt Product</string>
+    <string name="label_salt_volume_us_gallons">Volume (US Gallons)</string>
+    <string name="label_current_ppt">Current (PPT)</string>
+    <string name="label_desired_ppt">Desired (PPT)</string>
+    <string name="result_substrate_bags">%1$s Bags (~%2$s kg)</string>
+    <string name="result_alternate">Alternate: %1$s %2$s</string>
+    <string name="result_placeholder">--</string>
+    <string name="error_salt_mix_inputs">Enter valid inputs (Target &gt; Current)</string>
 </resources>

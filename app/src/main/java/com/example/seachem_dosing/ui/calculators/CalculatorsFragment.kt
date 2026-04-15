@@ -32,9 +32,7 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.transition.MaterialFadeThrough
 
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 
 class CalculatorsFragment : Fragment() {
@@ -46,6 +44,7 @@ class CalculatorsFragment : Fragment() {
 
     // TextWatcher manager for proper cleanup to prevent memory leaks
     private val textWatcherManager = TextWatcherManager()
+    private val recalculators = linkedMapOf<Int, () -> Unit>()
 
     private companion object {
         const val INPUT_DEBOUNCE_MS = 250L
@@ -73,8 +72,7 @@ class CalculatorsFragment : Fragment() {
         applyProfileUi()
         setupVolumeDisplay()
 
-        // Offload heavy initialization to a coroutine with better frame pacing
-        // Use Default dispatcher for setup work to avoid blocking main thread
+        // Build calculator cards in small batches so first render is not delayed by all cards.
         viewLifecycleOwner.lifecycleScope.launch {
             // Setup cards in smaller batches with yields between to prevent frame drops
             // Batch 1: Planted basics
@@ -100,8 +98,8 @@ class CalculatorsFragment : Fragment() {
 
             // Batch 3: Buffers
             setupCardBatch {
-                setupUniversalCard(binding.cardAlkalineBuffer.root, "alkaline_buffer", SeachemCalculations.Product.ALKALINE_BUFFER, R.string.calc_alkaline_buffer_title, R.string.calc_alkaline_buffer_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
-                    currentLabelRes = R.string.label_current_kh_meq, targetLabelRes = R.string.label_target_kh_meq)
+                setupUniversalCard(binding.cardAlkalineBuffer.root, "alkaline_buffer", SeachemCalculations.Product.ALKALINE_BUFFER, R.string.calc_alkaline_buffer_title, R.string.calc_alkaline_buffer_subtitle, SeachemCalculations.UnitScale.DKH, true,
+                    currentLabelRes = R.string.label_current_kh, targetLabelRes = R.string.label_target_kh)
                 setupUniversalCard(binding.cardAcidBuffer.root, "acid_buffer", SeachemCalculations.Product.ACID_BUFFER, R.string.calc_acid_title, R.string.calc_acid_subtitle, SeachemCalculations.UnitScale.DKH, true,
                     currentLabelRes = R.string.label_current_kh, targetLabelRes = R.string.label_target_kh)
             }
@@ -109,8 +107,8 @@ class CalculatorsFragment : Fragment() {
             setupCardBatch {
                 setupUniversalCard(binding.cardPotassiumBicarbonate.root, "khco3", SeachemCalculations.Product.POTASSIUM_BICARBONATE, R.string.calc_khco3_title, R.string.calc_khco3_subtitle, SeachemCalculations.UnitScale.DKH, true,
                     currentLabelRes = R.string.label_current_kh, targetLabelRes = R.string.label_target_kh)
-                setupUniversalCard(binding.cardEquilibrium.root, "equilibrium", SeachemCalculations.Product.EQUILIBRIUM, R.string.calc_equilibrium_title, R.string.calc_equilibrium_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
-                    currentLabelRes = R.string.label_current_gh_meq, targetLabelRes = R.string.label_target_gh_meq)
+                setupUniversalCard(binding.cardEquilibrium.root, "equilibrium", SeachemCalculations.Product.EQUILIBRIUM, R.string.calc_equilibrium_title, R.string.calc_equilibrium_subtitle, SeachemCalculations.UnitScale.DKH, true,
+                    currentLabelRes = R.string.label_current_gh, targetLabelRes = R.string.label_target_gh)
                 setupUniversalCard(binding.cardNeutralRegulator.root, "neutral_regulator", SeachemCalculations.Product.NEUTRAL_REGULATOR, R.string.calc_neutral_title, R.string.calc_neutral_subtitle,
                     showScale = false, currentLabelRes = R.string.label_current_ph, targetLabelRes = R.string.label_target_ph)
             }
@@ -127,9 +125,9 @@ class CalculatorsFragment : Fragment() {
 
             // Batch 5: Reef buffers
             setupCardBatch {
-                setupUniversalCard(binding.cardReefBuffer.root, "reef_buffer", SeachemCalculations.Product.REEF_BUFFER, R.string.calc_reef_buffer_title, R.string.calc_reef_buffer_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
+                setupUniversalCard(binding.cardReefBuffer.root, "reef_buffer", SeachemCalculations.Product.REEF_BUFFER, R.string.calc_reef_buffer_title, R.string.calc_reef_buffer_subtitle, SeachemCalculations.UnitScale.DKH, true,
                     currentLabelRes = R.string.label_current_alk, targetLabelRes = R.string.label_target_alk)
-                setupUniversalCard(binding.cardReefBuilder.root, "reef_builder", SeachemCalculations.Product.REEF_BUILDER, R.string.calc_reef_builder_title, R.string.calc_reef_builder_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
+                setupUniversalCard(binding.cardReefBuilder.root, "reef_builder", SeachemCalculations.Product.REEF_BUILDER, R.string.calc_reef_builder_title, R.string.calc_reef_builder_subtitle, SeachemCalculations.UnitScale.DKH, true,
                     currentLabelRes = R.string.label_current_alk, targetLabelRes = R.string.label_target_alk)
                 setupUniversalCard(binding.cardReefCalcium.root, "reef_calcium", SeachemCalculations.Product.REEF_CALCIUM, R.string.calc_reef_calcium_title, R.string.calc_reef_calcium_subtitle,
                     showScale = true, currentLabelRes = R.string.label_current_ca, targetLabelRes = R.string.label_target_ca)
@@ -137,7 +135,7 @@ class CalculatorsFragment : Fragment() {
 
             // Batch 6: More reef
             setupCardBatch {
-                setupUniversalCard(binding.cardReefCarbonate.root, "reef_carbonate", SeachemCalculations.Product.REEF_CARBONATE, R.string.calc_reef_carbonate_title, R.string.calc_reef_carbonate_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
+                setupUniversalCard(binding.cardReefCarbonate.root, "reef_carbonate", SeachemCalculations.Product.REEF_CARBONATE, R.string.calc_reef_carbonate_title, R.string.calc_reef_carbonate_subtitle, SeachemCalculations.UnitScale.DKH, true,
                     currentLabelRes = R.string.label_current_alk, targetLabelRes = R.string.label_target_alk)
                 setupUniversalCard(binding.cardReefComplete.root, "reef_complete", SeachemCalculations.Product.REEF_COMPLETE, R.string.calc_reef_complete_title, R.string.calc_reef_complete_subtitle,
                     showScale = true, currentLabelRes = R.string.label_current_ca, targetLabelRes = R.string.label_target_ca)
@@ -147,7 +145,7 @@ class CalculatorsFragment : Fragment() {
             setupCardBatch {
                 setupUniversalCard(binding.cardReefFusion1.root, "reef_fusion1", SeachemCalculations.Product.REEF_FUSION_1, R.string.calc_reef_fusion1_title, R.string.calc_reef_fusion1_subtitle,
                     showScale = true, currentLabelRes = R.string.label_current_ca, targetLabelRes = R.string.label_target_ca)
-                setupUniversalCard(binding.cardReefFusion2.root, "reef_fusion2", SeachemCalculations.Product.REEF_FUSION_2, R.string.calc_reef_fusion2_title, R.string.calc_reef_fusion2_subtitle, SeachemCalculations.UnitScale.MEQ_L, true,
+                setupUniversalCard(binding.cardReefFusion2.root, "reef_fusion2", SeachemCalculations.Product.REEF_FUSION_2, R.string.calc_reef_fusion2_title, R.string.calc_reef_fusion2_subtitle, SeachemCalculations.UnitScale.DKH, true,
                     currentLabelRes = R.string.label_current_alk, targetLabelRes = R.string.label_target_alk)
             }
 
@@ -193,6 +191,15 @@ class CalculatorsFragment : Fragment() {
         if (_binding == null) return
         block()
         yield() // Allow UI to render frames
+    }
+
+    private fun registerRecalculator(cardView: View, calculate: () -> Unit) {
+        recalculators[System.identityHashCode(cardView)] = calculate
+    }
+
+    private fun recalculateAllCards() {
+        if (_binding == null) return
+        recalculators.values.forEach { it() }
     }
 
     private fun setupUniversalCard(
@@ -289,7 +296,11 @@ class CalculatorsFragment : Fragment() {
             if (result.primaryValue.toDouble() > 0.0) {
                 tvResult.text = "${result.primaryValue.toPlainString()} ${result.primaryUnit}"
                 tvSecondResult.visibility = View.VISIBLE
-                tvSecondResult.text = "Alternate: ${result.secondaryValue.toPlainString()} ${result.secondaryUnit}"
+                tvSecondResult.text = getString(
+                    R.string.result_alternate,
+                    result.secondaryValue.toPlainString(),
+                    result.secondaryUnit
+                )
             } else {
                 tvResult.text = getString(R.string.result_no_dose)
                 tvSecondResult.visibility = View.GONE
@@ -303,6 +314,7 @@ class CalculatorsFragment : Fragment() {
         etCurrent.addTextChangedListener(currentWatcher)
         etTarget.addTextChangedListener(targetWatcher)
         spinnerScale.setOnItemClickListener { _, _, _, _ -> calculate() }
+        registerRecalculator(cardView) { calculate() }
         
         // Restore Inputs from ViewModel
         val savedCurrent = viewModel.getInput("${calculatorId}_current").value
@@ -335,7 +347,12 @@ class CalculatorsFragment : Fragment() {
         val products = listOf("Flourite", "Flourite Black", "Flourite Black Sand", "Flourite Dark", "Flourite Red", "Flourite Sand", "Gray Coast", "Meridian", "Onyx", "Onyx Sand", "Pearl Beach")
         val adapter = ArrayAdapter(requireContext(), R.layout.item_dropdown_menu, products)
         spinner.setAdapter(adapter)
-        spinner.setText(products[0], false)
+        val savedProductIndex = (viewModel.subProduct.value ?: 0).coerceIn(products.indices)
+        spinner.setText(products[savedProductIndex], false)
+        etL.setText((viewModel.subLength.value ?: 0.0).takeIf { it > 0.0 }?.toString().orEmpty())
+        etW.setText((viewModel.subWidth.value ?: 0.0).takeIf { it > 0.0 }?.toString().orEmpty())
+        etD.setText((viewModel.subDepth.value ?: 0.0).takeIf { it > 0.0 }?.toString().orEmpty())
+        toggleUnit.check(if ((viewModel.subUnit.value ?: "cm") == "in") R.id.btnUnitIn else R.id.btnUnitCm)
         
         fun calculate() {
             val l = etL.text?.toString()?.toDoubleOrNull() ?: 0.0
@@ -355,7 +372,11 @@ class CalculatorsFragment : Fragment() {
             val bags = res.primaryValue.toDouble()
             // Estimate weight: standard 7kg per bag (approx)
             val weight = bags * 7.0
-            result.text = "${res.primaryValue.toPlainString()} Bags (~${String.format("%.1f", weight)} kg)"
+            result.text = getString(
+                R.string.result_substrate_bags,
+                res.primaryValue.toPlainString(),
+                String.format("%.1f", weight)
+            )
         }
 
         // Use debounced watchers
@@ -367,6 +388,8 @@ class CalculatorsFragment : Fragment() {
         etD.addTextChangedListener(watcherD)
         spinner.setOnItemClickListener { _, _, _, _ -> calculate() }
         toggleUnit.addOnButtonCheckedListener { _, _, _ -> calculate() }
+        registerRecalculator(card) { calculate() }
+        calculate()
     }
 
     private fun setupVolumeDisplay() {
@@ -389,21 +412,33 @@ class CalculatorsFragment : Fragment() {
         val result = cardView.findViewById<TextView>(R.id.tvResultPrime)
         val expandIcon = cardView.findViewById<ImageView>(R.id.iconExpand)
         setupExpandableCard(cardView.findViewById(R.id.headerPrime), cardView.findViewById(R.id.contentPrime), expandIcon)
-        result.text = String.format("%.1f ml", viewModel.calculatePrimeDose())
+        fun calculate() {
+            result.text = getString(R.string.result_ml, String.format("%.1f", viewModel.calculatePrimeDose()))
+        }
+        registerRecalculator(cardView) { calculate() }
+        calculate()
     }
     
     private fun setupStabilityCard(cardView: View) {
         val result = cardView.findViewById<TextView>(R.id.tvResultStability)
         val expandIcon = cardView.findViewById<ImageView>(R.id.iconExpand)
         setupExpandableCard(cardView.findViewById(R.id.headerStability), cardView.findViewById(R.id.contentStability), expandIcon)
-        result.text = String.format("%.1f ml", viewModel.calculateStabilityDose())
+        fun calculate() {
+            result.text = getString(R.string.result_ml, String.format("%.1f", viewModel.calculateStabilityDose()))
+        }
+        registerRecalculator(cardView) { calculate() }
+        calculate()
     }
     
     private fun setupSafeCard(cardView: View) {
         val result = cardView.findViewById<TextView>(R.id.tvResultSafe)
         val expandIcon = cardView.findViewById<ImageView>(R.id.iconExpand)
         setupExpandableCard(cardView.findViewById(R.id.headerSafe), cardView.findViewById(R.id.contentSafe), expandIcon)
-        result.text = String.format("%.2f g", viewModel.calculateSafeSimple())
+        fun calculate() {
+            result.text = getString(R.string.result_grams, String.format("%.2f", viewModel.calculateSafeSimple()))
+        }
+        registerRecalculator(cardView) { calculate() }
+        calculate()
     }
     
     private fun setupWaterChangeCard(cardView: View) {
@@ -418,21 +453,49 @@ class CalculatorsFragment : Fragment() {
         expandIcon.rotation = 180f
         
         setupExpandableCard(header, content, expandIcon)
-        
+
+        percentInput.setText((viewModel.defaultWaterChangePercent.value ?: 20.0).toString())
+
+        fun calculate() {
+            val percent = percentInput.text?.toString()?.toDoubleOrNull() ?: 0.0
+            result.text = getString(
+                R.string.result_change_volume,
+                String.format("%.1f", viewModel.calculateWaterChangeLitres(percent))
+            )
+        }
+
         val watcher = DebouncedTextWatcher(INPUT_DEBOUNCE_MS, viewLifecycleOwner) { p ->
-            result.text = String.format("%.1f L", viewModel.calculateWaterChangeLitres(p))
+            result.text = getString(
+                R.string.result_change_volume,
+                String.format("%.1f", viewModel.calculateWaterChangeLitres(p))
+            )
         }
         percentInput.addTextChangedListener(watcher)
-        // Initial calc
-        result.text = String.format("%.1f L", viewModel.calculateWaterChangeLitres(percentInput.text.toString().toDoubleOrNull() ?: 0.0))
+        registerRecalculator(cardView) { calculate() }
+        calculate()
     }
 
     private fun setupExpandableCard(header: View, content: LinearLayout, expandIcon: ImageView) {
+        fun updateAccessibilityState() {
+            header.contentDescription = getString(
+                if (content.visibility == View.VISIBLE) {
+                    R.string.cd_card_expanded
+                } else {
+                    R.string.cd_card_collapsed
+                }
+            )
+        }
+
+        header.isClickable = true
+        header.isFocusable = true
+        expandIcon.contentDescription = getString(R.string.cd_expand_card)
+        updateAccessibilityState()
         header.setOnClickListener {
             val isExpanded = content.visibility == View.VISIBLE
             TransitionManager.beginDelayedTransition(header.parent as ViewGroup, AutoTransition())
             content.visibility = if (isExpanded) View.GONE else View.VISIBLE
             expandIcon.animate().rotation(if (isExpanded) 0f else 180f).setDuration(200).start()
+            updateAccessibilityState()
         }
     }
     
@@ -557,11 +620,10 @@ class CalculatorsFragment : Fragment() {
         val etCur = card.findViewById<TextInputEditText>(R.id.etSaltCurrent)
         val etTar = card.findViewById<TextInputEditText>(R.id.etSaltTarget)
 
-        // Default state
-        setupExpandableCard(header, content, expandIcon)
         content.visibility = View.VISIBLE
         expandIcon.rotation = 180f
-        resultPrimary.text = "---"
+        setupExpandableCard(header, content, expandIcon)
+        resultPrimary.text = getString(R.string.result_placeholder)
 
         // Setup Spinner
         val products = com.example.seachem_dosing.logic.SaltMixCalculations.SALT_MIX_PRODUCTS.keys.toList()
@@ -603,8 +665,8 @@ class CalculatorsFragment : Fragment() {
                  resultPrimary.text = "${res.kilograms} kg"
                  resultDetails.text = "${res.grams} g (${res.pounds} lbs)"
             } else {
-                 resultPrimary.text = "---"
-                 resultDetails.text = "Enter valid inputs (Target > Current)"
+                 resultPrimary.text = getString(R.string.result_placeholder)
+                 resultDetails.text = getString(R.string.error_salt_mix_inputs)
             }
         }
 
@@ -617,6 +679,7 @@ class CalculatorsFragment : Fragment() {
         etCur.addTextChangedListener(curWatcher)
         etTar.addTextChangedListener(tarWatcher)
         spinner.setOnItemClickListener { _, _, _, _ -> calculate() }
+        registerRecalculator(card) { calculate() }
 
         calculate()
     }
@@ -642,7 +705,19 @@ class CalculatorsFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.volume.observe(viewLifecycleOwner) { updateVolumeDisplay() }
+        fun onVolumeInputsChanged() {
+            updateVolumeDisplay()
+            recalculateAllCards()
+        }
+
+        viewModel.volume.observe(viewLifecycleOwner) { onVolumeInputsChanged() }
+        viewModel.volumeUnit.observe(viewLifecycleOwner) { onVolumeInputsChanged() }
+        viewModel.volumeMode.observe(viewLifecycleOwner) { onVolumeInputsChanged() }
+        viewModel.dimLength.observe(viewLifecycleOwner) { onVolumeInputsChanged() }
+        viewModel.dimBreadth.observe(viewLifecycleOwner) { onVolumeInputsChanged() }
+        viewModel.dimHeight.observe(viewLifecycleOwner) { onVolumeInputsChanged() }
+        viewModel.dimUnit.observe(viewLifecycleOwner) { onVolumeInputsChanged() }
+        viewModel.defaultWaterChangePercent.observe(viewLifecycleOwner) { recalculateAllCards() }
         viewModel.profile.observe(viewLifecycleOwner) { applyProfileUi() }
     }
 
@@ -650,6 +725,7 @@ class CalculatorsFragment : Fragment() {
         super.onDestroyView()
         // Clean up text watchers to prevent memory leaks
         textWatcherManager.cleanup()
+        recalculators.clear()
         _binding = null
     }
 }

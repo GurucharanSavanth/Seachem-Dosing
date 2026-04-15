@@ -9,6 +9,7 @@ import com.example.seachem_dosing.ai.AiInsightState
 import com.example.seachem_dosing.ai.ChatMessage
 import com.example.seachem_dosing.logic.Calculations
 import com.example.seachem_dosing.logic.SeachemCalculations
+import org.json.JSONObject
 import java.math.BigDecimal
 import java.util.concurrent.ConcurrentHashMap
 
@@ -109,25 +110,43 @@ class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
     }
 
     fun generateExportData(): String {
-        // Safe JSON string escaping
-        fun escapeJson(s: String?): String = s?.replace("\\", "\\\\")?.replace("\"", "\\\"") ?: ""
+        val parameters = JSONObject()
+            .put("ammonia", ammonia.value ?: 0.0)
+            .put("nitrite", nitrite.value ?: 0.0)
+            .put("nitrate", nitrate.value ?: 0.0)
+            .put("gh", gh.value ?: 0.0)
+            .put("ghUnit", ghUnit.value ?: "dh")
+            .put("kh", kh.value ?: 0.0)
+            .put("khUnit", khUnit.value ?: "dh")
+            .put("ph", ph.value ?: 0.0)
+            .put("temperature", temperature.value ?: 0.0)
+            .put("salinity", salinity.value ?: 0.0)
+            .put("alkalinity", alkalinity.value ?: 0.0)
+            .put("calcium", calcium.value ?: 0.0)
+            .put("magnesium", magnesium.value ?: 0.0)
+            .put("phosphate", phosphate.value ?: 0.0)
+            .put("dissolvedOxygen", dissolvedOxygen.value ?: 0.0)
+            .put("potassium", potassium.value ?: 0.0)
+            .put("iron", iron.value ?: 0.0)
+            .put("strontium", strontium.value ?: 0.0)
+            .put("iodide", iodide.value ?: 0.0)
 
-        val sb = StringBuilder()
-        sb.append("{\n")
-        sb.append("  \"profile\": \"${escapeJson(_profileId.value)}\",\n")
-        sb.append("  \"volume\": ${volume.value ?: 0.0},\n")
-        sb.append("  \"volumeUnit\": \"${escapeJson(volumeUnit.value)}\",\n")
-        sb.append("  \"parameters\": {\n")
-        sb.append("    \"ammonia\": ${ammonia.value ?: 0.0},\n")
-        sb.append("    \"nitrite\": ${nitrite.value ?: 0.0},\n")
-        sb.append("    \"nitrate\": ${nitrate.value ?: 0.0},\n")
-        sb.append("    \"ph\": ${ph.value ?: 0.0},\n")
-        sb.append("    \"gh\": ${gh.value ?: 0.0},\n")
-        sb.append("    \"kh\": ${kh.value ?: 0.0},\n")
-        sb.append("    \"temperature\": ${temperature.value ?: 0.0}\n")
-        sb.append("  }\n")
-        sb.append("}")
-        return sb.toString()
+        val dimensions = JSONObject()
+            .put("length", dimLength.value ?: 0.0)
+            .put("breadth", dimBreadth.value ?: 0.0)
+            .put("height", dimHeight.value ?: 0.0)
+            .put("unit", dimUnit.value ?: "cm")
+
+        return JSONObject()
+            .put("profile", _profileId.value ?: AquariumProfile.FRESHWATER.id)
+            .put("volume", volume.value ?: 0.0)
+            .put("volumeUnit", volumeUnit.value ?: "US")
+            .put("volumeMode", volumeMode.value ?: "direct")
+            .put("effectiveVolumeLitres", getEffectiveVolumeLitres())
+            .put("dimensions", dimensions)
+            .put("defaultWaterChangePercent", defaultWaterChangePercent.value ?: 20.0)
+            .put("parameters", parameters)
+            .toString(2)
     }
     
     // Legacy calculator state holders (required by older fragments if any reference remains)
@@ -345,9 +364,6 @@ class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
         val khVal = getKhInDegrees()
         setInput("alkaline_buffer_current", khVal)
         setInput("acid_buffer_current", khVal)
-        setInput("reef_builder_current", khVal)
-        setInput("reef_buffer_current", khVal)
-        setInput("reef_carbonate_current", khVal)
         setInput("khco3_current", khVal) // For Potassium Bicarbonate
         // Legacy
         _khCurrent.value = khVal
@@ -359,6 +375,14 @@ class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
         val ghVal = getGhInDegrees()
         setInput("equilibrium_current", ghVal)
         _ghCurrent.value = ghVal
+    }
+
+    fun syncAlkalinityFromParams() {
+        val alkVal = alkalinity.value ?: 0.0
+        setInput("reef_builder_current", alkVal)
+        setInput("reef_buffer_current", alkVal)
+        setInput("reef_carbonate_current", alkVal)
+        setInput("reef_fusion2_current", alkVal)
     }
 
     fun syncPhFromParams() {
@@ -389,7 +413,7 @@ class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
         
         setInput("reef_iodide_current", iodide.value ?: 0.0)
         
-        // Alkalinity handled by syncKhFromParams
+        syncAlkalinityFromParams()
     }
     
     fun resetAll() {
@@ -543,20 +567,53 @@ class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
     fun setAmmonia(value: Double) { ammonia.value = coerceNonNegative(value) }
     fun setNitrite(value: Double) { nitrite.value = coerceNonNegative(value) }
     fun setNitrate(value: Double) { nitrate.value = coerceNonNegative(value) }
-    fun setGh(value: Double) { gh.value = coerceNonNegative(value) }
-    fun setKh(value: Double) { kh.value = coerceNonNegative(value) }
-    fun setPh(value: Double) { ph.value = coercePh(value) }
+    fun setGh(value: Double) {
+        gh.value = coerceNonNegative(value)
+        syncGhFromParams()
+    }
+    fun setKh(value: Double) {
+        kh.value = coerceNonNegative(value)
+        syncKhFromParams()
+    }
+    fun setPh(value: Double) {
+        ph.value = coercePh(value)
+        syncPhFromParams()
+    }
     fun setTemperature(value: Double) { temperature.value = coerceTemperature(value) }
     fun setSalinity(value: Double) { salinity.value = coerceSalinity(value) }
-    fun setAlkalinity(value: Double) { alkalinity.value = coerceNonNegative(value) }
-    fun setCalcium(value: Double) { calcium.value = coerceNonNegative(value) }
-    fun setMagnesium(value: Double) { magnesium.value = coerceNonNegative(value) }
-    fun setPhosphate(value: Double) { phosphate.value = coerceNonNegative(value) }
+    fun setAlkalinity(value: Double) {
+        alkalinity.value = coerceNonNegative(value)
+        syncAlkalinityFromParams()
+    }
+    fun setCalcium(value: Double) {
+        calcium.value = coerceNonNegative(value)
+        syncNewParams()
+    }
+    fun setMagnesium(value: Double) {
+        magnesium.value = coerceNonNegative(value)
+        syncNewParams()
+    }
+    fun setPhosphate(value: Double) {
+        phosphate.value = coerceNonNegative(value)
+        syncNewParams()
+    }
     fun setDissolvedOxygen(value: Double) { dissolvedOxygen.value = coerceNonNegative(value) }
-    fun setPotassium(value: Double) { potassium.value = coerceNonNegative(value) }
-    fun setIron(value: Double) { iron.value = coerceNonNegative(value) }
-    fun setStrontium(value: Double) { strontium.value = coerceNonNegative(value) }
-    fun setIodide(value: Double) { iodide.value = coerceNonNegative(value) }
+    fun setPotassium(value: Double) {
+        potassium.value = coerceNonNegative(value)
+        syncNewParams()
+    }
+    fun setIron(value: Double) {
+        iron.value = coerceNonNegative(value)
+        syncNewParams()
+    }
+    fun setStrontium(value: Double) {
+        strontium.value = coerceNonNegative(value)
+        syncNewParams()
+    }
+    fun setIodide(value: Double) {
+        iodide.value = coerceNonNegative(value)
+        syncNewParams()
+    }
     fun setGhUnit(unit: String) { ghUnit.value = unit }
     fun setKhUnit(unit: String) { khUnit.value = unit }
     

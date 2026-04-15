@@ -9,7 +9,6 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,7 +44,6 @@ class DashboardFragment : Fragment() {
     private val recommendationsRunnable = Runnable { updateRecommendations() }
     private var isGhUpdating = false
     private var isKhUpdating = false
-    private val logTag = "DashboardFragment"
 
     // TextWatcher manager for proper cleanup to prevent memory leaks
     private val textWatcherManager = TextWatcherManager()
@@ -280,7 +278,6 @@ class DashboardFragment : Fragment() {
                     viewModel.setGh(convertedValue)
                     viewModel.setGhUnit(newUnit)
                     viewModel.syncGhFromParams()
-                    Log.d(logTag, "GH unit changed $oldUnit -> $newUnit, $currentValue -> $convertedValue")
                 }
                 scheduleRecommendationsUpdate()
             }
@@ -318,7 +315,6 @@ class DashboardFragment : Fragment() {
                     viewModel.setKh(convertedValue)
                     viewModel.setKhUnit(newUnit)
                     viewModel.syncKhFromParams()
-                    Log.d(logTag, "KH unit changed $oldUnit -> $newUnit, $currentValue -> $convertedValue")
                 }
                 scheduleRecommendationsUpdate()
             }

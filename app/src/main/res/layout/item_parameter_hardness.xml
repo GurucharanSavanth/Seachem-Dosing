@@ -33,6 +33,8 @@
             android:layout_marginStart="12dp"
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="?attr/colorOnSurface"
+            android:maxLines="2"
+            android:ellipsize="end"
             tools:text="General Hardness (GH)" />
 
         <!-- Input Field -->

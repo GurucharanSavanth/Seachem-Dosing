@@ -1,5 +1,6 @@
 package com.example.seachem_dosing.ui.settings
 
+import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -319,12 +320,20 @@ class SettingsFragment : Fragment() {
                 putExtra(Intent.EXTRA_EMAIL, arrayOf("savanthgc@gmail.com"))
                 putExtra(Intent.EXTRA_SUBJECT, "Seachem Dosing App Support")
             }
-            startActivity(Intent.createChooser(intent, getString(R.string.settings_contact)))
+            startActivitySafely(Intent.createChooser(intent, getString(R.string.settings_contact)))
         }
 
         view.findViewById<LinearLayout>(R.id.settingSourceCode).setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.settings_source_url)))
+            startActivitySafely(intent)
+        }
+    }
+
+    private fun startActivitySafely(intent: Intent) {
+        try {
             startActivity(intent)
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(requireContext(), R.string.settings_no_app_available, Toast.LENGTH_SHORT).show()
         }
     }
 

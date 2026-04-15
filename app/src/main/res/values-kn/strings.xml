@@ -106,7 +106,7 @@
 
     <string name="label_current">ಪ್ರಸ್ತುತ</string>
     <string name="label_target">ಗುರಿ</string>
-    <string name="result_no_dose">ಡೋಸ್ ಅಗತ್ಯವಿಲ್ಲ</string>
+    <string name="result_no_dose">NA</string>
     <string name="result_grams">%s g</string>
     <string name="result_ml">%s ml</string>
 
