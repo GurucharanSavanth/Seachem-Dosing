@@ -62,5 +62,14 @@ Records tools/commands that failed, were unavailable, or whose live state contra
 
 ---
 
+## F-07 — Instrumented Compose UI tests blocked on API-36 emulator (Espresso InputManager)
+
+- **Observation:** `connectedDebugAndroidTest` fails with `NoSuchMethodException: android.hardware.input.InputManager.getInstance` from `Espresso.onIdle` (via Compose `EspressoLink`). Only AVD available is **Pixel_10_Pro_XL (API 36)**.
+- **Cause:** Espresso (incl. bumped 3.6.1) reflects on `InputManager.getInstance()`, removed in Android 15/16 (API 35/36). Stable Espresso doesn't yet support API 36.
+- **Remediation attempted:** bumped `espresso-core` 3.5.1→3.6.1 + `ext-junit` 1.1.5→1.2.1 — did NOT resolve (same exception; newer stack lines confirm 3.6.1 is active).
+- **Fallback (in effect):** verify Compose screens on-device via `installDebug` + `am start` + `screencap` + `adb input tap` (no Espresso). **ProfileSelection confirmed**: renders correctly, selection interaction works, no crash, POND→"Sand and Gravel".
+- **Capability loss:** automated instrumented UI assertions only. JVM unit tests unaffected (36 green).
+- **Retest/follow-up:** create an API≤34 AVD for instrumented runs, or adopt espresso 3.7.0-alpha when stable. `ProfileSelectionScreenTest` retained (runs on a compatible API). Kept the 3.6.1 bump (newer baseline, harmless).
+
 ## Build/command failures
-_None recorded yet. Baseline `./gradlew clean assembleDebug testDebugUnitTest lintDebug --continue` is running (bg `bl1ezi8qi`); failures, if any, will be appended here with exact command + error + root-cause hypothesis + fix._
+_Baseline + per-phase builds all green (see commits). No unresolved build failures._

@@ -8,8 +8,7 @@
     <fragment
         android:id="@+id/navigation_profile"
         android:name="com.example.seachem_dosing.ui.profile.ProfileSelectionFragment"
-        android:label="@string/profile_select_title"
-        tools:layout="@layout/fragment_profile_selection" />
+        android:label="@string/profile_select_title" />
 
     <fragment
         android:id="@+id/navigation_dashboard"

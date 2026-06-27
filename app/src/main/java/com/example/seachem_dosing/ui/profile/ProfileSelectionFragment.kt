@@ -19,9 +19,9 @@ import com.google.android.material.transition.MaterialFadeThrough
  * Hosts the Compose [ProfileSelectionScreen] (ADR-001 migration).
  *
  * Persistence + navigation stay here, identical to the former XML version, so
- * behaviour is unchanged. `fragment_profile_selection.xml` and the `bg_profile_*`
- * drawables are retained until on-device visual/a11y parity is verified, then
- * removed in a follow-up (parity gate — no emulator in this environment).
+ * behaviour is unchanged. The former `fragment_profile_selection.xml` + its
+ * `bg_profile_*` drawables were removed after on-device parity verification
+ * (renders + selection interaction confirmed on Pixel_10_Pro_XL, API 36).
  */
 class ProfileSelectionFragment : Fragment() {
 

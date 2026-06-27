@@ -3,8 +3,8 @@ agp = "8.13.2"
 kotlin = "2.0.21"
 coreKtx = "1.10.1"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"   # v2.0 — 3.5.1 reflects on removed InputManager.getInstance, breaks on API 34+ emulators
 appcompat = "1.6.1"
 material = "1.10.0"
 
