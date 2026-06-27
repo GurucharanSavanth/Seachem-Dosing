@@ -5,23 +5,27 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.seachem_dosing.R
-import com.example.seachem_dosing.databinding.FragmentProfileSelectionBinding
 import com.example.seachem_dosing.ui.MainViewModel
-import com.google.android.material.card.MaterialCardView
+import com.example.seachem_dosing.ui.theme.SeachemTheme
 import com.google.android.material.transition.MaterialFadeThrough
 
+/**
+ * Hosts the Compose [ProfileSelectionScreen] (ADR-001 migration).
+ *
+ * Persistence + navigation stay here, identical to the former XML version, so
+ * behaviour is unchanged. `fragment_profile_selection.xml` and the `bg_profile_*`
+ * drawables are retained until on-device visual/a11y parity is verified, then
+ * removed in a follow-up (parity gate — no emulator in this environment).
+ */
 class ProfileSelectionFragment : Fragment() {
 
-    private var _binding: FragmentProfileSelectionBinding? = null
-    private val binding get() = _binding!!
-
     private val viewModel: MainViewModel by activityViewModels()
-    private var selectedProfile: MainViewModel.AquariumProfile? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,56 +37,21 @@ class ProfileSelectionFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentProfileSelectionBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val stored = loadStoredProfile()
-        if (stored != null) {
-            selectedProfile = stored
-            updateSelection()
-            binding.btnContinue.isEnabled = true
+        savedInstanceState: Bundle?,
+    ): View = ComposeView(requireContext()).apply {
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        setContent {
+            SeachemTheme {
+                ProfileSelectionScreen(
+                    initialSelected = loadStoredProfile(),
+                    onContinue = { profile ->
+                        viewModel.setProfile(profile)
+                        storeProfile(profile)
+                        findNavController().navigate(R.id.navigation_dashboard)
+                    },
+                )
+            }
         }
-
-        binding.cardFreshwater.setOnClickListener {
-            selectedProfile = MainViewModel.AquariumProfile.FRESHWATER
-            updateSelection()
-            binding.btnContinue.isEnabled = true
-        }
-        binding.cardSaltwater.setOnClickListener {
-            selectedProfile = MainViewModel.AquariumProfile.SALTWATER
-            updateSelection()
-            binding.btnContinue.isEnabled = true
-        }
-        binding.cardPond.setOnClickListener {
-            selectedProfile = MainViewModel.AquariumProfile.POND
-            updateSelection()
-            binding.btnContinue.isEnabled = true
-        }
-
-        binding.btnContinue.setOnClickListener {
-            val profile = selectedProfile ?: return@setOnClickListener
-            viewModel.setProfile(profile)
-            storeProfile(profile)
-            findNavController().navigate(R.id.navigation_dashboard)
-        }
-    }
-
-    private fun updateSelection() {
-        setCardSelected(binding.cardFreshwater, selectedProfile == MainViewModel.AquariumProfile.FRESHWATER, R.color.profile_freshwater)
-        setCardSelected(binding.cardSaltwater, selectedProfile == MainViewModel.AquariumProfile.SALTWATER, R.color.profile_saltwater)
-        setCardSelected(binding.cardPond, selectedProfile == MainViewModel.AquariumProfile.POND, R.color.profile_pond)
-    }
-
-    private fun setCardSelected(card: MaterialCardView, selected: Boolean, colorRes: Int) {
-        val strokeWidth = if (selected) resources.getDimensionPixelSize(R.dimen.profile_card_stroke) else 0
-        card.strokeWidth = strokeWidth
-        card.strokeColor = ContextCompat.getColor(requireContext(), colorRes)
     }
 
     private fun loadStoredProfile(): MainViewModel.AquariumProfile? {
@@ -94,11 +63,6 @@ class ProfileSelectionFragment : Fragment() {
     private fun storeProfile(profile: MainViewModel.AquariumProfile) {
         val prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(KEY_PROFILE, profile.id).apply()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     companion object {
