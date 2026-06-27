@@ -1,0 +1,22 @@
+# Canonical line endings — kills the repo-wide CRLF/LF churn.
+# Auto-detect text, store/checkout as LF everywhere.
+* text=auto eol=lf
+
+# Windows batch scripts must stay CRLF.
+*.bat text eol=crlf
+
+# Binaries — never normalize.
+*.png   binary
+*.webp  binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.apk   binary
+*.aab   binary
+*.jar   binary
+*.zip   binary
+*.dm    binary
+*.so    binary
+*.keystore binary
+*.part  binary
+*.lck   binary

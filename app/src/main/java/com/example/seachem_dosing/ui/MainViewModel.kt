@@ -291,11 +291,6 @@ class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
 
     fun calculatePrimeDose(): Double = Calculations.calculatePrimeDose(getEffectiveVolumeLitres())
     fun calculateStabilityDose(): Double = Calculations.calculateStabilityDose(getEffectiveVolumeLitres())
-    fun calculateSafe(): Calculations.GoldBufferResult {
-        val litres = getEffectiveVolumeLitres()
-        val grams = Calculations.calculateSafeGrams(litres)
-        return Calculations.GoldBufferResult(grams, grams > 0)
-    }
     fun calculateSafeSimple(): Double = Calculations.calculateSafeGrams(getEffectiveVolumeLitres())
     fun calculateAptComplete(): Calculations.AptResult {
         val litres = getEffectiveVolumeLitres()

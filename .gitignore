@@ -16,3 +16,6 @@ local.properties
 /CLAUDE.md
 /AGENTS.md
 /.claude
+
+# Firebase config — contains an API key, must not be committed.
+/app/google-services.json

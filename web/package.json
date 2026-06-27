@@ -1,0 +1,30 @@
+{
+  "name": "seachem-dosing-web",
+  "version": "2.0.0-alpha.1",
+  "type": "module",
+  "private": true,
+  "description": "Web frontend for Seachem Dosing — TypeScript + Vite + PWA (per ADR-004)",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "sync-check": "node ../scripts/verify-sync.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0",
+    "@vitest/coverage-v8": "^2.0.0",
+    "eslint": "^9.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "typescript-eslint": "^8.0.0",
+    "vite-plugin-pwa": "^0.20.0"
+  }
+}

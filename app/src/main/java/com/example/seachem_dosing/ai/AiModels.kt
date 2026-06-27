@@ -17,12 +17,7 @@ data class ChatMessage(
     val timestamp: Long = System.currentTimeMillis()
 )
 
-enum class AiRole {
-    USER,
-    ASSISTANT
-}
-
 data class AiMessage(
-    val role: AiRole,
+    val role: ChatRole,
     val text: String
 )

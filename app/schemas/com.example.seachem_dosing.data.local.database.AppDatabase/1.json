@@ -1,0 +1,268 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "7bf3baf2a7179377ec4d6d9d843fd767",
+    "entities": [
+      {
+        "tableName": "parameter_log",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profile_id` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `ammonia` REAL, `nitrite` REAL, `nitrate` REAL, `gh` REAL, `kh` REAL, `ph` REAL, `temperature` REAL, `salinity` REAL, `alkalinity` REAL, `calcium` REAL, `magnesium` REAL, `phosphate` REAL, `dissolved_oxygen` REAL, `potassium` REAL, `iron` REAL, `strontium` REAL, `iodide` REAL, `volume_litres` REAL NOT NULL, `notes` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profileId",
+            "columnName": "profile_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ammonia",
+            "columnName": "ammonia",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nitrite",
+            "columnName": "nitrite",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nitrate",
+            "columnName": "nitrate",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "gh",
+            "columnName": "gh",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "kh",
+            "columnName": "kh",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ph",
+            "columnName": "ph",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "temperature",
+            "columnName": "temperature",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "salinity",
+            "columnName": "salinity",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "alkalinity",
+            "columnName": "alkalinity",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "calcium",
+            "columnName": "calcium",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "magnesium",
+            "columnName": "magnesium",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "phosphate",
+            "columnName": "phosphate",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dissolvedOxygen",
+            "columnName": "dissolved_oxygen",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "potassium",
+            "columnName": "potassium",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "iron",
+            "columnName": "iron",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "strontium",
+            "columnName": "strontium",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "iodide",
+            "columnName": "iodide",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "volumeLitres",
+            "columnName": "volume_litres",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_parameter_log_profile_id_timestamp",
+            "unique": false,
+            "columnNames": [
+              "profile_id",
+              "timestamp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_parameter_log_profile_id_timestamp` ON `${TABLE_NAME}` (`profile_id`, `timestamp`)"
+          },
+          {
+            "name": "index_parameter_log_timestamp",
+            "unique": false,
+            "columnNames": [
+              "timestamp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_parameter_log_timestamp` ON `${TABLE_NAME}` (`timestamp`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "dosing_log",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profile_id` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `product` TEXT NOT NULL, `amount` REAL NOT NULL, `unit` TEXT NOT NULL, `volume_litres_at_dose` REAL NOT NULL, `administered` INTEGER NOT NULL, `notes` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profileId",
+            "columnName": "profile_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "product",
+            "columnName": "product",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "volumeLitresAtDose",
+            "columnName": "volume_litres_at_dose",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "administered",
+            "columnName": "administered",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_dosing_log_profile_id_timestamp",
+            "unique": false,
+            "columnNames": [
+              "profile_id",
+              "timestamp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_dosing_log_profile_id_timestamp` ON `${TABLE_NAME}` (`profile_id`, `timestamp`)"
+          },
+          {
+            "name": "index_dosing_log_product",
+            "unique": false,
+            "columnNames": [
+              "product"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_dosing_log_product` ON `${TABLE_NAME}` (`product`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7bf3baf2a7179377ec4d6d9d843fd767')"
+    ]
+  }
+}
