@@ -128,3 +128,31 @@ enum class ParameterValidationStatus(override val storageCode: String) : Storage
         fun fromCodeOrThrow(code: String): ParameterValidationStatus = lookup(BY_CODE, code)
     }
 }
+
+/** Water-parameter kind recorded by a parameter event (mirrors the v1 parameter_log columns). */
+enum class ParameterType(override val storageCode: String) : StorageCoded {
+    AMMONIA("ammonia"),
+    NITRITE("nitrite"),
+    NITRATE("nitrate"),
+    GH("gh"),
+    KH("kh"),
+    PH("ph"),
+    TEMPERATURE("temperature"),
+    SALINITY("salinity"),
+    ALKALINITY("alkalinity"),
+    CALCIUM("calcium"),
+    MAGNESIUM("magnesium"),
+    PHOSPHATE("phosphate"),
+    DISSOLVED_OXYGEN("dissolved_oxygen"),
+    POTASSIUM("potassium"),
+    IRON("iron"),
+    STRONTIUM("strontium"),
+    IODIDE("iodide"),
+    ;
+
+    companion object {
+        private val BY_CODE = codeMap<ParameterType>()
+        fun fromCode(code: String): ParameterType? = BY_CODE[code]
+        fun fromCodeOrThrow(code: String): ParameterType = lookup(BY_CODE, code)
+    }
+}

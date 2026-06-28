@@ -38,6 +38,10 @@ class HistoryCodesTest {
         roundTrips(ParameterValidationStatus.entries.toTypedArray(), { it.storageCode }, ParameterValidationStatus::fromCode)
     }
 
+    @Test fun parameterType_roundTrips() {
+        roundTrips(ParameterType.entries.toTypedArray(), { it.storageCode }, ParameterType::fromCode)
+    }
+
     @Test fun fromCode_unknown_returnsNull_preservingRawCode() {
         assertNull(HistoryEventType.fromCode("does_not_exist"))
         assertNull(UnitCode.fromCode("furlongs"))
