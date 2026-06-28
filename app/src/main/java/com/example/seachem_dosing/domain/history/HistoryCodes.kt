@@ -1,16 +1,15 @@
 package com.example.seachem_dosing.domain.history
 
 /**
- * Closed persistence registries for the v2 history schema (ADR-011 §4).
+ * Closed persistence registries for the v2 history schema (ADR-011 §3/§4).
  *
  * **Storage rule:** entities persist the stable [StorageCoded.storageCode] **string** (never the
  * enum ordinal) in a `*_code` column. The enum is the domain interpretation of that string.
  *
- * **Unknown-code policy (forward-compatible):** [fromCode] returns `null` for an unrecognized code
- * — the raw string stays in the entity column, so a record written by a newer app version is
- * preserved, never silently mapped to an unrelated known value. Callers that require a known code
- * (e.g. writing a NEW record) use [fromCodeOrThrow], which raises a typed error. Reads tolerate
- * unknowns; writes do not.
+ * **Unknown-code policy (forward-compatible):** [HistoryEventType.fromCode] etc. return `null` for an
+ * unrecognized code — the raw string stays in the entity column, so a record written by a newer app
+ * version is preserved, never silently mapped to an unrelated known value. Callers requiring a known
+ * code (writing a NEW record) use `fromCodeOrThrow`, which raises a typed error.
  */
 interface StorageCoded {
     val storageCode: String
@@ -27,10 +26,16 @@ private inline fun <reified T> codeMap(): Map<String, T> where T : Enum<T>, T : 
 private inline fun <reified T> lookup(map: Map<String, T>, code: String): T =
     map[code] ?: throw IllegalArgumentException("unknown ${T::class.simpleName} code: '$code'")
 
-/** Kind of history event (ADR-011 §4). Calculation-only events are not persisted in the timeline. */
+/**
+ * Kind of history event (ADR-011 §4). Calculation-only events are not persisted in the timeline.
+ * Legacy dose rows split by the v1 `administered` flag (preserved structurally, not in notes);
+ * neither legacy type is the modern [DOSE_ADMINISTERED].
+ */
 enum class HistoryEventType(override val storageCode: String) : StorageCoded {
-    LEGACY_DOSE_RECORD("legacy_dose_record"),
+    LEGACY_DOSE_CALCULATION("legacy_dose_calculation"),
+    LEGACY_DOSE_ADMINISTERED("legacy_dose_administered"),
     LEGACY_PARAMETER_RECORD("legacy_parameter_record"),
+    LEGACY_PARAMETER_SNAPSHOT_EMPTY("legacy_parameter_snapshot_empty"),
     DOSE_ADMINISTERED("dose_administered"),
     WATER_PARAMETER_RECORDED("water_parameter_recorded"),
     CORRECTION("correction"),
@@ -59,20 +64,24 @@ enum class PrecisionStatus(override val storageCode: String) : StorageCoded {
 }
 
 /** Physical dimension a [UnitCode] measures — units are only interconvertible within a dimension. */
-enum class UnitDimension { VOLUME, MASS, MASS_CONCENTRATION, ALKALINITY, SALINITY }
+enum class UnitDimension { VOLUME, MASS, MASS_CONCENTRATION, ALKALINITY, SALINITY, TEMPERATURE, PH, HARDNESS, UNKNOWN }
 
 /**
  * Dimensional unit codes (ADR-011 §3). Stored as [storageCode]; a unit is inferred from nothing.
  *
- * [requiresCalibration] units cannot be used for an exact quantity by themselves:
- *  - `MANUFACTURER_SCOOP` needs the product-specific scoop-definition id (a companion column on the
- *    dose detail);
- *  - `USER_CALIBRATED_SPOON` needs the calibration volume + its unit. A label alone is insufficient.
+ * [requiresMeasureDefinition] units cannot stand for an exact quantity alone — they reference an
+ * immutable [MeasureDefinition] (id stored in a `*_measure_definition_id` column):
+ *  - `MANUFACTURER_SCOOP` / `MANUFACTURER_CAPFUL` need the product-specific definition;
+ *  - `USER_CALIBRATED_SPOON` needs the user's calibration definition;
+ *  - `LEGACY_ENGINE_*` reference the historical engine definitions ([LegacyMeasureDefinitions]).
+ *
+ * Future-use codes (`US_TEASPOON`, `METRIC_TEASPOON`, `MANUFACTURER_*`) are retained but are NOT
+ * used for v1 migration (the v1 teaspoon/tablespoon were product-specific mass measures — ADR-011).
  */
 enum class UnitCode(
     override val storageCode: String,
     val dimension: UnitDimension,
-    val requiresCalibration: Boolean = false,
+    val requiresMeasureDefinition: Boolean = false,
 ) : StorageCoded {
     MILLILITER("ml", UnitDimension.VOLUME),
     LITER("l", UnitDimension.VOLUME),
@@ -81,14 +90,22 @@ enum class UnitCode(
     IMPERIAL_GALLON("imp_gal", UnitDimension.VOLUME),
     US_TEASPOON("tsp_us", UnitDimension.VOLUME),
     METRIC_TEASPOON("tsp_metric", UnitDimension.VOLUME),
-    MANUFACTURER_SCOOP("scoop_mfr", UnitDimension.VOLUME, requiresCalibration = true),
-    USER_CALIBRATED_SPOON("spoon_user", UnitDimension.VOLUME, requiresCalibration = true),
+    MANUFACTURER_SCOOP("scoop_mfr", UnitDimension.VOLUME, requiresMeasureDefinition = true),
+    MANUFACTURER_CAPFUL("capful_mfr", UnitDimension.VOLUME, requiresMeasureDefinition = true),
+    USER_CALIBRATED_SPOON("spoon_user", UnitDimension.VOLUME, requiresMeasureDefinition = true),
     GRAM("g", UnitDimension.MASS),
     MILLIGRAM("mg", UnitDimension.MASS),
     PPM_MG_PER_L("ppm_mg_per_l", UnitDimension.MASS_CONCENTRATION),
     DKH("dkh", UnitDimension.ALKALINITY),
     MEQ_PER_L("meq_per_l", UnitDimension.ALKALINITY),
     PPT("ppt", UnitDimension.SALINITY),
+    CELSIUS("celsius", UnitDimension.TEMPERATURE),
+    PH_VALUE("ph_value", UnitDimension.PH),
+    DEGREE_GH("dgh", UnitDimension.HARDNESS),
+    // legacy engine-defined measures (migration only) — reference LegacyMeasureDefinitions
+    LEGACY_ENGINE_MASS_MEASURE("legacy_engine_mass", UnitDimension.MASS, requiresMeasureDefinition = true),
+    LEGACY_ENGINE_VOLUME_MEASURE("legacy_engine_volume", UnitDimension.VOLUME, requiresMeasureDefinition = true),
+    LEGACY_UNSPECIFIED("legacy_unspecified", UnitDimension.UNKNOWN),
     ;
 
     companion object {

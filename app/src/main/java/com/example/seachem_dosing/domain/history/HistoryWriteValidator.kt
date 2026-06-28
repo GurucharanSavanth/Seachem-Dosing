@@ -4,10 +4,10 @@ package com.example.seachem_dosing.domain.history
  * Pure write-path validator for the history audit log (ADR-011 Gate D mandatory adjustments).
  * Returns the list of constraint violations (empty == valid). No I/O, no Room — fully unit-tested.
  *
- * Note: `calculated`/`concentration` pair-integrity and `rounding` pair-integrity are guaranteed
- * structurally by the [Quantity] / [RoundingInfo] types (a non-null value always carries its unit),
- * so they need no runtime check. This validator enforces the rules the types cannot:
- * conditional calibration fields, identifier presence, and the stricter NEW_EXACT_RECORD set.
+ * `calculated`/`concentration` and `rounding` pair-integrity are guaranteed structurally by the
+ * [Quantity] / [RoundingInfo] types (a non-null value always carries its unit). This validator
+ * enforces what the types cannot: conditional measure-definition ids, identifier presence, and the
+ * stricter NEW_EXACT_RECORD set.
  */
 object HistoryWriteValidator {
 
@@ -18,30 +18,9 @@ object HistoryWriteValidator {
         requireNotBlank(cmd.productId, "productId")
         requirePositiveTimes(cmd.occurredAtEpochMillis, cmd.createdAtEpochMillis)
 
-        // conditional_unit_fields
-        when {
-            cmd.administered.unit == UnitCode.MANUFACTURER_SCOOP -> {
-                if (cmd.administeredCalibration?.scoopDefinitionId.isNullOrBlank()) {
-                    add("conditional_unit_fields: MANUFACTURER_SCOOP requires administeredCalibration.scoopDefinitionId")
-                }
-                if (cmd.administeredCalibration?.calibratedVolume != null) {
-                    add("conditional_unit_fields: scoop unit must not carry a calibratedVolume")
-                }
-            }
-            cmd.administered.unit == UnitCode.USER_CALIBRATED_SPOON -> {
-                if (cmd.administeredCalibration?.calibratedVolume == null) {
-                    add("conditional_unit_fields: USER_CALIBRATED_SPOON requires administeredCalibration.calibratedVolume")
-                }
-                if (!cmd.administeredCalibration?.scoopDefinitionId.isNullOrBlank()) {
-                    add("conditional_unit_fields: calibrated-spoon unit must not carry a scoopDefinitionId")
-                }
-            }
-            else -> if (cmd.administeredCalibration != null) {
-                add("conditional_unit_fields: calibration payload only allowed for scoop/calibrated-spoon units")
-            }
-        }
+        checkMeasureDef("administered", cmd.administered.unit, cmd.administeredMeasureDefinitionId)
+        checkMeasureDef("calculated", cmd.calculated?.unit, cmd.calculatedMeasureDefinitionId)
 
-        // legacy_nullability: stricter requirements for new exact records
         if (cmd.precisionStatus == PrecisionStatus.NEW_EXACT_RECORD) {
             requireNotBlank(cmd.appVersion, "appVersion (NEW_EXACT_RECORD)")
             requireNotBlank(cmd.engineVersion, "engineVersion (NEW_EXACT_RECORD dose came from an engine)")
@@ -76,6 +55,19 @@ object HistoryWriteValidator {
         requireNotBlank(cmd.voidsEventId, "voidsEventId")
         requireNotBlank(cmd.reason, "reason")
         requirePositiveTimes(cmd.occurredAtEpochMillis, cmd.createdAtEpochMillis)
+    }
+
+    /** A `requiresMeasureDefinition` unit needs a definition id; other units must not carry one. */
+    private fun MutableList<String>.checkMeasureDef(label: String, unit: UnitCode?, defId: String?) {
+        val needs = unit?.requiresMeasureDefinition == true
+        when {
+            unit == null && !defId.isNullOrBlank() ->
+                add("conditional_unit_fields: $label measure-definition id without an amount")
+            needs && defId.isNullOrBlank() ->
+                add("conditional_unit_fields: $label $unit requires a measure-definition id")
+            unit != null && !needs && !defId.isNullOrBlank() ->
+                add("conditional_unit_fields: $label measure-definition id only allowed for a measure-definition unit")
+        }
     }
 
     private fun MutableList<String>.requireNotBlank(value: String?, field: String) {

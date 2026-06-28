@@ -65,6 +65,8 @@ class HistoryEventRepositoryImpl(
                     parameterTypeCode = cmd.parameterType.storageCode,
                     measuredValueDecimal = cmd.measured.value.canonicalValue,
                     measuredUnitCode = cmd.measured.unit.storageCode,
+                    tankVolumeDecimal = cmd.tankVolume?.value?.canonicalValue,
+                    tankVolumeUnitCode = cmd.tankVolume?.unit?.storageCode,
                     testMethod = cmd.testMethod,
                     sourceDeviceOrKit = cmd.sourceDeviceOrKit,
                     validationStatusCode = cmd.validationStatus.storageCode,
@@ -154,15 +156,14 @@ class HistoryEventRepositoryImpl(
         tankVolumeUnitCode = cmd.tankVolume.unit.storageCode,
         calculatedAmountDecimal = cmd.calculated?.value?.canonicalValue,
         calculatedAmountUnitCode = cmd.calculated?.unit?.storageCode,
+        calculatedMeasureDefinitionId = cmd.calculatedMeasureDefinitionId,
         administeredAmountDecimal = cmd.administered.value.canonicalValue,
         administeredAmountUnitCode = cmd.administered.unit.storageCode,
+        administeredMeasureDefinitionId = cmd.administeredMeasureDefinitionId,
         roundingModeCode = cmd.rounding?.modeCode,
         roundingScale = cmd.rounding?.scale,
         userModifiedAmount = cmd.userModifiedAmount,
         warningsAcknowledged = cmd.warningsAcknowledged,
-        administeredScoopDefinitionId = cmd.administeredCalibration?.scoopDefinitionId,
-        administeredCalibratedVolumeDecimal = cmd.administeredCalibration?.calibratedVolume?.value?.canonicalValue,
-        administeredCalibratedVolumeUnitCode = cmd.administeredCalibration?.calibratedVolume?.unit?.storageCode,
     )
 
     companion object {

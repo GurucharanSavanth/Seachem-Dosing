@@ -12,7 +12,9 @@ class HistoryWriteValidatorTest {
 
     private fun validDose(
         administeredUnit: UnitCode = UnitCode.MILLILITER,
-        calibration: Calibration? = null,
+        administeredMeasureDefId: String? = null,
+        calculated: Quantity? = null,
+        calculatedMeasureDefId: String? = null,
         precision: PrecisionStatus = PrecisionStatus.NEW_EXACT_RECORD,
         app: String? = "1.0",
         engine: String? = "seachem-engine-1",
@@ -21,7 +23,8 @@ class HistoryWriteValidatorTest {
         occurredAtEpochMillis = 1000, createdAtEpochMillis = 1000, productId = "prime",
         administered = q("5.0", administeredUnit), tankVolume = q("100", UnitCode.LITER),
         userModifiedAmount = false, precisionStatus = precision, appVersion = app, engineVersion = engine,
-        administeredCalibration = calibration,
+        administeredMeasureDefinitionId = administeredMeasureDefId,
+        calculated = calculated, calculatedMeasureDefinitionId = calculatedMeasureDefId,
     )
 
     private fun assertValid(v: List<String>) = assertTrue("expected valid, got $v", v.isEmpty())
@@ -41,30 +44,31 @@ class HistoryWriteValidatorTest {
         assertViolates(HistoryWriteValidator.validate(validDose().copy(createdAtEpochMillis = -1)), "createdAt")
     }
 
-    // conditional_unit_fields
-    @Test fun scoopUnit_requiresScoopDefinitionId() {
-        assertViolates(HistoryWriteValidator.validate(validDose(UnitCode.MANUFACTURER_SCOOP)), "scoopDefinitionId")
-        assertValid(HistoryWriteValidator.validate(validDose(UnitCode.MANUFACTURER_SCOOP, Calibration(scoopDefinitionId = "scoop-A"))))
+    // conditional measure-definition fields
+    @Test fun measureDefinitionUnit_requiresDefinitionId() {
+        assertViolates(HistoryWriteValidator.validate(validDose(UnitCode.MANUFACTURER_SCOOP)), "requires a measure-definition id")
+        assertValid(HistoryWriteValidator.validate(validDose(UnitCode.MANUFACTURER_SCOOP, administeredMeasureDefId = "scoop-A")))
     }
 
-    @Test fun scoopUnit_mustNotCarryCalibratedVolume() {
-        val bad = validDose(UnitCode.MANUFACTURER_SCOOP, Calibration(scoopDefinitionId = "s", calibratedVolume = q("1.0", UnitCode.MILLILITER)))
-        assertViolates(HistoryWriteValidator.validate(bad), "must not carry a calibratedVolume")
+    @Test fun plainUnit_mustNotCarryMeasureDefinitionId() {
+        assertViolates(
+            HistoryWriteValidator.validate(validDose(UnitCode.MILLILITER, administeredMeasureDefId = "x")),
+            "only allowed for a measure-definition unit",
+        )
     }
 
-    @Test fun calibratedSpoon_requiresCalibratedVolume() {
-        assertViolates(HistoryWriteValidator.validate(validDose(UnitCode.USER_CALIBRATED_SPOON)), "requires administeredCalibration.calibratedVolume")
-        assertValid(HistoryWriteValidator.validate(validDose(UnitCode.USER_CALIBRATED_SPOON, Calibration(calibratedVolume = q("4.93", UnitCode.MILLILITER)))))
+    @Test fun calculatedMeasureDefinitionUnit_requiresDefinitionId() {
+        val missing = validDose(calculated = q("3.0", UnitCode.MANUFACTURER_SCOOP))
+        assertViolates(HistoryWriteValidator.validate(missing), "calculated MANUFACTURER_SCOOP requires a measure-definition id")
+        val ok = validDose(calculated = q("3.0", UnitCode.MANUFACTURER_SCOOP), calculatedMeasureDefId = "scoop-A")
+        assertValid(HistoryWriteValidator.validate(ok))
     }
 
-    @Test fun calibratedSpoon_mustNotCarryScoopId() {
-        val bad = validDose(UnitCode.USER_CALIBRATED_SPOON, Calibration(scoopDefinitionId = "s", calibratedVolume = q("4.93", UnitCode.MILLILITER)))
-        assertViolates(HistoryWriteValidator.validate(bad), "must not carry a scoopDefinitionId")
-    }
-
-    @Test fun plainUnit_mustNotCarryCalibration() {
-        val bad = validDose(UnitCode.MILLILITER, Calibration(scoopDefinitionId = "s"))
-        assertViolates(HistoryWriteValidator.validate(bad), "only allowed for scoop/calibrated-spoon")
+    @Test fun calculatedMeasureDefinitionId_withoutCalculatedAmount_violates() {
+        assertViolates(
+            HistoryWriteValidator.validate(validDose(calculatedMeasureDefId = "x")),
+            "calculated measure-definition id without an amount",
+        )
     }
 
     // legacy_nullability

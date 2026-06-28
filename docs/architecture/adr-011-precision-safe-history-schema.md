@@ -110,3 +110,44 @@ Room v1 + v2 exported schemas · `Migration(1,2)` impl · migration test fixture
 
 ## Rollback
 Pre-release (versionCode 1, no shipped data) → migration risk is low. If v2 proves unstable, revert the schema commits; v1 remains intact (non-destructive migration never drops v1 data before validation).
+
+---
+
+## §11 — Defensible legacy migration semantics (amendment 2026-06-29)
+
+### V1 writer status
+**No reachable production write path was found** for v1 `dosing_log`/`parameter_log`: `RecordDoseUseCase` and `HistoryRepositoryImpl` are orphaned (no callers); the DAOs are inserted only by that unreferenced repo. Normal execution never populated the v1 tables; the app is pre-release (versionCode 1). This is *not* an absolute "rows are impossible" claim — tests, dev builds, or manual DB edits could create rows — so `Migration(1,2)` stays **non-destructive** and must correctly handle synthetic v1 rows. The legacy mapping is therefore proportional: no speculative product aliases, no product-specific teaspoon registry, no fabricated evidence/formula ids, no unsupported unit conversions.
+
+### Standard physical units vs legacy engine-defined measures
+The v1 engine's `tsp`/`tbsp` are **product-specific mass measures**, not volumes (`SeachemCalculations.kt`: `tsp = grams ÷ {5,6,7,8}` per product; `tbsp = grams ÷ 16` at L160); `caps = ml ÷ 5` (L208) is a 5 mL volume. Physical units (`g→GRAM`, `mL→MILLILITER`) map directly; engine measures reference an **immutable [MeasureDefinition]** ([`LegacyMeasureDefinitions`]) with `provenance = LEGACY_APPLICATION_ENGINE`, `manufacturerVerified = false`:
+- `legacy-engine:capful:5ml` (volume, 5 mL) · `legacy-engine:tablespoon:16g` (mass, 16 g). **No teaspoon definition** (no product-label contract + no data ⇒ all `tsp` → `LEGACY_UNSPECIFIED`).
+
+### Legacy dose-unit mapping (`LegacyUnitMapper`)
+| v1 `unit` | v2 `UnitCode` | measure-definition id |
+|---|---|---|
+| `g` | `GRAM` | — |
+| `mL` | `MILLILITER` | — |
+| `caps` | `LEGACY_ENGINE_VOLUME_MEASURE` | `legacy-engine:capful:5ml` |
+| `tbsp` | `LEGACY_ENGINE_MASS_MEASURE` | `legacy-engine:tablespoon:16g` |
+| `tsp` | `LEGACY_UNSPECIFIED` (raw preserved, no conversion) | — |
+| *(any other)* | `LEGACY_UNSPECIFIED` (raw preserved) | — |
+Prohibited: mapping legacy `tsp`/`tbsp` to `US_TEASPOON`/`METRIC_TEASPOON`/any volume spoon.
+
+### Schema corrections applied
+- **Event types:** `LEGACY_DOSE_CALCULATION` (v1 `administered=false`), `LEGACY_DOSE_ADMINISTERED` (v1 `administered=true`; **not** the modern `DOSE_ADMINISTERED`), `LEGACY_PARAMETER_RECORD`, `LEGACY_PARAMETER_SNAPSHOT_EMPTY`.
+- **`dose_event_detail`:** `product_id`, `administered_amount_decimal`, `administered_amount_unit_code` → **nullable** (legacy compat; new-exact enforced in repository validation). Added `legacy_product_label`, `legacy_original_unit_text`, `calculated_measure_definition_id`, `administered_measure_definition_id`. Removed scoop/calibrated-volume columns (subsumed by measure-definition ids).
+- **`parameter_event_detail`:** added `tank_volume_decimal`/`tank_volume_unit_code` (preserve v1 `volume_litres`, unit `LITER`; nullable for new readings).
+
+### 17-field parameter mapping (`LegacyParameterMapping`; source field = `ParameterType.storageCode`, reversible)
+| v1 column | parameter type | v2 unit |
+|---|---|---|
+| ammonia, nitrite, nitrate, phosphate, calcium, magnesium, potassium, iron, strontium, iodide, dissolved_oxygen | same | `PPM_MG_PER_L` |
+| ph | PH | `PH_VALUE` (not dimensionless) |
+| temperature | TEMPERATURE | `CELSIUS` |
+| gh | GH | `DEGREE_GH` |
+| kh, alkalinity | KH / ALKALINITY | `DKH` |
+| salinity | SALINITY | `PPT` |
+Units follow the app's `MainViewModel` defaults (gh/kh stored in degrees; °C; ppt). Defensive — no v1 unit column existed.
+
+### Migration validation (for `Migration(1,2)`, next)
+Non-destructive; fan one `parameter_log` row → N `LEGACY_PARAMETER_RECORD` events (one per non-null column) or one `LEGACY_PARAMETER_SNAPSHOT_EMPTY` if all-null; deterministic ids `legacy-v1:<table>:<id>[:<field>]`, idempotency `migration:v1-to-v2:…`; all legacy values `LEGACY_BINARY64_APPROXIMATION`; verify source/destination counts + `PRAGMA foreign_key_check`; drop v1 tables only after validation; throw to roll back on mismatch.

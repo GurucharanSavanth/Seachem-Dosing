@@ -60,14 +60,22 @@ class HistoryCodesTest {
         assertNull(UnitCode.fromCode("ML"))
     }
 
-    @Test fun unitCode_dimensionsAndCalibration() {
+    @Test fun unitCode_dimensionsAndMeasureDefinition() {
         assertEquals(UnitDimension.VOLUME, UnitCode.MILLILITER.dimension)
         assertEquals(UnitDimension.MASS, UnitCode.GRAM.dimension)
         assertEquals(UnitDimension.MASS_CONCENTRATION, UnitCode.PPM_MG_PER_L.dimension)
-        assertEquals(UnitDimension.ALKALINITY, UnitCode.DKH.dimension)
-        assertEquals(UnitDimension.SALINITY, UnitCode.PPT.dimension)
-        // only scoop/calibrated spoon require calibration
-        val needCal = UnitCode.entries.filter { it.requiresCalibration }.toSet()
-        assertEquals(setOf(UnitCode.MANUFACTURER_SCOOP, UnitCode.USER_CALIBRATED_SPOON), needCal)
+        assertEquals(UnitDimension.TEMPERATURE, UnitCode.CELSIUS.dimension)
+        assertEquals(UnitDimension.PH, UnitCode.PH_VALUE.dimension)
+        assertEquals(UnitDimension.HARDNESS, UnitCode.DEGREE_GH.dimension)
+        assertEquals(UnitDimension.UNKNOWN, UnitCode.LEGACY_UNSPECIFIED.dimension)
+        // scoop/capful/calibrated-spoon + legacy engine measures need a measure definition
+        val needDef = UnitCode.entries.filter { it.requiresMeasureDefinition }.toSet()
+        assertEquals(
+            setOf(
+                UnitCode.MANUFACTURER_SCOOP, UnitCode.MANUFACTURER_CAPFUL, UnitCode.USER_CALIBRATED_SPOON,
+                UnitCode.LEGACY_ENGINE_MASS_MEASURE, UnitCode.LEGACY_ENGINE_VOLUME_MEASURE,
+            ),
+            needDef,
+        )
     }
 }

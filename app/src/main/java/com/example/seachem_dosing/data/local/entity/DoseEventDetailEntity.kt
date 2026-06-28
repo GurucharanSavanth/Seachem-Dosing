@@ -8,13 +8,21 @@ import androidx.room.PrimaryKey
 
 /**
  * Dose-event detail (ADR-011 §1), 1:1 with its [HistoryEventEntity] via [eventId] (PK + FK,
- * `ON DELETE RESTRICT`). `*_decimal` columns hold canonical [com.example.seachem_dosing.core
- * .numerics.StoredDecimal] strings (never REAL/Double); `*_unit_code` columns hold [UnitCode]
- * storage codes. Calculated vs administered amounts are kept separate (never overwritten).
+ * `ON DELETE RESTRICT`). `*_decimal` columns hold canonical
+ * [com.example.seachem_dosing.core.numerics.StoredDecimal] strings (never REAL/Double);
+ * `*_unit_code` hold `UnitCode` storage codes. Calculated vs administered amounts are separate
+ * (never overwritten).
  *
- * Scoop/calibrated-spoon administration: when [administeredAmountUnitCode] is a calibration unit
- * (`scoop_mfr` / `spoon_user`), the companion fields capture the scoop-definition id or the
- * user's calibration volume + unit — a unit label alone is not a measurement (ADR-011 §3).
+ * Nullability supports honest legacy migration; the repository validator enforces stricter
+ * per-event-type requirements for new exact records:
+ *  - `LEGACY_DOSE_CALCULATION`: calculated_* set, administered_* null.
+ *  - `LEGACY_DOSE_ADMINISTERED`: calculated_* and administered_* set (same legacy value), never the
+ *    modern DOSE_ADMINISTERED type.
+ *  - new `DOSE_ADMINISTERED`: administered_* required, product_id required.
+ *
+ * Engine-defined / calibrated units (`requiresMeasureDefinition`) carry a
+ * `*_measure_definition_id` referencing an immutable measure definition. Exact v1 product/unit text
+ * is preserved in [legacyProductLabel]/[legacyOriginalUnitText] (machine-significant, not notes).
  */
 @Entity(
     tableName = "dose_event_detail",
@@ -30,7 +38,8 @@ import androidx.room.PrimaryKey
 )
 data class DoseEventDetailEntity(
     @PrimaryKey @ColumnInfo(name = "event_id") val eventId: String,
-    @ColumnInfo(name = "product_id") val productId: String,
+    @ColumnInfo(name = "product_id") val productId: String? = null,
+    @ColumnInfo(name = "legacy_product_label") val legacyProductLabel: String? = null,
     @ColumnInfo(name = "product_variant_id") val productVariantId: String? = null,
     @ColumnInfo(name = "formula_rule_id") val formulaRuleId: String? = null,
     @ColumnInfo(name = "evidence_source_id") val evidenceSourceId: String? = null,
@@ -41,13 +50,13 @@ data class DoseEventDetailEntity(
     @ColumnInfo(name = "tank_volume_unit_code") val tankVolumeUnitCode: String,
     @ColumnInfo(name = "calculated_amount_decimal") val calculatedAmountDecimal: String? = null,
     @ColumnInfo(name = "calculated_amount_unit_code") val calculatedAmountUnitCode: String? = null,
-    @ColumnInfo(name = "administered_amount_decimal") val administeredAmountDecimal: String,
-    @ColumnInfo(name = "administered_amount_unit_code") val administeredAmountUnitCode: String,
+    @ColumnInfo(name = "calculated_measure_definition_id") val calculatedMeasureDefinitionId: String? = null,
+    @ColumnInfo(name = "administered_amount_decimal") val administeredAmountDecimal: String? = null,
+    @ColumnInfo(name = "administered_amount_unit_code") val administeredAmountUnitCode: String? = null,
+    @ColumnInfo(name = "administered_measure_definition_id") val administeredMeasureDefinitionId: String? = null,
+    @ColumnInfo(name = "legacy_original_unit_text") val legacyOriginalUnitText: String? = null,
     @ColumnInfo(name = "rounding_mode_code") val roundingModeCode: String? = null,
     @ColumnInfo(name = "rounding_scale") val roundingScale: Int? = null,
     @ColumnInfo(name = "user_modified_amount") val userModifiedAmount: Boolean,
     @ColumnInfo(name = "warnings_acknowledged") val warningsAcknowledged: String? = null,
-    @ColumnInfo(name = "administered_scoop_definition_id") val administeredScoopDefinitionId: String? = null,
-    @ColumnInfo(name = "administered_calibrated_volume_decimal") val administeredCalibratedVolumeDecimal: String? = null,
-    @ColumnInfo(name = "administered_calibrated_volume_unit_code") val administeredCalibratedVolumeUnitCode: String? = null,
 )
