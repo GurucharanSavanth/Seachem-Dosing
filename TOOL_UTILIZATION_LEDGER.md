@@ -90,4 +90,11 @@
 
 ## 5. Completeness statement
 
-Every expected plugin/skill/MCP from the prompt is accounted for above as used / not-applicable / blocked / deferred. **Complete utilization is NOT yet claimed** — rows marked "deferred" will be updated with real invocation + output as each phase executes. Owner-approval gates: Figma auth, hookify install, any push/release/signing, any Supabase/Drive/Gmail use.
+Every expected plugin/skill/MCP from the prompt is accounted for above as used / not-applicable / blocked / deferred. Owner-approval gates: Figma auth, hookify install, any push/release/signing, any Supabase/Drive/Gmail use.
+
+## 6. Actual session usage (2026-06-28)
+
+- **USED:** `deep-research` (web research), `spec` (SPEC.md), `superpowers:writing-plans` (MODERNIZATION_PLAN, the `/plan` fallback), `Agent` general-purpose ×4 (research fan-out — 2 functional, 2 no-op, F-05), `WebSearch`/`WebFetch` (main-thread research), Gradle build/test/lint, adb emulator (install/screencap/`input tap` — on-device verification of all 5 screens), `caveman` (prose, active), `ponytail` (governor, active), `TaskCreate`/`TaskUpdate` (phase tracking).
+- **DEFERRED → owner-triggered:** `code-review` + `security-guidance` plugins (heavy on the full-branch diff; security self-review done in FINAL_QA_REPORT.md instead). `caveman-review`, `ralph-loop` (no bounded-loop task arose), `hookify` (no guardrail installed). Mermaid Chart MCP — diagrams authored as text source in `DIAGRAMS/`. Scholar Gateway — evidence came from manufacturer/IUPAC, not papers.
+- **BLOCKED:** `WebFetch` rate-limit mid-research (F-06, task #14); instrumented Compose tests on API-36 (F-07).
+- **NOT APPLICABLE (unchanged):** freecad, ui5-mcp-server, sap-mdk-server, supabase, Hugging Face, Drive/Gmail/Calendar/Notion/Coupler/Explorium/LunarCrush.
