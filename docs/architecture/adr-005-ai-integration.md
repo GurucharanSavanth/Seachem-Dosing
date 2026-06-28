@@ -1,6 +1,6 @@
 # ADR-005: AI Integration — Hybrid (Gemini API + Optional Local LLM)
 
-**Status:** Accepted
+**Status:** Superseded by [ADR-010](adr-010-remove-ai-chat.md) (2026-06-28 — AI/chat code removed; this ADR retained as historical design analysis and the basis for any future re-entry).
 **Date:** 2026-05-09
 **Deciders:** Gurucharan.S
 **User decision:** B (Local LLM) → revised to **5c (Hybrid)** after device-class reality check
