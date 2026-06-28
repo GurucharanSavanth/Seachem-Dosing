@@ -45,6 +45,7 @@ import com.example.seachem_dosing.domain.medication.MedProduct
 import com.example.seachem_dosing.domain.medication.MedicationCatalog
 import com.example.seachem_dosing.domain.medication.MedicationSafetyEngine
 import com.example.seachem_dosing.domain.medication.MedicationSafetyEngine.MedAdvice
+import com.example.seachem_dosing.domain.medication.MedicationSearchEngine
 import com.example.seachem_dosing.domain.medication.MedicationSafetyEngine.TankContext
 import com.example.seachem_dosing.domain.medication.WaterType
 import java.math.BigDecimal
@@ -159,6 +160,7 @@ private fun BeginnerFlow() {
     var inverts by remember { mutableStateOf(false) }
     val selectedSymptoms = remember { mutableListOf<String>().toMutableStateList() }
     var showOptions by remember { mutableStateOf(false) }
+    var query by remember { mutableStateOf("") }
 
     LabeledDropdown("Water type", WATER_TYPES.map { it.second }, WATER_TYPES.indexOfFirst { it.first == waterType }) { waterType = WATER_TYPES[it].first; showOptions = false }
     SwitchRow("Invertebrates / corals present", inverts) { inverts = it; showOptions = false }
@@ -182,7 +184,8 @@ private fun BeginnerFlow() {
         // Safety-first: never diagnose from symptoms. Show products the LABEL verifies for this
         // water type, each run through the safety engine with the known context. Low-confidence by design.
         Text("Not a diagnosis. Products verified for ${waterType.name.lowercase()}; confirm species + consult an expert.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        MedicationCatalog.forWaterType(waterType).forEach { product ->
+        OutlinedTextField(query, { query = it }, label = { Text("Search products") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+        MedicationSearchEngine.search(query, waterType).forEach { product ->
             val result = MedicationSafetyEngine.assess(
                 product,
                 TankContext(waterType = waterType, volumeLitres = BigDecimal("1"), hasInvertsOrCorals = inverts, filtrationAcknowledged = false, speciesConfirmed = false),
