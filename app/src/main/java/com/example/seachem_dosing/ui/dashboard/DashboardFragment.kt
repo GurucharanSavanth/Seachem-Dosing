@@ -23,6 +23,7 @@ import com.example.seachem_dosing.R
 import com.example.seachem_dosing.databinding.FragmentDashboardBinding
 import com.example.seachem_dosing.databinding.ItemParameterBinding
 import com.example.seachem_dosing.databinding.ItemParameterHardnessBinding
+import com.example.seachem_dosing.domain.engine.RecommendationEngine
 import com.example.seachem_dosing.logic.Calculations
 import com.example.seachem_dosing.ui.MainViewModel
 import com.example.seachem_dosing.util.TextWatcherManager
@@ -820,11 +821,66 @@ class DashboardFragment : Fragment() {
 
     private fun updateRecommendations() {
         if (_binding == null) return
+        val litres = viewModel.getEffectiveVolumeLitres()
         when (viewModel.profile.value ?: MainViewModel.AquariumProfile.FRESHWATER) {
-            MainViewModel.AquariumProfile.FRESHWATER -> updateFreshwaterRecommendations()
-            MainViewModel.AquariumProfile.SALTWATER -> updateSaltwaterRecommendations()
-            MainViewModel.AquariumProfile.POND -> updatePondRecommendations()
+            MainViewModel.AquariumProfile.FRESHWATER -> {
+                renderReport(
+                    RecommendationEngine.freshwater(
+                        RecommendationEngine.FreshwaterInput(
+                            litres = litres,
+                            ammonia = viewModel.ammonia.value ?: 0.0,
+                            nitrite = viewModel.nitrite.value ?: 0.0,
+                            nitrate = viewModel.nitrate.value ?: 0.0,
+                            ghDegrees = viewModel.getGhInDegrees(),
+                            khDegrees = viewModel.getKhInDegrees(),
+                            ph = viewModel.ph.value ?: 0.0,
+                            temp = viewModel.temperature.value ?: 0.0,
+                            potassium = viewModel.potassium.value ?: 0.0,
+                            iron = viewModel.iron.value ?: 0.0,
+                        )
+                    )
+                )
+                ghBinding?.let { updateHardnessStatus(it, viewModel.getGhInDegrees()) }
+                khBinding?.let { updateHardnessStatus(it, viewModel.getKhInDegrees()) }
+            }
+            MainViewModel.AquariumProfile.SALTWATER -> renderReport(
+                RecommendationEngine.saltwater(
+                    RecommendationEngine.SaltwaterInput(
+                        litres = litres,
+                        salinity = viewModel.salinity.value ?: 0.0,
+                        alkalinity = viewModel.alkalinity.value ?: 0.0,
+                        calcium = viewModel.calcium.value ?: 0.0,
+                        magnesium = viewModel.magnesium.value ?: 0.0,
+                        nitrate = viewModel.nitrate.value ?: 0.0,
+                        phosphate = viewModel.phosphate.value ?: 0.0,
+                        ph = viewModel.ph.value ?: 0.0,
+                        temp = viewModel.temperature.value ?: 0.0,
+                        strontium = viewModel.strontium.value ?: 0.0,
+                        iodide = viewModel.iodide.value ?: 0.0,
+                    )
+                )
+            )
+            MainViewModel.AquariumProfile.POND -> renderReport(RecommendationEngine.pond(litres))
         }
+    }
+
+    /** Map an engine [RecommendationEngine.Report] (resource IDs) to display text. */
+    private fun renderReport(report: RecommendationEngine.Report) {
+        val actions = report.actions.map { m ->
+            if (m.arg != null) getString(m.res, m.arg) else getString(m.res)
+        }
+        val details = report.details.map { line ->
+            when (line) {
+                is RecommendationEngine.Line.Param -> getString(
+                    R.string.reco_line_format,
+                    getString(line.labelRes),
+                    "${line.value} ${getString(line.unitRes)}",
+                    getString(line.msgRes),
+                )
+                is RecommendationEngine.Line.Plain -> getString(line.res)
+            }
+        }
+        setRecommendationsText(buildRecommendationsText(actions, details))
     }
 
     private fun observeViewModel() {
