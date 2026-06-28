@@ -13,14 +13,12 @@
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.example.seachem_dosing.ui.dashboard.DashboardFragment"
-        android:label="@string/nav_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:label="@string/nav_dashboard" />
 
     <fragment
         android:id="@+id/navigation_calculators"
         android:name="com.example.seachem_dosing.ui.calculators.CalculatorsFragment"
-        android:label="@string/nav_calculators"
-        tools:layout="@layout/fragment_calculators" />
+        android:label="@string/nav_calculators" />
 
     <fragment
         android:id="@+id/navigation_medication"
