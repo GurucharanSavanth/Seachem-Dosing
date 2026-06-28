@@ -25,7 +25,6 @@
     <fragment
         android:id="@+id/navigation_settings"
         android:name="com.example.seachem_dosing.ui.settings.SettingsFragment"
-        android:label="@string/nav_settings"
-        tools:layout="@layout/fragment_settings" />
+        android:label="@string/nav_settings" />
 
 </navigation>
