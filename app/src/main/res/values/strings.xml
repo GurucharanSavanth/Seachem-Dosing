@@ -360,6 +360,7 @@ Consider water change or phosphate control.</string>
     <!-- Actions -->
     <string name="action_calculate">Calculate</string>
     <string name="action_copy">Copy</string>
+    <string name="action_share">Share</string>
     <string name="action_copied">Copied!</string>
     <string name="action_reset">Reset</string>
     <string name="action_cancel">Cancel</string>
