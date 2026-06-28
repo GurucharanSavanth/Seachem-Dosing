@@ -13,6 +13,10 @@
         android:icon="@drawable/ic_water_drop"
         android:title="Medication" />
     <item
+        android:id="@+id/navigation_fertilizer"
+        android:icon="@drawable/ic_calculate"
+        android:title="Fertilizer" />
+    <item
         android:id="@+id/navigation_settings"
         android:icon="@drawable/ic_settings"
         android:title="@string/nav_settings" />

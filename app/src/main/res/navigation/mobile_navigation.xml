@@ -28,6 +28,11 @@
         android:label="Medication" />
 
     <fragment
+        android:id="@+id/navigation_fertilizer"
+        android:name="com.example.seachem_dosing.ui.fertilizer.FertilizerFragment"
+        android:label="Fertilizer" />
+
+    <fragment
         android:id="@+id/navigation_settings"
         android:name="com.example.seachem_dosing.ui.settings.SettingsFragment"
         android:label="@string/nav_settings" />
