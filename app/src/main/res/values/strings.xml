@@ -367,15 +367,6 @@ Consider water change or phosphate control.</string>
     <string name="action_ok">OK</string>
     <string name="action_edit">Edit</string>
 
-    <!-- AI -->
-    <string name="ai_insight_title">Gemini Insight</string>
-    <string name="ai_insight_button">Analyze</string>
-    <string name="ai_insight_placeholder">Tap Analyze to get guidance from your readings.</string>
-    <string name="ai_chat_title">Aquarium Chat</string>
-    <string name="ai_chat_hint">Ask about aquarium dosing, water parameters, or fish care.</string>
-    <string name="ai_chat_input_hint">Ask an aquarium question</string>
-    <string name="ai_chat_send">Send</string>
-
     <!-- Menus -->
     <string name="menu_switch_profile">Switch profile</string>
     <string name="menu_theme">Theme</string>

@@ -18,7 +18,8 @@ import org.koin.core.logger.Level
  *   dataModule   — Room database + DAOs + Repository implementations.
  *   domainModule — UseCase classes (factory-scoped).
  *
- * AI module will be added when Phase 7 wires GeminiClient / LocalLlmClient.
+ * AI/chat was removed as an orphan stub (see docs/architecture/adr-010-remove-ai-chat.md);
+ * any future AI module is gated on the re-entry requirements recorded there.
  */
 class SeachemDosingApp : Application() {
 

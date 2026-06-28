@@ -5,8 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import com.example.seachem_dosing.ai.AiInsightState
-import com.example.seachem_dosing.ai.ChatMessage
 import com.example.seachem_dosing.logic.Calculations
 import com.example.seachem_dosing.logic.SeachemCalculations
 import org.json.JSONObject
@@ -37,12 +35,6 @@ class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
     val profile: LiveData<AquariumProfile> = _profileId.map { id ->
         AquariumProfile.fromId(id) ?: AquariumProfile.FRESHWATER
     }
-
-    private val _aiInsight = MutableLiveData(AiInsightState())
-    val aiInsight: LiveData<AiInsightState> = _aiInsight
-
-    private val _chatMessages = MutableLiveData<List<ChatMessage>>(emptyList())
-    val chatMessages: LiveData<List<ChatMessage>> = _chatMessages
 
     // ==================== Volume Settings ====================
 
@@ -440,8 +432,6 @@ class MainViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
         ghUnit.value = "dh"
         khUnit.value = "dh"
         defaultWaterChangePercent.value = 20.0
-        _aiInsight.value = AiInsightState()
-        _chatMessages.value = emptyList()
         // Reset calc inputs
         _calcInputs.clear()
         
