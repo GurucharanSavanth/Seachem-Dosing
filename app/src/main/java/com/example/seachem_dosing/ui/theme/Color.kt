@@ -2,7 +2,9 @@ package com.example.seachem_dosing.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Mirrors res/values/colors.xml (md_theme_*). Keep in sync if the XML palette changes.
+// CANONICAL colour-token source (ADR-009). res/values/colors.xml is a compatibility bridge
+// for the retained XML shell (ADR-007). ColorTokenParityTest enforces the two stay numerically
+// identical — edit values here first, then mirror into colors.xml; the test fails on any drift.
 
 // --- Light ---
 val LightPrimary = Color(0xFF0A7A8C)
