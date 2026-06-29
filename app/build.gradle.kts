@@ -32,8 +32,8 @@ android {
         applicationId = "com.example.seachem_dosing"
         minSdk = 33   // v2.0 — Android 13+ per ADR-006 (owner decision); ~68.9% device coverage (DEEP_RESEARCH_REPORT WS1)
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
