@@ -9,7 +9,7 @@
 A dual-platform application (Android & Web) for aquarium enthusiasts to calculate precise dosing amounts for Seachem supplements based on water volume and parameters.
 
 <p align="center">
-  <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" alt="App Icon" width="120"/>
+  <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp" alt="App Icon" width="120"/>
 </p>
 
 ---
@@ -50,18 +50,18 @@ A dual-platform application (Android & Web) for aquarium enthusiasts to calculat
 |---|---|
 | **Language** | Kotlin 2.0.21 |
 | **Min SDK** | 33 (Android 13.0) |
-| **Architecture** | MVVM + LiveData |
-| **UI** | Fragment Navigation + ViewBinding |
+| **Architecture** | MVVM/UDF hybrid: legacy `MainViewModel` uses LiveData/SavedStateHandle; History uses StateFlow/Flow |
+| **UI** | Jetpack Compose screens hosted in the Fragment/XML Navigation shell through ComposeView; ViewBinding remains in `MainActivity` shell |
 | **Design** | Material Design 3 |
 | **Async** | Kotlin Coroutines |
-| **Storage** | DataStore Preferences |
+| **Storage** | Room v2 for history/audit persistence; active settings/profile state uses SavedStateHandle + SharedPreferences; DataStore Preferences is staged, not wired |
 
 ### Web App
 | | |
 |---|---|
-| **Stack** | HTML5, CSS3, Vanilla JS (ES6+) |
-| **Framework** | None (zero dependencies) |
-| **Testing** | Jest + ESLint |
+| **Stack** | Vite + TypeScript PWA bootstrap in `web/`; legacy static app remains in `Base_Template/` |
+| **Framework** | No UI framework currently wired |
+| **Testing** | Vitest + ESLint (`web/`); legacy static tests remain under `Base_Template/` where applicable |
 
 ---
 
@@ -71,11 +71,11 @@ A dual-platform application (Android & Web) for aquarium enthusiasts to calculat
 
 ```bash
 # Clone
-git clone https://github.com/GurucharanSavanth/Seachem-Calculatore.git
-cd SeachemDosing
+git clone https://github.com/GurucharanSavanth/Seachem-Dosing.git
+cd Seachem-Dosing
 
 # Build & Install
-./gradlew installDebug
+./gradlew :app:installDebug
 ```
 
 ### Web
@@ -95,9 +95,10 @@ python -m http.server 8000
 ## Project Structure
 
 ```
-SeachemDosing/
+Seachem-Dosing/
 ├── app/src/main/java/com/example/seachem_dosing/
 │   ├── MainActivity.kt
+│   ├── data/local/               # Room v2 history/audit persistence
 │   ├── logic/
 │   │   ├── Calculations.kt          # Core math (SYNC POINT)
 │   │   ├── SeachemCalculations.kt
@@ -111,6 +112,7 @@ SeachemDosing/
 │   └── util/
 │       └── DebouncedTextWatcher.kt  # Performance utility
 │
+├── web/                         # Vite + TypeScript v2 web bootstrap
 ├── Base_Template/
 │   ├── index.html
 │   └── js/
@@ -119,8 +121,8 @@ SeachemDosing/
 │       └── uiHandlers.js
 │
 └── docs/
-    ├── MEMORY.md      # Project history
-    └── AGENTS.md      # Dev guidelines
+    ├── architecture/  # ADRs
+    └── design/        # UI/design audits and remediation plans
 ```
 
 ---
@@ -197,16 +199,16 @@ Contributions are welcome! Please read the guidelines:
 
 ```bash
 # Debug build
-./gradlew assembleDebug
+./gradlew :app:assembleDebug
 
 # Release build
-./gradlew assembleRelease
+./gradlew :app:assembleRelease
 
 # Run tests
-./gradlew test
+./gradlew :app:testDebugUnitTest
 
 # Install on device
-./gradlew installDebug
+./gradlew :app:installDebug
 ```
 
 ---
