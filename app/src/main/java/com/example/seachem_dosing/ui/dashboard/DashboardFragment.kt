@@ -16,7 +16,13 @@ import androidx.fragment.app.activityViewModels
 import com.example.seachem_dosing.R
 import com.example.seachem_dosing.ui.MainViewModel
 import com.example.seachem_dosing.ui.theme.SeachemTheme
+import androidx.lifecycle.lifecycleScope
+import com.example.seachem_dosing.domain.history.ParameterType
+import com.example.seachem_dosing.domain.usecase.RecordWaterParameterReadingUseCase
 import com.google.android.material.transition.MaterialFadeThrough
+import java.util.UUID
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 /**
  * Hosts the Compose [DashboardScreen] (ADR-001). All volume/parameter wiring and
@@ -26,6 +32,7 @@ import com.google.android.material.transition.MaterialFadeThrough
 class DashboardFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
+    private val recordReading: RecordWaterParameterReadingUseCase by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,9 +53,47 @@ class DashboardFragment : Fragment() {
                     viewModel = viewModel,
                     onCopy = ::copyRecommendations,
                     onShare = ::shareRecommendations,
+                    onSaveReadings = ::saveReadings,
                 )
             }
         }
+    }
+
+    private fun saveReadings() {
+        val profileId = (viewModel.profile.value ?: MainViewModel.AquariumProfile.FRESHWATER).id
+        val volume = viewModel.getEffectiveVolumeLitres()
+        val readings = buildReadings()
+        if (readings.isEmpty()) {
+            Toast.makeText(requireContext(), getString(R.string.save_readings_none), Toast.LENGTH_SHORT).show()
+            return
+        }
+        val batchKey = "dashboard:${UUID.randomUUID()}"
+        viewLifecycleOwner.lifecycleScope.launch {
+            val saved = WaterReadingsRecorder(recordReading).save(profileId, volume, batchKey, readings)
+            Toast.makeText(requireContext(), getString(R.string.save_readings_done, saved), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun buildReadings(): List<Pair<ParameterType, Double>> {
+        val vm = viewModel
+        val common = listOf(
+            ParameterType.NITRATE to (vm.nitrate.value ?: 0.0),
+            ParameterType.PH to (vm.ph.value ?: 0.0),
+            ParameterType.TEMPERATURE to (vm.temperature.value ?: 0.0),
+            ParameterType.GH to vm.getGhInDegrees(),
+            ParameterType.KH to vm.getKhInDegrees(),
+        )
+        val saltwater = if (vm.profile.value == MainViewModel.AquariumProfile.SALTWATER) {
+            listOf(
+                ParameterType.SALINITY to (vm.salinity.value ?: 0.0),
+                ParameterType.ALKALINITY to (vm.alkalinity.value ?: 0.0),
+                ParameterType.CALCIUM to (vm.calcium.value ?: 0.0),
+                ParameterType.MAGNESIUM to (vm.magnesium.value ?: 0.0),
+            )
+        } else {
+            emptyList()
+        }
+        return (common + saltwater).filter { it.second > 0.0 }
     }
 
     private fun copyRecommendations(text: String) {

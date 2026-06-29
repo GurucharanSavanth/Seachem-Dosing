@@ -24,6 +24,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -77,6 +78,7 @@ fun DashboardScreen(
     viewModel: MainViewModel,
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
+    onSaveReadings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val profile by viewModel.profile.observeAsState(AquariumProfile.FRESHWATER)
@@ -89,6 +91,11 @@ fun DashboardScreen(
 
         Spacer(Modifier.height(16.dp))
         VolumeSection(viewModel)
+
+        Spacer(Modifier.height(8.dp))
+        OutlinedButton(onClick = onSaveReadings, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(R.string.action_save_readings))
+        }
 
         if (profile != AquariumProfile.POND) {
             SectionHeader(stringResource(R.string.section_parameters))
