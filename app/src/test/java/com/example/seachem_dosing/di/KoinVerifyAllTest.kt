@@ -1,5 +1,6 @@
 package com.example.seachem_dosing.di
 
+import com.example.seachem_dosing.data.repository.HistoryEventRepository
 import org.junit.Test
 import org.koin.test.verify.verify
 
@@ -15,6 +16,7 @@ class KoinVerifyAllTest {
 
     @Test
     fun `appModule resolves`() {
-        appModule.verify()
+        // HistoryEventRepository is provided at runtime by the (statically-excluded) dataModule.
+        appModule.verify(extraTypes = listOf(HistoryEventRepository::class))
     }
 }

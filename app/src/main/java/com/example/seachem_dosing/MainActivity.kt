@@ -85,6 +85,12 @@ class MainActivity : AppCompatActivity() {
                     }
                     true
                 }
+                R.id.action_history -> {
+                    if (navController.currentDestination?.id != R.id.navigation_history) {
+                        navController.navigate(R.id.navigation_history)
+                    }
+                    true
+                }
                 R.id.menu_theme_system -> {
                     applyThemeMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                     true

@@ -1,15 +1,14 @@
 package com.example.seachem_dosing.di
 
+import com.example.seachem_dosing.ui.history.HistoryViewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 /**
- * App-scoped DI bindings: settings managers, theme/locale state.
- *
- * Repository bindings live in [dataModule]; UseCase bindings will live in
- * domainModule (added at Phase 4.6). ViewModel bindings will be wired here
- * when Phase 4.7 (StateFlow migration) replaces the manually-instantiated
- * MainViewModel with Koin's `viewModel { }` DSL.
+ * App-scoped DI bindings. ViewModels that need repository/use-case injection are bound here via
+ * Koin's `viewModel { }` DSL; the legacy [com.example.seachem_dosing.ui.MainViewModel] remains
+ * AndroidX-instantiated (SavedStateHandle) until its StateFlow migration.
  */
 val appModule = module {
-    // Empty — populated as Phase 4.5+ (Repository) and 4.6 (UseCase) land.
+    viewModel { HistoryViewModel(get()) }
 }
