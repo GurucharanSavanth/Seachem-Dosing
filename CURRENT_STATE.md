@@ -1,44 +1,32 @@
 # CURRENT_STATE — autonomous execution handoff
 
-**Branch:** v2.0-wip · **Last verified commit:** e140e7d (history schema correction, 130 JVM tests green)
+**Branch:** v2.0-wip (local-only, no upstream) · **Latest commit:** `5cddf60`
 
-## Phase
-History v2 — Phases 1–5 COMPLETE (migration + write triggers + screen + integration, device-verified).
+## Commit policy (standing)
+- **No `Co-Authored-By` trailer.** All commits under **GurucharanSavanth <savanthgc@gmail.com>** only.
+- v2.0-wip history was rewritten (filter-branch) to strip the old Claude co-author trailer from all 34 commits;
+  content verified byte-identical. Hashes below the rewrite point changed.
 
-- `15f1e64` migrate to v2 · `d2bf91c` migration+DAO instrumented (12/12)
-- `75cb266` write-trigger use cases · `4dea031` History screen (VM+Compose+nav+top-bar action)
-- `920e8c7` Save-readings dashboard trigger · `6d83014` end-to-end integration (16/16 instrumented)
-- Gates: JVM 137/0/0, instrumented 16/0, lint clean, Koin verify ok, tree clean.
-
-## Remaining for History
-- "Log as administered" UI button on the calculator result (use case + integration-test done; UI button pending).
-  Needs a unit-handling decision: calculator dose results in `g`/`mL` log cleanly; `tsp`/`caps`/`tbsp` are
-  product-mass spoons with no verified per-product measure definition (same issue as legacy migration).
+## History v2 — COMPLETE & device-verified
+- **Precision:** `StoredDecimal` (canonical String, no Double for new values; legacy binary64 path quarantined).
+- **Registries:** event types, precision status, units (+ legacy engine measures), routes, parameter types.
+- **Schema:** append-only 3-table model (history_event + dose/parameter_event_detail), AppDatabase **v2**,
+  non-destructive `Migration(1,2)` (defensive legacy conversion; orphan v1 vertical retired). Exported `2.json`.
+- **Write path:** typed commands + `HistoryWriteValidator` + `HistoryEventRepository` (idempotent, atomic) +
+  `LogAdministeredDoseUseCase` / `RecordWaterParameterReadingUseCase`.
+- **Read screen:** `HistoryViewModel` (Koin/StateFlow) + Compose `HistoryScreen` (filters, detail, voided badge,
+  loading/empty/error/retry, a11y), top-bar History action.
+- **Write triggers (both wired):** dashboard **Save readings**; calculator **Log as administered** (logs physical
+  g/mL amount — spoons never logged as exact).
+- **Gates:** JVM **142/0/0**, instrumented **16/0** on emulator-5554, lint clean, Koin verify, tree clean.
 
 ## Device-test blocker (recorded, non-fatal)
-- **Compose UI tests** (`createComposeRule`/Espresso) FAIL on `emulator-5554` (Pixel_10_Pro_XL, API-"17" preview):
-  `NoSuchMethodException: android.hardware.input.InputManager.getInstance` from `Espresso.onIdle` (espresso 3.6.1
-  doesn't support this preview image). Migration/DAO/integration instrumented tests are unaffected (no Espresso).
-  HistoryScreen states covered by `HistoryViewModelTest` + integration tests. Revisit with a stable API 34/35 AVD
-  or espresso 3.7 before adding Compose UI tests.
+- Compose UI tests (`createComposeRule`/Espresso) FAIL on emulator-5554 (API-"17" preview): `NoSuchMethodException:
+  InputManager.getInstance` (espresso 3.6.1 gap). Non-Espresso instrumented tests unaffected. Revisit with a
+  stable API 34/35 AVD or espresso 3.7. HistoryScreen states covered by VM + integration tests.
 
-## Completed gates (this session)
-- `1d0744f` menuAnchor fix · `040f74c` UI audit + ADRs 007–010 · `8f88463` AI/chat removal
-- `5dfd806` colour-token parity · `fa0b50a` ADR-011 · `d6605d7`+`3fedd31` StoredDecimal (precision)
-- `6f38b59` registries · `d3c2a24` v2 entities · `ec408f4` DAO+repo · `e140e7d` legacy semantics
-
-## Active decisions (authoritative = ADRs)
-- ADR-007 retain Fragment shell · ADR-008 build History · ADR-009 Compose-first colour · ADR-010 remove AI
-- ADR-011 (+§11): precision-safe append-only 3-table history; StoredDecimal canonical String; v1 writer
-  orphaned ⇒ proportionate non-destructive migration; legacy tsp/tbsp = mass measures → LEGACY_UNSPECIFIED/
-  engine-measure (never volume spoons); decimals = TEXT, repository is StoredDecimal boundary.
-
-## Next executable task
-Commit E: wire 3 v2 entities into AppDatabase v2 + Migration(1,2) + export 2.json + room-testing androidTest;
-then instrumented migration/DAO tests on emulator-5554; then write triggers (Log administered / Save reading);
-then History UI; then integration; then remaining master-prompt phases.
-
-## Unresolved / deferred
-- Orphan use cases (Calculate/Convert/Validate/QuickDose) + CalculationsRepository — dead from UI; cleanup in a later phase.
-- Parameter↔unit dimensional validation for NEW readings (beyond structural) — later.
-- R2 done (param units added). minSdk locked at 33 (ADR-006).
+## Next (Phase 6 — broad program, per master prompt)
+Repository-wide review · architecture remediation (god ViewModel, StateFlow) · calculation-engine verification ·
+medication/fertilizer engine hardening · catalog/indexing · UI/UX audit corrections · accessibility · adaptive
+layouts · performance · security review · dependency modernization · dead-code cleanup (other orphan use cases) ·
+i18n (KN parity for new strings) · release config · SBOM/attribution · final QA. No hard blockers.
