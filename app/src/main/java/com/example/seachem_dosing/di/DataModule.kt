@@ -3,8 +3,6 @@ package com.example.seachem_dosing.di
 import androidx.room.Room
 import com.example.seachem_dosing.data.local.database.AppDatabase
 import com.example.seachem_dosing.data.local.database.MIGRATION_1_2
-import com.example.seachem_dosing.data.repository.CalculationsRepository
-import com.example.seachem_dosing.data.repository.CalculationsRepositoryImpl
 import com.example.seachem_dosing.data.repository.HistoryEventRepository
 import com.example.seachem_dosing.data.repository.HistoryEventRepositoryImpl
 import org.koin.android.ext.koin.androidContext
@@ -30,5 +28,4 @@ val dataModule = module {
     single { get<AppDatabase>().historyDao() }
 
     single<HistoryEventRepository> { HistoryEventRepositoryImpl(get()) { UUID.randomUUID().toString() } }
-    single<CalculationsRepository> { CalculationsRepositoryImpl() }
 }

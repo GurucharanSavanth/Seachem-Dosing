@@ -1,24 +1,16 @@
 package com.example.seachem_dosing.di
 
 import com.example.seachem_dosing.BuildConfig
-import com.example.seachem_dosing.domain.usecase.CalculateDoseUseCase
-import com.example.seachem_dosing.domain.usecase.CalculateQuickDoseUseCase
-import com.example.seachem_dosing.domain.usecase.ConvertUnitsUseCase
 import com.example.seachem_dosing.domain.usecase.LogAdministeredDoseUseCase
 import com.example.seachem_dosing.domain.usecase.RecordWaterParameterReadingUseCase
-import com.example.seachem_dosing.domain.usecase.ValidateInputUseCase
 import org.koin.dsl.module
 
 /**
- * Domain-layer DI bindings: UseCase classes.
- * UseCases are factory-scoped (new instance per request) — they are stateless
- * and cheap to construct, no need to share across consumers.
+ * Domain-layer DI bindings: the explicit history write-trigger use cases (factory-scoped, stateless).
+ * The earlier Calculate/Convert/Validate use cases + CalculationsRepository were orphaned (no UI
+ * caller — the calculator drives [com.example.seachem_dosing.ui.MainViewModel] directly) and removed.
  */
 val domainModule = module {
-    factory { CalculateDoseUseCase(get()) }
-    factory { CalculateQuickDoseUseCase(get()) }
-    factory { ConvertUnitsUseCase() }
-    factory { ValidateInputUseCase() }
     factory { LogAdministeredDoseUseCase(get(), { System.currentTimeMillis() }, BuildConfig.VERSION_NAME) }
     factory { RecordWaterParameterReadingUseCase(get(), { System.currentTimeMillis() }, BuildConfig.VERSION_NAME) }
 }
