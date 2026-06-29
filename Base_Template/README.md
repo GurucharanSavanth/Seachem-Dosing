@@ -1,5 +1,9 @@
 # Aquarium Dosing & Water‑Parameter Calculator
 
+> Legacy static web app documentation. `Base_Template/` has no local `package.json`
+> or Jest test suite in this repository; npm/Jest/CI claims below are historical.
+> The active TypeScript scaffold lives in `web/`.
+
 ## [Click here for Calculator](https://gurucharansavanth.github.io/Seachem-Dosing-Calculator/)
 
 [![Live Demo](https://img.shields.io/badge/demo-online-brightgreen.svg)](https://gurucharansavanth.github.io/Seachem-Dosing-Calculator/)
@@ -34,7 +38,7 @@
 | **Accessibility** | WCAG 2.2 AA colours, full keyboard nav, `aria‑live` results, English + ಕನ್ನಡ toggle.                                                                                      |
 | **Theming**       | One‑click light/dark (prefers‐color‑scheme aware).                                                                                                                        |
 | **Responsive**    | Mobile‑first layout; footer action‑bar for Android/iOS convenience.                                                                                                       |
-| **Reliability**   | Unit‑tested math (Jest); ESLint + Security rules; GitHub Actions CI.                                                                                                      |
+| **Reliability**   | Legacy static implementation; current automated web work is under `web/`.                                                                                                  |
 
 
 
@@ -52,12 +56,8 @@
 git clone https://github.com/GurucharanSavanth/Seachem-Dosing-Calculator.git
 cd Seachem-Dosing-Calculator
 
-# Install dev‑deps for linting/testing
-npm ci
-
-# Run tests & linter
-npm test      # Jest
-npm run lint  # ESLint
+# No local npm workflow exists in Base_Template in this repository.
+# Use ../web for the current TypeScript scaffold.
 ```
 
 > A simple static file server (e.g. `npx serve`) is handy for live‑reload previewing.
@@ -87,7 +87,6 @@ npm run lint  # ESLint
 │   ├── dosingCalculations.js# 💡 Pure math — the critical path
 │   ├── uiHandlers.js        # DOM glue & CSV export
 │   └── translations.js      # EN ↔︎ KN strings
-├── tests/                   # Jest specs (math audit)
 ```
 
 ---
@@ -117,10 +116,8 @@ All equations are unit‑tested against manufacturer tables and stoichiometric c
 
 ## Testing
 
-* **Jest** (`npm test`) covers every dosing function with edge‑low, nominal, edge‑high cases.
-* **ESLint** (`npm run lint`) enforces Airbnb + `plugin:security/recommended`.
-
-> CI fails if either lint or tests fail — keeping `main` green.
+No Base_Template-local Jest/ESLint workflow exists in this repository. Current web
+automation belongs to `web/` and repository CI.
 
 ---
 
@@ -128,8 +125,7 @@ All equations are unit‑tested against manufacturer tables and stoichiometric c
 
 | Stage      | Tool         | Purpose                                              |
 | ---------- | ------------ | ---------------------------------------------------- |
-| **Lint**   | ESLint       | Code quality & security rules                        |
-| **Test**   | Jest         | Math regression suite                                |
+| **Lint/Test** | `web/` workflow | Current TypeScript scaffold checks                  |
 | **Deploy** | GitHub Pages | Auto‑publish `main` → live demo (via Pages settings) |
 
 
@@ -138,7 +134,8 @@ All equations are unit‑tested against manufacturer tables and stoichiometric c
 ## Contributing
 
 1. **Fork** & create a feature branch (`git checkout -b feat/my-fix`).
-2. `npm ci && npm test && npm run lint` — keep it green.
+2. For legacy static-only changes, verify the affected page manually; for the
+   current TypeScript scaffold, use the workflows documented in `../web/README.md`.
 3. Commit with [Conventional Commits](https://www.conventionalcommits.org/) (`chore:`, `fix:`, `feat:`…).
 4. Open a PR – GitHub Actions will run automatically.
 

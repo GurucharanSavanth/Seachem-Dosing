@@ -170,7 +170,7 @@ Seachem-Dosing/
 Contributions are welcome! Please read the guidelines:
 
 ### Before You Start
-1. Check [Issues](https://github.com/GurucharanSavanth/Seachem-Calculatore/issues) for existing discussions
+1. Check [Issues](https://github.com/GurucharanSavanth/Seachem-Dosing/issues) for existing discussions
 2. Read `AGENTS.md` for code style guidelines
 
 ### Important Rules
@@ -233,7 +233,7 @@ and [NOTICE](NOTICE) for attribution.
 </p>
 
 <p align="center">
-  <a href="https://github.com/GurucharanSavanth/Seachem-Calculatore/issues">Report Bug</a>
+  <a href="https://github.com/GurucharanSavanth/Seachem-Dosing/issues">Report Bug</a>
   ·
-  <a href="https://github.com/GurucharanSavanth/Seachem-Calculatore/issues">Request Feature</a>
+  <a href="https://github.com/GurucharanSavanth/Seachem-Dosing/issues">Request Feature</a>
 </p>

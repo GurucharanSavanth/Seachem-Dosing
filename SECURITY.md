@@ -20,14 +20,15 @@ Reviewed at v2.0 (offline-first). Attack surface is intentionally minimal:
 | Network | **None** — the app makes no network calls (the inert AI/chat stub was removed). |
 | Exported components | **Only** `MainActivity` (the launcher) is exported. No exported services / receivers / providers, no deep links, no `FileProvider`, no `WebView`. |
 | Backup | `allowBackup="false"` — local data is excluded from device/cloud backup. |
-| Release build | `isMinifyEnabled` + `isShrinkResources` + R8; `isDebuggable=false`, `isJniDebuggable=false`. |
+| Release build | Release config enables `isMinifyEnabled` + `isShrinkResources` + R8; verify with a fresh `assembleRelease` before release. |
 | Signing | Release credentials resolved from Gradle properties / environment variables only — **no keystore or password in source**. `local.properties` is git-ignored. |
-| Secrets | No API keys, tokens, or private keys in source or history (scanned). |
+| Secrets | No known API keys, tokens, or private keys in tracked source. `app/google-services.json` is gitignored local config; no automated secret scan is currently configured. |
 
 ## Data handling
 
-The app stores, on-device only (Room / DataStore): aquarium tank profiles, water-parameter
-readings, and dosing/medication history. This is **low-sensitivity hobbyist data** — no personal
+The app stores data on-device only. Current storage is Room v2 for history/audit
+records, SharedPreferences for the selected profile, and SavedStateHandle for active
+screen state; DataStore Preferences is staged but not wired. This is **low-sensitivity hobbyist data** — no personal
 identifiers, credentials, payment data, or human medical records.
 
 - **Not encrypted at rest.** Justified: there are no secrets to protect, and the data is

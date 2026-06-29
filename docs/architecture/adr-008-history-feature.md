@@ -5,14 +5,25 @@
 **Deciders:** Gurucharan.S
 **Related:** ADR-003 (Room), `docs/design/UI_DOMAIN_CONNECTION_MATRIX.md` (ISSUE-CONN-003)
 
+**Current implementation note (2026-06-29):** the decision to connect History is
+implemented. The old v1 DAO/repository names and destructive delete/clear scope
+below are historical; ADR-011 supersedes them with the v2 append-only event schema
+and correction/void events.
+
 ## Context
-Room (`AppDatabase`, `DosingLogDao`, `ParameterLogDao`), `HistoryRepository(Impl)`, and use-cases exist and are tested, but **no UI consumes them** (grep-confirmed zero `ui/` references). The persistence layer is an orphan vertical with KSP/schema cost and no user value. Product goals list dosing/test history.
+Room persistence existed as an orphan vertical when this ADR was written. The current
+implementation has `HistoryEventRepository`, `HistoryViewModel`, `HistoryScreen`,
+dashboard "Save readings", calculator "Log as administered", and the History route
+wired into the Fragment/XML shell.
 
 ## Decision
 Complete the History vertical slice rather than delete built+tested infrastructure. Realize existing investment and the stated product goal.
 
 ## Scope
-Navigation destination · Compose `HistoryScreen` · `HistoryViewModel` · immutable `HistoryUiState` · UI events · repository/use-case integration · states: loading / empty / populated / recoverable-error · destructive-action confirmation (delete-one, clear-all) · filtering · sorting · search where justified · record-detail view · state restoration · accessibility semantics · responsive phone/tablet layout.
+Navigation destination · Compose `HistoryScreen` · `HistoryViewModel` · immutable `HistoryUiState` · UI events · repository/use-case integration · states: loading / empty / populated / recoverable-error · filtering · sorting · search where justified · record-detail view · state restoration · accessibility semantics · responsive phone/tablet layout.
+
+Explicitly out of current scope: physical delete-one / clear-all. History is
+append-only; corrections and voids are represented by new events (ADR-011).
 
 ## Data-mapping discipline
 Expose **only** fields the Room schema actually supports. Do not surface UI-designed fields with no backing column. Candidate fields *if represented by schema*: calculation type, tank/profile id, inputs+units, results+units, formula/rule id, evidence/source id, warnings, timestamp, app version, engine version, rounding policy, audit metadata. Verify each against `data/local/entity/*` before binding; mark unsupported as out-of-scope, not fabricated.

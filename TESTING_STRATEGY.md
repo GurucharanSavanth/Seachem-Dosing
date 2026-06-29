@@ -1,16 +1,16 @@
 # TESTING_STRATEGY.md
 
-**Project:** Seachem-Dosing v2.0 · **Branch:** `v2.0-wip` · **Updated:** 2026-06-28
+**Project:** Seachem-Dosing v2.0 · **Branch:** `v2.0-wip` · **Updated:** 2026-06-29
 
 ## Layers
 
 | Layer | Tool | What | Status |
 |---|---|---|---|
-| Unit (JVM) | JUnit4 | engines, result model, safety gates, chemistry, search | **54 green** |
-| On-device smoke | adb (`installDebug` + `screencap` + `input tap`) | every Compose screen rendered + key interactions | all 5 screens verified on Pixel_10_Pro_XL (API 36) |
-| Instrumented (Compose) | androidx.compose.ui.test | `ProfileSelectionScreenTest` | **blocked on API-36 emulator** (Espresso `InputManager.getInstance`, F-07) — runs on API ≤ 34 / CI |
+| Unit (JVM) | JUnit4 | engines, result model, safety gates, chemistry, search, history | latest generated report: 138 tests, 0 failures/errors/skips |
+| On-device smoke | adb (`installDebug` + `screencap` + `input tap`) | Compose screen rendering + key interactions | historical Pixel_10_Pro_XL (API 36) smoke; not rerun in docs-remediation workstream |
+| Instrumented (Compose) | androidx.compose.ui.test | `ProfileSelectionScreenTest` | exists, but not CI-gated; prior API-36 emulator run blocked on Espresso `InputManager.getInstance` |
 | Lint | `lintDebug` | unused resources, a11y, correctness | run each phase |
-| Web parity | `scripts/verify-sync.js` (inherited) | Kotlin ↔ JS coeff parity | inherited; revisit when web stack chosen (R6) |
+| Web parity | `scripts/verify-sync.js` (legacy) | `Calculations.kt` ↔ `Base_Template` constants only | does not cover `web/src/**` or `SeachemCalculations.kt` yet |
 
 ## Unit suites (`app/src/test`)
 
@@ -21,9 +21,9 @@
 - `domain/engine/RecommendationEngineTest` — FW/SW/pond threshold→message **parity lock** (§V — dashboard advice cannot silently drift).
 - `domain/medication/MedicationSafetyEngineTest` — §V4 FW/SW block, §V5 high-risk→NeedsMoreInput + inverts/copper block, dup-active block, §V6 carbon-removal surfaced.
 - `domain/medication/MedicationSearchEngineTest` — §V4 water-type separation, §V8 no duplicate IDs, ranking.
-- Inherited: `CalculationsTest`, `SeachemCalculationsTest`, `MainViewModelTest`, `di/KoinVerifyAllTest`, `domain/usecase/CalculateDoseUseCaseTest`.
+- Inherited/current support: `CalculationsTest`, `SeachemCalculationsTest`, `MainViewModelTest`, `di/KoinVerifyAllTest`, `HistoryWriteUseCasesTest`, History repository/DAO/migration tests.
 
-## On-device verification log (this session, Pixel_10_Pro_XL)
+## Historical on-device verification log (Pixel_10_Pro_XL)
 
 | Screen | Verified |
 |---|---|
@@ -39,7 +39,7 @@
 ```
 ./gradlew clean assembleDebug testDebugUnitTest lintDebug --continue   # baseline
 ./gradlew assembleDebug testDebugUnitTest                              # per phase
-./gradlew connectedDebugAndroidTest -P...class=ProfileSelectionScreenTest  # blocked API36 (F-07)
+./gradlew connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.example.seachem_dosing.ui.profile.ProfileSelectionScreenTest
 adb install + am start + screencap + input tap                        # on-device smoke
 ```
 

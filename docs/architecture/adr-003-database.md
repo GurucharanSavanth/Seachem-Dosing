@@ -5,6 +5,11 @@
 **Deciders:** Gurucharan.S (delegated decision to Claude)
 **Decision:** C2 (Room)
 
+**Current implementation note (2026-06-29):** the Room decision remains current, but the
+v1 schema sketch below is historical. The committed app now uses the ADR-011 v2
+append-only event schema (`history_event`, `dose_event_detail`,
+`parameter_event_detail`) plus non-destructive `Migration(1,2)`.
+
 ## Context
 
 Current persistence: only `SavedStateHandle` (process-death survival of single ViewModel) + `SharedPreferences` for selected profile (`ProfileSelectionFragment.kt:88-97`) + `DataStore Preferences 1.0.0` already in classpath but unused.
@@ -64,7 +69,7 @@ AndroidX SQL ORM, KSP-compiled DAOs.
 
 ObjectBox advantages (sync, raw speed) don't apply: no sync requirement stated, datasets are MB-scale max. Room's compile-time SQL check + native Flow + AndroidX backing + smaller APK win.
 
-## Schema Sketch
+## Historical Schema Sketch (Superseded By ADR-011)
 
 ```kotlin
 @Entity(tableName = "parameter_log")
@@ -112,7 +117,8 @@ interface ParameterLogDao {
 }
 ```
 
-Initial DB version 1. No migrations needed yet.
+At ADR creation this sketch assumed DB version 1. ADR-011 supersedes that sketch:
+the committed database is version 2 and has a required migration from v1.
 
 ## Consequences
 
@@ -136,7 +142,7 @@ Initial DB version 1. No migrations needed yet.
    - `androidx.room:room-ktx:2.6.1`
    - `androidx.room:room-compiler:2.6.1` (ksp)
 2. Add KSP plugin: `com.google.devtools.ksp:2.0.21-1.0.27`.
-3. Create `data/local/database/AppDatabase.kt` with version 1.
+3. Create `data/local/database/AppDatabase.kt` with version 1. Superseded by ADR-011 v2.
 4. Configure schema export: `ksp { arg("room.schemaLocation", "$projectDir/schemas") }`.
 5. Add `@Database(entities = [...], version = 1, exportSchema = true)` annotation.
 6. Wire Room into Koin via `dataModule`: `single { Room.databaseBuilder(...).build() }`.

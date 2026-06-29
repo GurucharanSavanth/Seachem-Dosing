@@ -5,6 +5,12 @@
 **Deciders:** Gurucharan.S
 **User decision:** B (Vite + TS) + sub-decision 4a (full parity with Android)
 
+**Current implementation note (2026-06-29):** `web/` exists as an alpha scaffold, not
+the shipped replacement for `Base_Template/`. PWA config exists but install/offline
+behavior and icon assets are not verified. CI currently runs web typecheck and lint,
+not web tests/build. `scripts/verify-sync.js` still checks the legacy `Base_Template`
+pair only.
+
 ## Context
 
 Current web app (`Base_Template/`):
@@ -25,16 +31,22 @@ Android side (`SeachemCalculations.kt` + `Calculations.kt` + `SaltMixCalculation
   - Substrate (Gravel) calculator with 11 product specs.
   - SaltMix calculator with 17 product factors (Kotlin already integrated; JS exists in `Feature_Update/salt-mix-calculator.js` orphan).
 
-User decision: **4a — full parity**. Web v2.0 ships with all 23+ calculators that Android has.
+User decision: **4a — full parity**. Target web scope is all Android calculators,
+but the current `web/` scaffold is not yet the shipped parity replacement.
 
 ## Decision
 
-Adopt **Vite 5+ TypeScript strict-mode + ES6 modules + PWA** in a new `web/` directory (replacing `Base_Template/`). Port all 14+ Android-only calculators to web using identical formulas. Maintain calculation sync invariant.
+Adopt **Vite + TypeScript strict-mode + ES6 modules + PWA target** in a new `web/`
+directory. It replaces `Base_Template/` only after UI, calculator, PWA, and sync-test
+parity are complete. Port all Android-only calculators to web using identical formulas.
+Maintain calculation sync invariant.
 
 ## Options Considered
 
 ### Option A — Modularize vanilla JS only
-Keep current approach: split into ES6 modules, add JSDoc, add `// @ts-check`, add Jest, add manifest+service-worker. No build step.
+Rejected historical alternative: split the legacy app into ES6 modules, add
+JSDoc/`// @ts-check`, add tests, and add manifest/service-worker support without
+a build step.
 
 | Dimension | Score (1-5) |
 |---|---|
@@ -91,7 +103,10 @@ User picked **4a** — full parity. Implications: 14+ new calculators on web sid
 
 For BigDecimal Kotlin functions, web port uses `decimal.js` library or `BigInt`-based fixed-point if precision-critical. Default: `Number` (IEEE 754) since web sync-check passes within 1e-9.
 
-## Web Module Structure
+## Target Web Module Structure
+
+This is the accepted target shape, not the complete current implementation. See
+`web/README.md` for the current alpha scaffold layout.
 
 ```
 web/
@@ -165,12 +180,12 @@ No frontend framework (React/Vue) — keep zero-runtime-dep ethos. Use vanilla D
 **Easier:**
 - Adding a calculator → write `calculators/foo.ts` (pure function) + UI card mount. Type system enforces shape.
 - TS strict mode catches coefficient drift, NaN paths, missing enum branches.
-- PWA installable on mobile, works offline.
+- PWA installable on mobile, works offline once manifest/assets/service-worker behavior is verified.
 - IndexedDB history mirrors Android Room behavior.
 
 **Harder:**
 - Build step in dev loop (Vite HMR mitigates).
-- CI must run `npm ci && npm run lint && npm test && npm run build`.
+- Target CI gate: `npm ci && npm run lint && npm test && npm run build`. Current CI only runs install, typecheck, and lint.
 - Calculation sync invariant now spans 3 places: `Calculations.kt`, `dosingCalculations.js` (legacy until migration done), `web/src/calculators/*.ts`. Two-source migration period.
 
 **Revisit if:**
@@ -178,6 +193,8 @@ No frontend framework (React/Vue) — keep zero-runtime-dep ethos. Use vanilla D
 - TypeScript strict-mode causes friction for casual contributors → relax to `noImplicitAny: true` only.
 
 ## Action Items
+
+These are the implementation plan, not a statement of completed work.
 
 1. Create `web/` dir parallel to `Base_Template/`.
 2. Initialize `package.json`, `tsconfig.json` (strict), `vite.config.ts`, `vitest.config.ts`, `.eslintrc.cjs`.
@@ -188,7 +205,7 @@ No frontend framework (React/Vue) — keep zero-runtime-dep ethos. Use vanilla D
 7. Build PWA scaffold (`vite-plugin-pwa`, `manifest.json`, app icons from `mipmap`).
 8. Add `web/tests/sync-validation.test.ts` that imports `web/src/core/constants.ts` and compares to a JSON dump of Kotlin constants (produced by `scripts/verify-sync.js --emit-json`).
 9. Once `web/` is at parity, archive `Base_Template/` → `archive/Base_Template-v1/` (don't delete; useful reference for 1 release cycle).
-10. Update README.md to point at `web/` and remove stale `npm test`/`npm run lint` claims.
+10. Update README.md to point at `web/` as the primary web app only after parity is verified.
 
 ## Rollback Criteria
 

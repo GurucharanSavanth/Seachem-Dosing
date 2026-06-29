@@ -22,7 +22,8 @@ history_event
   occurred_at              created_at               source_module
   app_version              engine_version (nullable) idempotency_key (unique)
   schema_version           precision_status (enum)  notes (nullable)
-  correction_of_event_id (nullable, FK self)        voided (bool)  void_reason (nullable)
+  supersedes_event_id (nullable, FK self)           voids_event_id (nullable, FK self)
+  correction_reason (nullable)
 
 dose_event_detail (FK event_id -> history_event)
   event_id (PK/FK)         product_id               product_variant_id (nullable)
@@ -30,13 +31,17 @@ dose_event_detail (FK event_id -> history_event)
   concentration_decimal (null)  concentration_unit (null)
   tank_volume_decimal      tank_volume_unit
   calculated_amount_decimal (null) calculated_amount_unit (null)
+  calculated_measure_definition_id (nullable)
   administered_amount_decimal      administered_amount_unit
+  administered_measure_definition_id (nullable)
+  legacy_product_label (nullable) legacy_original_unit_text (nullable)
   rounding_mode (null)     rounding_scale (null)    user_modified_amount (bool)
   warnings_acknowledged (text, nullable)
 
 parameter_event_detail (FK event_id -> history_event)
   event_id (PK/FK)         parameter_type (enum)    measured_value_decimal
-  measured_unit            test_method (null)       source_device_or_kit (null)
+  measured_unit            tank_volume_decimal (nullable) tank_volume_unit (nullable)
+  test_method (null)       source_device_or_kit (null)
   validation_status (enum)
 ```
 - One applicable detail row per event, enforced by repository validation + DAO transaction + FK. `dose`/`parameter` detail tables only; **no** medication/fertilizer/maintenance/livestock detail tables until their requirements are defined.
@@ -44,11 +49,16 @@ parameter_event_detail (FK event_id -> history_event)
 
 ### 2. Precision-safe decimal persistence
 - No `REAL`/`Float`/`Double` for any dose, concentration, volume, or measured value.
-- Persist via `StoredDecimal(val canonicalValue: String)` where `canonicalValue == BigDecimal.toPlainString()`, reconstructed with the strict `BigDecimal(String)` ctor. Room `TypeConverter` is **lossless `BigDecimal ↔ canonical String`, no rounding**, covered by round-trip + malformed-input tests, representation documented here.
+- Persist via canonical decimal strings produced by `StoredDecimal`, where the stored value
+  equals `BigDecimal.toPlainString()` and reconstructs with the strict `BigDecimal(String)`
+  ctor. A `StoredDecimalConverter` is covered by unit tests, but the current Room entities
+  store `*_decimal` columns as `String`; malformed value rejection is enforced by domain
+  factories/validators before persistence and by parser tests, not by a registered Room
+  `@TypeConverter`.
 - Rules: no scientific notation, no locale separators, no grouping, no implicit binary conversion, no silent scale reduction, reject malformed/NaN/Infinity before persistence, explicit rounding only at domain/display boundaries.
 - **New-value envelope** (persistence acceptance — *not* the engine's intermediate precision): precision ≤ **38**, scale ≤ **18**, canonical length ≤ **64**. Engines may use a larger/unlimited `MathContext` and round only at domain/display boundaries. Never silently reduce an input's scale to fit; domain validators may narrow ranges but must reject/warn explicitly, never truncate, and preserve the original accepted value for audit.
 - **Persisted-legacy compatibility envelope:** any canonical value `BigDecimal.valueOf(legacyDouble).toPlainString()` can produce — *no* size limit — so every value the layer writes stays readable (the legacy-read invariant).
-- **Four factories:** `from(BigDecimal)` / `parseNewValue(String)` (new-value envelope; the user-input path) · `fromLegacyBinary64(Double)` (migration-only, no envelope) · `parseStoredCanonical(String)` (converter read path: canonical-only, no envelope). The Room converter reads via `parseStoredCanonical`, **never** the strict new-value parser, so high-scale legacy values remain readable.
+- **Four factories:** `from(BigDecimal)` / `parseNewValue(String)` (new-value envelope; the user-input path) · `fromLegacyBinary64(Double)` (migration-only, no envelope) · `parseStoredCanonical(String)` (stored read path: canonical-only, no envelope). Stored-value reads use `parseStoredCanonical`, **never** the strict new-value parser, so high-scale legacy values remain readable.
 - **Equality:** `StoredDecimal.equals()` = storage/audit identity (scale-sensitive: `1`/`1.0`/`1.00` distinct). Numeric & safety comparisons — dose limits, parameter thresholds, overdose checks, unit conversion — use `compareTo`/`numericallyEquals`, **never** representation equality. Do not derive idempotency from the raw decimal string unless scale-sensitive identity is explicitly intended.
 - Columns named `*_decimal` (`calculated_amount_decimal`, `administered_amount_decimal`, `tank_volume_decimal`, `concentration_decimal`, `measured_value_decimal`). No bare `amount` text column.
 
@@ -77,7 +87,7 @@ Explicit `Migration(1,2)`; **no** `fallbackToDestructiveMigration`. For each v1 
 Separate validation per `NEW_EXACT_RECORD` vs `LEGACY_BINARY64_APPROXIMATION` vs `UNKNOWN_PRECISION`. A **new** dose-administration record requires: event id, event type, profile id, occurred_at, created_at, source_module, idempotency_key, administered_amount_decimal, administered_unit, tank_volume_decimal, tank_volume_unit, precision_status, app_version, engine_version (when an engine produced the value). Formula/evidence ids required **only** when the record originated from a sourced rule — no placeholder source ids.
 
 ### 7. Append-only corrections
-Safety-relevant records are append-only. No silent edit of an administered-dose record. Corrections via: append `DOSE_CORRECTION` referencing `correction_of_event_id`, or `DOSE_VOID` with reason. Original calculated/administered amounts are never overwritten. If plain deletion stays available, document that it reduces audit completeness.
+Safety-relevant records are append-only. No silent edit of an administered-dose record. Corrections via: append a `CORRECTION` event referencing `supersedes_event_id`, or append a `VOID` event referencing `voids_event_id` with `correction_reason`. Original calculated/administered amounts are never overwritten. Physical deletion is not exposed.
 
 ### 8. Idempotency
 Unique index on `idempotency_key` for new write commands. Legacy rows use deterministic keys (`legacy-v1:…`). The repository maps unique-key conflicts to an idempotent-success / duplicate-command result — never an unhandled DB exception.
