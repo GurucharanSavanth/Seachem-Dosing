@@ -87,6 +87,9 @@ android {
         compose = true                   // v2.0 — per ADR-001
     }
 
+    // Room exported schemas as androidTest assets — required by MigrationTestHelper (ADR-011).
+    sourceSets.getByName("androidTest").assets.srcDir(files("$projectDir/schemas"))
+
     packaging {
         resources {
             excludes += "META-INF/INDEX.LIST"
