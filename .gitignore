@@ -18,6 +18,8 @@ local.properties
 /CLAUDE.md
 /AGENTS.md
 /.claude
+/app/.claude/
+/existing workflow by claude befor compacting.txt
 
 # Firebase config — contains an API key, must not be committed.
 /app/google-services.json
