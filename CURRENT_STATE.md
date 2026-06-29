@@ -3,7 +3,10 @@
 **Branch:** v2.0-wip · **Last verified commit:** e140e7d (history schema correction, 130 JVM tests green)
 
 ## Phase
-History v2 — Phase 1 (Commit E: Room v1→v2 migration) in progress.
+History v2 — Phases 1–2 COMPLETE (migration written + device-verified). Phase 3 (write triggers) next.
+
+- `15f1e64` feat(history): migrate legacy history schema to v2 (AppDatabase v2 + Migration(1,2) + 2.json; orphan v1 retired)
+- `d2bf91c` test(history): verify Room migration and DAO integrity — **12/12 instrumented green on emulator-5554**
 
 ## Completed gates (this session)
 - `1d0744f` menuAnchor fix · `040f74c` UI audit + ADRs 007–010 · `8f88463` AI/chat removal
