@@ -24,6 +24,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -92,7 +93,11 @@ private val UNI_CARDS = listOf(
  * Dashboard now; this screen shows the effective volume read-only.
  */
 @Composable
-fun CalculatorsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
+fun CalculatorsScreen(
+    viewModel: MainViewModel,
+    onLogDose: (DoseLogRequest) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val profile by viewModel.profile.observeAsState(AquariumProfile.FRESHWATER)
     // Observe volume inputs so dose results recompute when the tank volume changes.
     viewModel.volume.observeAsState().value
@@ -110,11 +115,11 @@ fun CalculatorsScreen(viewModel: MainViewModel, modifier: Modifier = Modifier) {
 
         when (profile) {
             AquariumProfile.FRESHWATER -> {
-                UNI_CARDS.filter { it.group == Group.FW }.forEach { CalcCard(viewModel, it, litres) }
+                UNI_CARDS.filter { it.group == Group.FW }.forEach { CalcCard(viewModel, it, litres, onLogDose) }
                 QuickDoses(viewModel, litres)
             }
             AquariumProfile.SALTWATER -> {
-                UNI_CARDS.filter { it.group == Group.SW }.forEach { CalcCard(viewModel, it, litres) }
+                UNI_CARDS.filter { it.group == Group.SW }.forEach { CalcCard(viewModel, it, litres, onLogDose) }
                 SaltMixCard(viewModel)
                 QuickDoses(viewModel, litres)
             }
@@ -156,7 +161,7 @@ private fun ExpandableCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CalcCard(viewModel: MainViewModel, spec: UniCard, litres: Double) {
+private fun CalcCard(viewModel: MainViewModel, spec: UniCard, litres: Double, onLogDose: (DoseLogRequest) -> Unit) {
     var current by remember { mutableStateOf("") }
     var target by remember { mutableStateOf("") }
     val scaleOptions = remember(spec) {
@@ -196,6 +201,12 @@ private fun CalcCard(viewModel: MainViewModel, spec: UniCard, litres: Double) {
         }
         if (result.primaryValue.toDouble() > 0.0) {
             Text(stringResource(R.string.result_alternate, result.secondaryValue.toPlainString(), result.secondaryUnit), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            doseLogRequestFrom(spec.product.name, result, litres)?.let { req ->
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(onClick = { onLogDose(req) }, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.action_log_administered))
+                }
+            }
         }
     }
 }

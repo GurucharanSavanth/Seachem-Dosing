@@ -25,6 +25,9 @@
     <string name="action_save_readings">Save readings to history</string>
     <string name="save_readings_done">Saved %1$d readings to history</string>
     <string name="save_readings_none">Enter water parameters first</string>
+    <string name="action_log_administered">Log as administered</string>
+    <string name="dose_logged">Logged to history</string>
+    <string name="dose_log_failed">Couldn\'t log dose</string>
 
     <!-- Dashboard -->
     <string name="dashboard_title">Water Status</string>
