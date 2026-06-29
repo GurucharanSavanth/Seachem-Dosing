@@ -4,7 +4,7 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
 [![API](https://img.shields.io/badge/API-24%2B-brightgreen)](https://android-arsenal.com/api?level=24)
 [![Material Design 3](https://img.shields.io/badge/Material%20Design-3-757575?logo=material-design&logoColor=white)](https://m3.material.io)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 A dual-platform application (Android & Web) for aquarium enthusiasts to calculate precise dosing amounts for Seachem supplements based on water volume and parameters.
 
@@ -221,7 +221,8 @@ Contributions are welcome! Please read the guidelines:
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details,
+and [NOTICE](NOTICE) for attribution.
 
 ---
 
