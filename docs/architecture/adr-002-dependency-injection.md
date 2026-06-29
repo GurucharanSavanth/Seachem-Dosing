@@ -5,9 +5,19 @@
 **Deciders:** Gurucharan.S
 **User decision:** B (Koin)
 
+**Current implementation note (2026-06-29):** Koin is active, but the app is in a
+hybrid state. `SeachemDosingApp` starts Koin with `appModule`, `dataModule`, and
+`domainModule`; `HistoryViewModel` is Koin-bound; `MainViewModel` remains
+AndroidX/SavedStateHandle-instantiated. AI/chat was removed by ADR-010, so there is
+no active `aiModule`.
+
 ## Context
 
-The app currently has no dependency injection container. `MainViewModel` is instantiated by `androidx.lifecycle.ViewModelProvider` directly with `SavedStateHandle`. AI clients (`GeminiClient`) are stubs but already take constructor params (`apiKey`, `model`). Phase 4 adds Repository + UseCase layers per ADR-003, plus Room DAOs and AI implementations — each needs lifecycle-scoped construction.
+At ADR creation the app had no dependency injection container. `MainViewModel` was
+instantiated by `androidx.lifecycle.ViewModelProvider` directly with
+`SavedStateHandle`, and AI clients were inert stubs. The current implementation
+keeps `MainViewModel` on the legacy path, binds the History vertical through Koin,
+and gates any future AI re-entry through ADR-010.
 
 Forces:
 - Koin and Hilt are the two viable Android DI frameworks in 2026; Dagger-only is dated.
@@ -86,19 +96,17 @@ User chose B (Koin). Build-time win and DSL readability outweigh compile-time sa
 
 ## Action Items
 
-1. Add to `gradle/libs.versions.toml`:
-   - `io.insert-koin:koin-android:3.5.6`
-   - `io.insert-koin:koin-androidx-compose:3.5.6` (when Compose mig starts)
-   - `io.insert-koin:koin-test:3.5.6` (testImplementation)
-2. Create `SeachemDosingApp : Application()` registered in `AndroidManifest.xml` via `android:name`.
-3. In `Application.onCreate()`: `startKoin { androidContext(this@SeachemDosingApp); modules(appModule, dataModule, domainModule) }`.
-4. Define modules:
-   - `appModule` — `SettingsManager`, theme/locale state.
-   - `dataModule` — Room database, DAOs, repositories.
-   - `domainModule` — UseCases.
-   - `aiModule` — Gemini/Local LLM clients (per ADR-005), feature-flag-gated.
-5. Migrate `MainViewModel` to `viewModel { MainViewModel(get(), get(), get()) }` and use `koinViewModel()` in fragments → composables.
-6. Add `KoinVerifyAllTest` to `app/src/test/`: `koinApplication { modules(allModules) }.checkModules()`.
+1. Completed: add Koin 4.0.0 catalog entries and dependencies.
+2. Completed: create `SeachemDosingApp : Application()` and register it in
+   `AndroidManifest.xml`.
+3. Completed: start Koin with `appModule`, `dataModule`, and `domainModule`.
+4. Completed for History: bind `HistoryViewModel`, Room database/DAO/repository, and
+   the two history write use cases.
+5. Partially complete: `KoinVerifyAllTest` statically verifies `appModule`; `dataModule`
+   remains excluded from static verify because it requires `androidContext()` and Room.
+6. Not current scope: migrate legacy `MainViewModel` to Koin only if/when its
+   SavedStateHandle/LiveData path is modernized.
+7. Superseded: `aiModule` is not active; ADR-010 controls any future AI/chat re-entry.
 
 ## Rollback Criteria
 

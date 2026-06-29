@@ -120,7 +120,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
 
     // Material Design 3 (XML)
-    implementation("com.google.android.material:material:1.11.0")
+    implementation(libs.material)
 
     // Constraint Layout (XML)
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")

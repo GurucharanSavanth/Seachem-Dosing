@@ -2,15 +2,16 @@
 
 **Date:** 2026-06-29
 **Base commit audited:** `756d944` (`docs: align tech stack with current architecture`)
-**Latest correction baseline:** `996c71f` (`docs: correct stale architecture claims`)
+**Latest correction baseline before this update:** `5ff8808` (`docs: update audit correction status`)
 **Scope:** root README, module READMEs, ADRs, testing/security/release docs, web docs, CI, Gradle config, and current implementation evidence.
 
 ## Summary
 
-The root README Tech Stack rows were corrected before this audit. High-severity drift
-in ADR-003, ADR-008, ADR-011, QA, testing, security, and web-status docs was corrected
-through `996c71f`. Remaining known drift is concentrated in ADR-002 hybrid DI wording,
-dependency catalog comments/Material alias state, and the tool-failure follow-up note.
+The root README Tech Stack rows were corrected before this audit. All findings from
+this pass have now been corrected or explicitly reframed as target/historical state.
+The remaining risks are not documentation-truth findings: instrumented UI execution
+still needs `adb`/emulator access, web v2 still lacks parity/PWA verification, and
+release-readiness still needs SBOM/release-build work.
 
 Do not treat old planning docs as current state unless this audit marks the claim verified.
 
@@ -21,7 +22,7 @@ Do not treat old planning docs as current state unless this audit marks the clai
 | DOC-001, DOC-002, DOC-009, DOC-010 | corrected | `docs/architecture/adr-003-database.md`, `docs/architecture/adr-008-history-feature.md`, and `docs/architecture/adr-011-precision-safe-history-schema.md` now label v1/destructive/schema-converter text as superseded or current implementation-specific. |
 | DOC-003, DOC-004, DOC-005, DOC-006, DOC-012, DOC-013, DOC-019, DOC-022, DOC-023, DOC-024 | corrected | `CURRENT_STATE.md`, `FINAL_QA_REPORT.md`, `TESTING_STRATEGY.md`, and `SECURITY.md` now use current Gradle/test evidence and avoid unsupported CI, signing, secret-scan, storage, and test-count claims. |
 | DOC-007, DOC-008, DOC-014, DOC-015, DOC-016, DOC-017, DOC-025, DOC-026 | corrected | `web/README.md`, `web/package.json`, `docs/architecture/adr-004-web-stack.md`, `Base_Template/README.md`, and `README.md` now describe web v2 as an alpha scaffold, PWA as a target, sync-check as legacy-only, and `Base_Template/` as the legacy static app. |
-| DOC-011, DOC-018, DOC-020, DOC-021 | open | Remaining remediation: ADR-002 hybrid DI/AI action drift, `TOOL_FAILURE_LOG.md` Espresso follow-up, stale dependency-catalog comments, and Material alias/config drift. |
+| DOC-011, DOC-018, DOC-020, DOC-021 | corrected | `docs/architecture/adr-002-dependency-injection.md`, `TOOL_FAILURE_LOG.md`, `gradle/libs.versions.toml`, and `app/build.gradle.kts` now reflect the active hybrid Koin state, stable AndroidX Test bump, active dependency comments, and Material catalog alias. |
 
 ## Critical Corrections Already Applied
 
@@ -76,9 +77,10 @@ Do not treat old planning docs as current state unless this audit marks the clai
 
 ## Next Correction Queue
 
-1. Fix high-severity documentation lies first: ADR-003, ADR-008, test/release/security overclaims, web PWA/parity claims.
-2. Then update medium-severity state docs: CURRENT_STATE, SECURITY storage wording, ADR-002/011, TESTING_STRATEGY commands.
-3. Then clean low-risk drift: version-catalog comments, Material alias, README stale issue links, Base_Template legacy labels.
+No correction remains open from this audit. Continue with Phase 9 verification:
+static security/privacy checks, accessibility review, emulator QA if `adb` becomes
+available, performance profiling only when an adb target exists, then release/SBOM
+readiness.
 
 ## Tool / Agent Use
 
@@ -93,8 +95,8 @@ Do not treat old planning docs as current state unless this audit marks the clai
 
 ## Handoff
 
-**Current correction baseline:** `996c71f`
-**Completed work:** Tech Stack README correction, repository-wide documentation truth audit, phase matrix, and high-severity documentation corrections.
-**Tests passed since audit start:** `./gradlew testDebugUnitTest`, `./gradlew lintDebug`, `./gradlew assembleDebug`; `testDebugUnitTest` was rerun after the high-severity docs batch.
-**Active risks:** DOC-011, DOC-018, DOC-020, and DOC-021 remain open; unrelated local edits remain in `.gitignore` and `.idea/appInsightsSettings.xml`.
-**Next executable task:** apply the remaining medium/low documentation corrections, then update the phase matrix from current code/docs.
+**Current correction baseline before this update:** `5ff8808`
+**Completed work:** Tech Stack README correction, repository-wide documentation truth audit, phase matrix, high-severity documentation corrections, and remaining medium/low drift corrections.
+**Tests passed since audit start:** `./gradlew testDebugUnitTest`, `./gradlew lintDebug`, `./gradlew assembleDebug`, and `./gradlew testDebugUnitTest assembleDebugAndroidTest lintDebug`.
+**Active risks:** `connectedDebugAndroidTest` could not run because `adb` is unavailable; unrelated local edits remain in `.gitignore` and `.idea/appInsightsSettings.xml`.
+**Next executable task:** continue Phase 9 verification: security/privacy, accessibility, performance/emulator only when tooling exists, then release/SBOM readiness.

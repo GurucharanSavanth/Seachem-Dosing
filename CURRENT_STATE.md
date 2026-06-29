@@ -1,7 +1,7 @@
 # CURRENT_STATE - autonomous execution handoff
 
 **Branch:** `v2.0-wip` (local-only, no upstream)
-**Latest completed documentation correction commit before this update:** `996c71f`
+**Latest completed documentation correction commit before this update:** `5ff8808`
 
 ## Commit policy
 
@@ -23,20 +23,20 @@
 - `./gradlew testDebugUnitTest` passed; generated JVM report shows 138 tests, 0 failures, 0 errors, 0 skipped.
 - `./gradlew lintDebug` passed.
 - `./gradlew assembleDebug` passed.
+- `./gradlew testDebugUnitTest assembleDebugAndroidTest lintDebug` passed after the AndroidX Test dependency bump.
+- `connectedDebugAndroidTest` was not run because `adb` is not on PATH in this shell.
 - Release build was not rerun in the current docs-remediation workstream. Existing generated artifact path is `app/build/outputs/apk/release/SeachemDosing-v2.0-release.apk`, but treat it as historical until `assembleRelease` is rerun.
 
 ## Known blockers / risks
 
-- Documentation drift remains the active Phase 9 task, but the high-severity README,
-  ADR-003, ADR-008, ADR-011, QA, testing, security, and web-status claims have been
-  corrected; see `docs/audit/DOCUMENTATION_TRUTH_AUDIT.md`.
+- Documentation truth audit findings from this pass are corrected; see
+  `docs/audit/DOCUMENTATION_TRUTH_AUDIT.md`.
 - Compose instrumented UI tests are not CI-gated; prior API-36 Espresso runs hit `InputManager.getInstance`.
 - Web v2 is a Vite/TypeScript scaffold and partial engine port, not a complete PWA replacement for `Base_Template/`.
 - No SBOM artifact exists yet.
 
 ## Next executable task
 
-Continue medium/low documentation remediation from `docs/audit/DOCUMENTATION_TRUTH_AUDIT.md`:
-ADR-002 hybrid DI state, dependency catalog comments/Material alias, Tool failure log
-status, and any remaining release/compliance wording. Run `git diff --check` and the
-smallest relevant verification before committing.
+Continue Phase 9 verification: security/privacy checks, accessibility review, and
+performance/emulator QA only when `adb`/device tooling is available. Then move to
+release/SBOM readiness.

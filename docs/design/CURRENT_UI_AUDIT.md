@@ -1,6 +1,9 @@
 # Current UI Audit — Master Issue Registry (v2.0-wip)
 
-Commit `1d0744f`. Architecture / state / consistency issues. Accessibility issues → `ACCESSIBILITY_AUDIT.md`; responsive → `RESPONSIVE_LAYOUT_AUDIT.md`; orphan wiring → `UI_DOMAIN_CONNECTION_MATRIX.md`; tokens/components → `DESIGN_SYSTEM_AUDIT.md`. No code changed.
+Commit `1d0744f` audit, refreshed 2026-06-29 for History wiring and AI removal.
+Architecture / state / consistency issues. Accessibility issues → `ACCESSIBILITY_AUDIT.md`;
+responsive → `RESPONSIVE_LAYOUT_AUDIT.md`; wiring → `UI_DOMAIN_CONNECTION_MATRIX.md`;
+tokens/components → `DESIGN_SYSTEM_AUDIT.md`.
 
 **"Claude Design produced/validated" column:** Claude Design is **not available** in this environment (no Claude Design plugin; design surfaces = Figma MCP + Mermaid). Every finding below is **code-grounded manual analysis**, not tool-generated. Marked `manual` throughout; honest by policy.
 
@@ -22,7 +25,10 @@ Severity: 🔴 high · 🟠 med · 🟡 low.
 
 ### ISSUE-ARCH-002 🔴 — God ViewModel
 - **Component:** `MainViewModel.kt` (628 lines, single `ViewModel` for all screens, `activityViewModels`)
-- **Current:** One LiveData-backed VM owns profile, volume, ~20 water params, calculator scratchpad map, salt-mix, substrate, AI/chat state, export, and a 26-arm dosing `when` (`:185-260`). Shared across 4 screens.
+- **Current:** One LiveData-backed VM owns profile, volume, ~20 water params, calculator
+  scratchpad map, salt-mix, substrate, export, and a 26-arm dosing `when` (`:185-260`).
+  Shared across legacy-profile/dashboard/calculator/settings paths; History now has a
+  separate `HistoryViewModel`.
 - **Expected:** Per-feature ViewModels (dashboard/calculator/medication/fertilizer/settings) over shared domain use cases; UDF with immutable state.
 - **Standard:** Android app architecture (UDF, ViewModel-per-screen), SOLID (SRP).
 - **User impact:** indirect (regression risk). **A11y:** none. **Functional:** high coupling; any screen can mutate global state; hard to test in isolation.
@@ -54,13 +60,13 @@ Severity: 🔴 high · 🟠 med · 🟡 low.
 - **Tests:** instrumented `recreate()` / process-death restoration tests (T-STATE-1..n).
 - **Claude Design:** manual.
 
-### ISSUE-ARCH-004 🟡 — Dead VM code + orphan resources
-- **Component:** `MainViewModel.kt:152-164,615-627` (legacy holders/setters), AI/chat resources
-- **Current:** "Legacy" holders/setters "kept for compatibility if referenced"; fragments that referenced them are gone. AI/chat resources unreferenced (see ISSUE-CONN-004).
+### ISSUE-ARCH-004 🟡 — Dead VM code
+- **Component:** `MainViewModel.kt:145-156,605+` (legacy holders/setters)
+- **Current:** "Legacy" holders/setters "kept for compatibility if referenced"; fragments that referenced them are gone. AI/chat resources were removed by ADR-010.
 - **Expected:** removed after non-reference confirmed.
 - **Standard:** dead-code hygiene; YAGNI.
 - **User impact:** none. **Functional:** noise, false "feature exists" signal.
-- **Correction:** confirm via grep + `lint UnusedResources`, then delete in a dedicated cleanup commit (post-parity).
+- **Correction:** confirm via grep + lint, then delete remaining dead VM code in a dedicated cleanup commit.
 - **Acceptance:** classification = obsolete+unreferenced; build green after removal.
 - **Tests:** build + lint.
 - **Claude Design:** manual.
