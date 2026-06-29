@@ -60,6 +60,7 @@ class ColorTokenParityTest {
         composeName.startsWith("Light") -> "md_theme_light_" + role(composeName.removePrefix("Light"))
         composeName.startsWith("Dark") -> "md_theme_dark_" + role(composeName.removePrefix("Dark"))
         composeName.startsWith("Profile") -> "profile_" + composeName.removePrefix("Profile").lowercase()
+        composeName.startsWith("Status") -> "status_" + composeName.removePrefix("Status").lowercase()
         else -> null
     }
 

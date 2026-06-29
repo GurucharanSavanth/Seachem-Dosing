@@ -50,11 +50,10 @@ import com.example.seachem_dosing.logic.Calculations
 import com.example.seachem_dosing.ui.MainViewModel
 import com.example.seachem_dosing.ui.MainViewModel.AquariumProfile
 import com.example.seachem_dosing.ui.MainViewModel.Status
-
-private val StatusGood = Color(0xFF4CAF50)
-private val StatusWarning = Color(0xFFFF9800)
-private val StatusDanger = Color(0xFFF44336)
-private val StatusInfo = Color(0xFF2196F3)
+import com.example.seachem_dosing.ui.theme.StatusDanger
+import com.example.seachem_dosing.ui.theme.StatusGood
+import com.example.seachem_dosing.ui.theme.StatusInfo
+import com.example.seachem_dosing.ui.theme.StatusWarning
 
 private fun Status.color(): Color = when (this) {
     Status.GOOD -> StatusGood

@@ -68,3 +68,9 @@ val DarkInversePrimary = Color(0xFF0A7A8C)
 val ProfileFreshwater = Color(0xFF2F9BB2)
 val ProfileSaltwater = Color(0xFF3A6FC6)
 val ProfilePond = Color(0xFF3E8E58)
+
+// Status indicators (res/values/colors.xml status_*) — parity-enforced by ColorTokenParityTest
+val StatusGood = Color(0xFF4CAF50)
+val StatusWarning = Color(0xFFFF9800)
+val StatusDanger = Color(0xFFF44336)
+val StatusInfo = Color(0xFF2196F3)
