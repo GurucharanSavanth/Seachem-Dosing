@@ -53,8 +53,8 @@
 
 ```bash
 # Clone & enter
-git clone https://github.com/GurucharanSavanth/Seachem-Dosing-Calculator.git
-cd Seachem-Dosing-Calculator
+git clone https://github.com/GurucharanSavanth/Seachem-Dosing.git
+cd Seachem-Dosing/Base_Template
 
 # No local npm workflow exists in Base_Template in this repository.
 # Use ../web for the current TypeScript scaffold.
