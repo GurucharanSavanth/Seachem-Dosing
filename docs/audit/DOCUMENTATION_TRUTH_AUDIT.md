@@ -2,13 +2,26 @@
 
 **Date:** 2026-06-29
 **Base commit audited:** `756d944` (`docs: align tech stack with current architecture`)
+**Latest correction baseline:** `996c71f` (`docs: correct stale architecture claims`)
 **Scope:** root README, module READMEs, ADRs, testing/security/release docs, web docs, CI, Gradle config, and current implementation evidence.
 
 ## Summary
 
-The root README Tech Stack rows were corrected before this audit. Remaining drift is concentrated in historical ADR/action-item sections, web-v2 status claims, stale test/release counts, and several security/compliance statements that overstate current automation.
+The root README Tech Stack rows were corrected before this audit. High-severity drift
+in ADR-003, ADR-008, ADR-011, QA, testing, security, and web-status docs was corrected
+through `996c71f`. Remaining known drift is concentrated in ADR-002 hybrid DI wording,
+dependency catalog comments/Material alias state, and the tool-failure follow-up note.
 
 Do not treat old planning docs as current state unless this audit marks the claim verified.
+
+## Correction Status
+
+| Finding IDs | Status | Correction evidence |
+|---|---|---|
+| DOC-001, DOC-002, DOC-009, DOC-010 | corrected | `docs/architecture/adr-003-database.md`, `docs/architecture/adr-008-history-feature.md`, and `docs/architecture/adr-011-precision-safe-history-schema.md` now label v1/destructive/schema-converter text as superseded or current implementation-specific. |
+| DOC-003, DOC-004, DOC-005, DOC-006, DOC-012, DOC-013, DOC-019, DOC-022, DOC-023, DOC-024 | corrected | `CURRENT_STATE.md`, `FINAL_QA_REPORT.md`, `TESTING_STRATEGY.md`, and `SECURITY.md` now use current Gradle/test evidence and avoid unsupported CI, signing, secret-scan, storage, and test-count claims. |
+| DOC-007, DOC-008, DOC-014, DOC-015, DOC-016, DOC-017, DOC-025, DOC-026 | corrected | `web/README.md`, `web/package.json`, `docs/architecture/adr-004-web-stack.md`, `Base_Template/README.md`, and `README.md` now describe web v2 as an alpha scaffold, PWA as a target, sync-check as legacy-only, and `Base_Template/` as the legacy static app. |
+| DOC-011, DOC-018, DOC-020, DOC-021 | open | Remaining remediation: ADR-002 hybrid DI/AI action drift, `TOOL_FAILURE_LOG.md` Espresso follow-up, stale dependency-catalog comments, and Material alias/config drift. |
 
 ## Critical Corrections Already Applied
 
@@ -80,8 +93,8 @@ Do not treat old planning docs as current state unless this audit marks the clai
 
 ## Handoff
 
-**Current commit:** `756d944`
-**Completed work:** Tech Stack README correction committed; repository-wide documentation truth audit written.
-**Tests passed since audit start:** `./gradlew testDebugUnitTest`, `./gradlew lintDebug`, `./gradlew assembleDebug`.
-**Active risks:** stale docs still exist; release/security/web claims are most misleading; unrelated local edits remain in `.gitignore` and `.idea/appInsightsSettings.xml`.
-**Next executable task:** apply high-severity documentation corrections from DOC-001 through DOC-008 in small commits, then rebuild the phase matrix from current code/docs.
+**Current correction baseline:** `996c71f`
+**Completed work:** Tech Stack README correction, repository-wide documentation truth audit, phase matrix, and high-severity documentation corrections.
+**Tests passed since audit start:** `./gradlew testDebugUnitTest`, `./gradlew lintDebug`, `./gradlew assembleDebug`; `testDebugUnitTest` was rerun after the high-severity docs batch.
+**Active risks:** DOC-011, DOC-018, DOC-020, and DOC-021 remain open; unrelated local edits remain in `.gitignore` and `.idea/appInsightsSettings.xml`.
+**Next executable task:** apply the remaining medium/low documentation corrections, then update the phase matrix from current code/docs.

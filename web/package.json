@@ -3,7 +3,7 @@
   "version": "2.0.0-alpha.1",
   "type": "module",
   "private": true,
-  "description": "Web frontend for Seachem Dosing — TypeScript + Vite + PWA (per ADR-004)",
+  "description": "TypeScript + Vite alpha scaffold for Seachem Dosing; PWA target per ADR-004",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

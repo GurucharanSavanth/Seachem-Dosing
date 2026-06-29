@@ -119,14 +119,23 @@ Room v1 + v2 exported schemas · `Migration(1,2)` impl · migration test fixture
 - **Harder:** 3-table model + converters + migration + ~25 tests before UI; larger surface than ADR-008 envisaged.
 
 ## Rollback
-Pre-release (versionCode 1, no shipped data) → migration risk is low. If v2 proves unstable, revert the schema commits; v1 remains intact (non-destructive migration never drops v1 data before validation).
+Before any public v2 data exists, migration risk is low. If v2 proves unstable,
+revert the schema commits; v1 remains intact because the non-destructive migration
+never drops v1 data before validation.
 
 ---
 
 ## §11 — Defensible legacy migration semantics (amendment 2026-06-29)
 
 ### V1 writer status
-**No reachable production write path was found** for v1 `dosing_log`/`parameter_log`: `RecordDoseUseCase` and `HistoryRepositoryImpl` are orphaned (no callers); the DAOs are inserted only by that unreferenced repo. Normal execution never populated the v1 tables; the app is pre-release (versionCode 1). This is *not* an absolute "rows are impossible" claim — tests, dev builds, or manual DB edits could create rows — so `Migration(1,2)` stays **non-destructive** and must correctly handle synthetic v1 rows. The legacy mapping is therefore proportional: no speculative product aliases, no product-specific teaspoon registry, no fabricated evidence/formula ids, no unsupported unit conversions.
+**No reachable production write path was found** for v1 `dosing_log`/`parameter_log`:
+`RecordDoseUseCase` and `HistoryRepositoryImpl` are orphaned (no callers); the DAOs
+are inserted only by that unreferenced repo. Normal execution should not have
+populated the v1 tables. This is *not* an absolute "rows are impossible" claim —
+tests, dev builds, or manual DB edits could create rows — so `Migration(1,2)` stays
+**non-destructive** and must correctly handle synthetic v1 rows. The legacy mapping
+is therefore proportional: no speculative product aliases, no product-specific
+teaspoon registry, no fabricated evidence/formula ids, no unsupported unit conversions.
 
 ### Standard physical units vs legacy engine-defined measures
 The v1 engine's `tsp`/`tbsp` are **product-specific mass measures**, not volumes (`SeachemCalculations.kt`: `tsp = grams ÷ {5,6,7,8}` per product; `tbsp = grams ÷ 16` at L160); `caps = ml ÷ 5` (L208) is a 5 mL volume. Physical units (`g→GRAM`, `mL→MILLILITER`) map directly; engine measures reference an **immutable [MeasureDefinition]** ([`LegacyMeasureDefinitions`]) with `provenance = LEGACY_APPLICATION_ENGINE`, `manufacturerVerified = false`:
