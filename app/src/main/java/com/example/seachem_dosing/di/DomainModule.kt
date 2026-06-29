@@ -3,7 +3,6 @@ package com.example.seachem_dosing.di
 import com.example.seachem_dosing.domain.usecase.CalculateDoseUseCase
 import com.example.seachem_dosing.domain.usecase.CalculateQuickDoseUseCase
 import com.example.seachem_dosing.domain.usecase.ConvertUnitsUseCase
-import com.example.seachem_dosing.domain.usecase.RecordDoseUseCase
 import com.example.seachem_dosing.domain.usecase.ValidateInputUseCase
 import org.koin.dsl.module
 
@@ -17,5 +16,4 @@ val domainModule = module {
     factory { CalculateQuickDoseUseCase(get()) }
     factory { ConvertUnitsUseCase() }
     factory { ValidateInputUseCase() }
-    factory { RecordDoseUseCase(get()) }
 }

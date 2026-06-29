@@ -1,0 +1,446 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "f3896765b8986c45b5680200b104ef6c",
+    "entities": [
+      {
+        "tableName": "history_event",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` TEXT NOT NULL, `event_type_code` TEXT NOT NULL, `aquarium_profile_id` TEXT NOT NULL, `occurred_at_epoch_millis` INTEGER NOT NULL, `created_at_epoch_millis` INTEGER NOT NULL, `source_module_code` TEXT NOT NULL, `app_version` TEXT, `engine_version` TEXT, `idempotency_key` TEXT NOT NULL, `schema_version` INTEGER NOT NULL, `precision_status_code` TEXT NOT NULL, `notes` TEXT, `supersedes_event_id` TEXT, `voids_event_id` TEXT, `correction_reason` TEXT, PRIMARY KEY(`event_id`), FOREIGN KEY(`supersedes_event_id`) REFERENCES `history_event`(`event_id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`voids_event_id`) REFERENCES `history_event`(`event_id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventTypeCode",
+            "columnName": "event_type_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "aquariumProfileId",
+            "columnName": "aquarium_profile_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "occurredAtEpochMillis",
+            "columnName": "occurred_at_epoch_millis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtEpochMillis",
+            "columnName": "created_at_epoch_millis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceModuleCode",
+            "columnName": "source_module_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "appVersion",
+            "columnName": "app_version",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "engineVersion",
+            "columnName": "engine_version",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "idempotencyKey",
+            "columnName": "idempotency_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "schemaVersion",
+            "columnName": "schema_version",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "precisionStatusCode",
+            "columnName": "precision_status_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "supersedesEventId",
+            "columnName": "supersedes_event_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "voidsEventId",
+            "columnName": "voids_event_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "correctionReason",
+            "columnName": "correction_reason",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "event_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_history_event_idempotency_key",
+            "unique": true,
+            "columnNames": [
+              "idempotency_key"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_history_event_idempotency_key` ON `${TABLE_NAME}` (`idempotency_key`)"
+          },
+          {
+            "name": "index_history_event_aquarium_profile_id_occurred_at_epoch_millis",
+            "unique": false,
+            "columnNames": [
+              "aquarium_profile_id",
+              "occurred_at_epoch_millis"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_history_event_aquarium_profile_id_occurred_at_epoch_millis` ON `${TABLE_NAME}` (`aquarium_profile_id`, `occurred_at_epoch_millis`)"
+          },
+          {
+            "name": "index_history_event_event_type_code",
+            "unique": false,
+            "columnNames": [
+              "event_type_code"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_history_event_event_type_code` ON `${TABLE_NAME}` (`event_type_code`)"
+          },
+          {
+            "name": "index_history_event_supersedes_event_id",
+            "unique": false,
+            "columnNames": [
+              "supersedes_event_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_history_event_supersedes_event_id` ON `${TABLE_NAME}` (`supersedes_event_id`)"
+          },
+          {
+            "name": "index_history_event_voids_event_id",
+            "unique": false,
+            "columnNames": [
+              "voids_event_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_history_event_voids_event_id` ON `${TABLE_NAME}` (`voids_event_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "history_event",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "supersedes_event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          },
+          {
+            "table": "history_event",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "voids_event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "dose_event_detail",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` TEXT NOT NULL, `product_id` TEXT, `legacy_product_label` TEXT, `product_variant_id` TEXT, `formula_rule_id` TEXT, `evidence_source_id` TEXT, `route_code` TEXT, `concentration_decimal` TEXT, `concentration_unit_code` TEXT, `tank_volume_decimal` TEXT NOT NULL, `tank_volume_unit_code` TEXT NOT NULL, `calculated_amount_decimal` TEXT, `calculated_amount_unit_code` TEXT, `calculated_measure_definition_id` TEXT, `administered_amount_decimal` TEXT, `administered_amount_unit_code` TEXT, `administered_measure_definition_id` TEXT, `legacy_original_unit_text` TEXT, `rounding_mode_code` TEXT, `rounding_scale` INTEGER, `user_modified_amount` INTEGER NOT NULL, `warnings_acknowledged` TEXT, PRIMARY KEY(`event_id`), FOREIGN KEY(`event_id`) REFERENCES `history_event`(`event_id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productId",
+            "columnName": "product_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "legacyProductLabel",
+            "columnName": "legacy_product_label",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "productVariantId",
+            "columnName": "product_variant_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "formulaRuleId",
+            "columnName": "formula_rule_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "evidenceSourceId",
+            "columnName": "evidence_source_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "routeCode",
+            "columnName": "route_code",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "concentrationDecimal",
+            "columnName": "concentration_decimal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "concentrationUnitCode",
+            "columnName": "concentration_unit_code",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "tankVolumeDecimal",
+            "columnName": "tank_volume_decimal",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tankVolumeUnitCode",
+            "columnName": "tank_volume_unit_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "calculatedAmountDecimal",
+            "columnName": "calculated_amount_decimal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "calculatedAmountUnitCode",
+            "columnName": "calculated_amount_unit_code",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "calculatedMeasureDefinitionId",
+            "columnName": "calculated_measure_definition_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "administeredAmountDecimal",
+            "columnName": "administered_amount_decimal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "administeredAmountUnitCode",
+            "columnName": "administered_amount_unit_code",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "administeredMeasureDefinitionId",
+            "columnName": "administered_measure_definition_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "legacyOriginalUnitText",
+            "columnName": "legacy_original_unit_text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "roundingModeCode",
+            "columnName": "rounding_mode_code",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "roundingScale",
+            "columnName": "rounding_scale",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userModifiedAmount",
+            "columnName": "user_modified_amount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "warningsAcknowledged",
+            "columnName": "warnings_acknowledged",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "event_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_dose_event_detail_product_id",
+            "unique": false,
+            "columnNames": [
+              "product_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_dose_event_detail_product_id` ON `${TABLE_NAME}` (`product_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "history_event",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "parameter_event_detail",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`event_id` TEXT NOT NULL, `parameter_type_code` TEXT NOT NULL, `measured_value_decimal` TEXT NOT NULL, `measured_unit_code` TEXT NOT NULL, `tank_volume_decimal` TEXT, `tank_volume_unit_code` TEXT, `test_method` TEXT, `source_device_or_kit` TEXT, `validation_status_code` TEXT NOT NULL, PRIMARY KEY(`event_id`), FOREIGN KEY(`event_id`) REFERENCES `history_event`(`event_id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "eventId",
+            "columnName": "event_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parameterTypeCode",
+            "columnName": "parameter_type_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "measuredValueDecimal",
+            "columnName": "measured_value_decimal",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "measuredUnitCode",
+            "columnName": "measured_unit_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tankVolumeDecimal",
+            "columnName": "tank_volume_decimal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "tankVolumeUnitCode",
+            "columnName": "tank_volume_unit_code",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "testMethod",
+            "columnName": "test_method",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sourceDeviceOrKit",
+            "columnName": "source_device_or_kit",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "validationStatusCode",
+            "columnName": "validation_status_code",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "event_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_parameter_event_detail_parameter_type_code",
+            "unique": false,
+            "columnNames": [
+              "parameter_type_code"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_parameter_event_detail_parameter_type_code` ON `${TABLE_NAME}` (`parameter_type_code`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "history_event",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "event_id"
+            ],
+            "referencedColumns": [
+              "event_id"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f3896765b8986c45b5680200b104ef6c')"
+    ]
+  }
+}

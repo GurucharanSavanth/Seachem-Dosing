@@ -2,18 +2,18 @@ package com.example.seachem_dosing.di
 
 import androidx.room.Room
 import com.example.seachem_dosing.data.local.database.AppDatabase
+import com.example.seachem_dosing.data.local.database.MIGRATION_1_2
 import com.example.seachem_dosing.data.repository.CalculationsRepository
 import com.example.seachem_dosing.data.repository.CalculationsRepositoryImpl
-import com.example.seachem_dosing.data.repository.HistoryRepository
-import com.example.seachem_dosing.data.repository.HistoryRepositoryImpl
+import com.example.seachem_dosing.data.repository.HistoryEventRepository
+import com.example.seachem_dosing.data.repository.HistoryEventRepositoryImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
+import java.util.UUID
 
 /**
- * Data-layer DI bindings: Room database + DAOs + Repository implementations.
- *
- * SettingsRepository will be added here when its implementation lands
- * (Phase 4.7 StateFlow migration).
+ * Data-layer DI bindings: Room database (v2 — ADR-011) + HistoryDao + repository implementations.
+ * [MIGRATION_1_2] converts any legacy v1 history rows non-destructively on upgrade.
  */
 val dataModule = module {
 
@@ -21,13 +21,14 @@ val dataModule = module {
         Room.databaseBuilder(
             androidContext(),
             AppDatabase::class.java,
-            AppDatabase.DB_NAME
-        ).build()
+            AppDatabase.DB_NAME,
+        )
+            .addMigrations(MIGRATION_1_2)
+            .build()
     }
 
-    single { get<AppDatabase>().parameterLogDao() }
-    single { get<AppDatabase>().dosingLogDao() }
+    single { get<AppDatabase>().historyDao() }
 
-    single<HistoryRepository> { HistoryRepositoryImpl(get(), get()) }
+    single<HistoryEventRepository> { HistoryEventRepositoryImpl(get()) { UUID.randomUUID().toString() } }
     single<CalculationsRepository> { CalculationsRepositoryImpl() }
 }
