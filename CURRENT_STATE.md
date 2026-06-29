@@ -3,10 +3,24 @@
 **Branch:** v2.0-wip · **Last verified commit:** e140e7d (history schema correction, 130 JVM tests green)
 
 ## Phase
-History v2 — Phases 1–2 COMPLETE (migration written + device-verified). Phase 3 (write triggers) next.
+History v2 — Phases 1–5 COMPLETE (migration + write triggers + screen + integration, device-verified).
 
-- `15f1e64` feat(history): migrate legacy history schema to v2 (AppDatabase v2 + Migration(1,2) + 2.json; orphan v1 retired)
-- `d2bf91c` test(history): verify Room migration and DAO integrity — **12/12 instrumented green on emulator-5554**
+- `15f1e64` migrate to v2 · `d2bf91c` migration+DAO instrumented (12/12)
+- `75cb266` write-trigger use cases · `4dea031` History screen (VM+Compose+nav+top-bar action)
+- `920e8c7` Save-readings dashboard trigger · `6d83014` end-to-end integration (16/16 instrumented)
+- Gates: JVM 137/0/0, instrumented 16/0, lint clean, Koin verify ok, tree clean.
+
+## Remaining for History
+- "Log as administered" UI button on the calculator result (use case + integration-test done; UI button pending).
+  Needs a unit-handling decision: calculator dose results in `g`/`mL` log cleanly; `tsp`/`caps`/`tbsp` are
+  product-mass spoons with no verified per-product measure definition (same issue as legacy migration).
+
+## Device-test blocker (recorded, non-fatal)
+- **Compose UI tests** (`createComposeRule`/Espresso) FAIL on `emulator-5554` (Pixel_10_Pro_XL, API-"17" preview):
+  `NoSuchMethodException: android.hardware.input.InputManager.getInstance` from `Espresso.onIdle` (espresso 3.6.1
+  doesn't support this preview image). Migration/DAO/integration instrumented tests are unaffected (no Espresso).
+  HistoryScreen states covered by `HistoryViewModelTest` + integration tests. Revisit with a stable API 34/35 AVD
+  or espresso 3.7 before adding Compose UI tests.
 
 ## Completed gates (this session)
 - `1d0744f` menuAnchor fix · `040f74c` UI audit + ADRs 007–010 · `8f88463` AI/chat removal
