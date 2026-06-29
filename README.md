@@ -2,7 +2,7 @@
 
 [![Android](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
-[![API](https://img.shields.io/badge/API-24%2B-brightgreen)](https://android-arsenal.com/api?level=24)
+[![API](https://img.shields.io/badge/API-33%2B-brightgreen)](https://android-arsenal.com/api?level=33)
 [![Material Design 3](https://img.shields.io/badge/Material%20Design-3-757575?logo=material-design&logoColor=white)](https://m3.material.io)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
@@ -49,7 +49,7 @@ A dual-platform application (Android & Web) for aquarium enthusiasts to calculat
 | | |
 |---|---|
 | **Language** | Kotlin 2.0.21 |
-| **Min SDK** | 24 (Android 7.0) |
+| **Min SDK** | 33 (Android 13.0) |
 | **Architecture** | MVVM + LiveData |
 | **UI** | Fragment Navigation + ViewBinding |
 | **Design** | Material Design 3 |
