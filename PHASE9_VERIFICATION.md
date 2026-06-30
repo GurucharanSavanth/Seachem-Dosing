@@ -65,7 +65,7 @@ No critical or high security finding. Matches `SECURITY.md` posture.
 - `processReleaseResources` re-ran (strings.xml changed) and succeeded — confirms
   the resource change compiles through the full release pipeline.
 - Unit/lint/debug gate (138 tests, lintDebug, assembleDebug) was green at the
-  parent commit per `CURRENT_STATE.md`; the only changes since are string/doc-only
+  parent commit's recorded verification; the only changes since are string/doc-only
   and cannot affect Kotlin compilation.
 
 ## 4. Not done (hard-blocked / out of scope)

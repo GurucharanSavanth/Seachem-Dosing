@@ -2,13 +2,13 @@
 
 **Date:** 2026-06-29
 **Current correction baseline before latest update:** `5ff8808`
-**Evidence basis:** `SPEC.md`, `MODERNIZATION_PLAN.md`, `CURRENT_STATE.md`, commit history, Gradle config, source/test inventory, generated `testDebugUnitTest` reports, and `DOCUMENTATION_TRUTH_AUDIT.md`.
+**Evidence basis:** `SPEC.md`, `MODERNIZATION_PLAN.md`, commit history, Gradle config, source/test inventory, generated `testDebugUnitTest` reports, and `DOCUMENTATION_TRUTH_AUDIT.md`.
 
 ## Matrix
 
 | Phase | Planned | Implemented | Tested | Documented | Remaining |
 |---|---|---|---|---|---|
-| 0. Baseline / checkpoint | Preserve WIP, verify baseline, keep master untouched. | Done historically; branch `v2.0-wip` active; latest checkpoint commits present. | Current turn: `testDebugUnitTest`, `lintDebug`, `assembleDebug` passed. | Partially stale: old counts and commit refs remain in `CURRENT_STATE.md`/QA docs. | Refresh state docs after each corrective commit. |
+| 0. Baseline / checkpoint | Preserve WIP, verify baseline, keep master untouched. | Done historically; branch `v2.0-wip` active; latest checkpoint commits present. | Current cleanup: `testDebugUnitTest`, `lintDebug`, `assembleDebug`, `assembleRelease` passed. | Partially stale: old counts remain in QA docs. | Use `CLEANUP_EXECUTION_LEDGER.md` for cleanup-run evidence. |
 | 1. SDK 33 + cleanup | minSdk 33, Android 13+ docs, dead pre-33 cleanup. | Done: `minSdk = 33`, `targetSdk = 36`, `compileSdk 36.1`; ADR-006. | Unit/lint/debug build passed after README correction. | Mostly current after `f371643` and `756d944`. | No code task pending; keep device-coverage caveat. |
 | 2-3. Result model + engines | Sealed result model, validation/unit engines, BigDecimal-safe dosing wrappers. | Partial: `CalcResult`, `ValidationEngine`, `UnitConversionEngine`, `FertilizerChemistryEngine`, recommendation and medication safety/search exist. `DosingResult` is still 2-case; no `DosingCalculationEngine` wrapper. | JVM tests cover result, validation, unit conversion, fertilizer, recommendation, medication safety/search. Latest generated JVM report: 138 tests, 0 fail/error/skip. | SPEC still marks T4/T6 incomplete. | Implement T4/T6 only if product flow needs it; current app still uses `MainViewModel` + `SeachemCalculations` directly. |
 | 4-5. Compose UI migration | Compose screens, Material 3 theme, parity, a11y, UI tests. | Screens are Compose-hosted in Fragment/XML shell; History route added; AI orphan removed; theme tokens moved. `MainViewModel` LiveData remains. | JVM tests cover VM/history/dose logging/theme; instrumented tests exist but current API-36 connected run is blocked by missing `adb`. | Design docs refreshed for History/AI state; detailed a11y/responsive/design-system findings remain. | Run compatible instrumented tests when device tooling exists; StateFlow/per-feature VM migration remains a larger implementation phase. |
