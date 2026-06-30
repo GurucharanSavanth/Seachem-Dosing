@@ -6,13 +6,13 @@ import org.junit.Test
 import java.io.File
 
 /**
- * ADR-009: [Color.kt] is the canonical colour-token source; `res/values/colors.xml` is a
- * compatibility bridge for the retained XML shell (ADR-007). This test fails on any drift
- * between the two so the hand-maintained bridge can never silently diverge.
+ * ADR-009: [Color.kt] is the canonical colour-token source; `res/values/colors.xml` is the
+ * active compatibility bridge for the retained XML theme shell (ADR-007). This test fails on
+ * any drift between bridged XML entries and Compose tokens.
  *
  * Pure file parsing — deliberately no Compose/Android classpath dependency, so it runs as a
- * plain JVM unit test. Token→XML-name mapping is derived, so new `Light…`, `Dark…` and
- * `Profile…` tokens are covered automatically (a token with no colors.xml sibling fails).
+ * plain JVM unit test. XML-name→token mapping is derived so removed XML bridge entries do not
+ * force unused resources back into the APK.
  */
 class ColorTokenParityTest {
 
@@ -26,28 +26,32 @@ class ColorTokenParityTest {
         assertTrue("Color.kt not found (cwd=${File(".").absolutePath})", colorKt.exists())
         assertTrue("colors.xml not found (cwd=${File(".").absolutePath})", colorsXml.exists())
 
-        val xml = xmlRe.findAll(colorsXml.readText())
+        val compose = composeRe.findAll(colorKt.readText())
             .associate { it.groupValues[1] to it.groupValues[2].uppercase() }
+        val xml = xmlRe.findAll(colorsXml.readText())
+            .map { it.groupValues[1] to it.groupValues[2].uppercase() }
 
         val mismatches = mutableListOf<String>()
         var checked = 0
-        composeRe.findAll(colorKt.readText()).forEach { m ->
-            val name = m.groupValues[1]
-            val composeArgb = m.groupValues[2].uppercase()        // 8 hex, ARGB
-            val xmlName = xmlNameFor(name) ?: return@forEach        // non-bridged token: skip
-            val xmlHex = xml[xmlName]
-            if (xmlHex == null) {
-                mismatches += "$name -> missing colors.xml entry '$xmlName'"
+        xml.forEach { (xmlName, xmlHex) ->
+            val composeName = composeNameFor(xmlName)
+            if (composeName == null) {
+                mismatches += "$xmlName -> no Color.kt token mapping"
+                return@forEach
+            }
+            val composeArgb = compose[composeName]
+            if (composeArgb == null) {
+                mismatches += "$xmlName -> missing Color.kt token '$composeName'"
                 return@forEach
             }
             val expected = if (xmlHex.length == 6) "FF$xmlHex" else xmlHex  // XML opaque -> alpha FF
             if (composeArgb != expected) {
-                mismatches += "$name: Color.kt=0x$composeArgb vs colors.xml/$xmlName=#$xmlHex"
+                mismatches += "$composeName: Color.kt=0x$composeArgb vs colors.xml/$xmlName=#$xmlHex"
             }
             checked++
         }
 
-        assertTrue("No colour tokens parsed from Color.kt — structure/regex changed", checked > 0)
+        assertTrue("No bridged colours parsed from colors.xml — structure/regex changed", checked > 0)
         assertEquals(
             "Colour-token drift (ADR-009 bridge):\n${mismatches.joinToString("\n")}",
             emptyList<String>(),
@@ -55,17 +59,15 @@ class ColorTokenParityTest {
         )
     }
 
-    /** Compose token name -> colors.xml sibling, or null when it has no bridge counterpart. */
-    private fun xmlNameFor(composeName: String): String? = when {
-        composeName.startsWith("Light") -> "md_theme_light_" + role(composeName.removePrefix("Light"))
-        composeName.startsWith("Dark") -> "md_theme_dark_" + role(composeName.removePrefix("Dark"))
-        composeName.startsWith("Profile") -> "profile_" + composeName.removePrefix("Profile").lowercase()
-        composeName.startsWith("Status") -> "status_" + composeName.removePrefix("Status").lowercase()
+    /** colors.xml sibling -> Compose token name, or null when the XML name is outside the bridge. */
+    private fun composeNameFor(xmlName: String): String? = when {
+        xmlName.startsWith("md_theme_light_") -> "Light" + tokenRole(xmlName.removePrefix("md_theme_light_"))
+        xmlName.startsWith("md_theme_dark_") -> "Dark" + tokenRole(xmlName.removePrefix("md_theme_dark_"))
         else -> null
     }
 
-    /** "OnPrimaryContainer" -> "onPrimaryContainer". */
-    private fun role(s: String): String = s.replaceFirstChar { it.lowercase() }
+    /** "onPrimaryContainer" -> "OnPrimaryContainer". */
+    private fun tokenRole(s: String): String = s.replaceFirstChar { it.uppercase() }
 
     /** Unit-test working dir is the module dir; fall back to repo root just in case. */
     private fun locate(rel: String): File =

@@ -52,3 +52,4 @@ T13|.|catalog search/index + FW/SW default filter|V4,V8
 
 ## §B
 id|date|cause|fix
+B1|2026-06-30|color parity test treated removed unused Compose-only tokens as required XML bridge entries|no new §V; test now derives active bridge from colors.xml

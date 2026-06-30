@@ -1,9 +1,0 @@
-node_modules/
-dist/
-coverage/
-.cache/
-*.log
-.DS_Store
-.vite/
-.env.local
-.env.*.local

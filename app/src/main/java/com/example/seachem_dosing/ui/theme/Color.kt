@@ -2,9 +2,9 @@ package com.example.seachem_dosing.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// CANONICAL colour-token source (ADR-009). res/values/colors.xml is a compatibility bridge
-// for the retained XML shell (ADR-007). ColorTokenParityTest enforces the two stay numerically
-// identical — edit values here first, then mirror into colors.xml; the test fails on any drift.
+// CANONICAL colour-token source (ADR-009). res/values/colors.xml is the active compatibility
+// bridge for the retained XML theme shell (ADR-007). ColorTokenParityTest enforces bridged
+// XML entries stay numerically identical.
 
 // --- Light ---
 val LightPrimary = Color(0xFF0A7A8C)
@@ -64,12 +64,12 @@ val DarkInverseSurface = Color(0xFFDFE7EA)
 val DarkInverseOnSurface = Color(0xFF0E1417)
 val DarkInversePrimary = Color(0xFF0A7A8C)
 
-// Profile accents (res/values/colors.xml profile_*)
+// Profile accents
 val ProfileFreshwater = Color(0xFF2F9BB2)
 val ProfileSaltwater = Color(0xFF3A6FC6)
 val ProfilePond = Color(0xFF3E8E58)
 
-// Status indicators (res/values/colors.xml status_*) — parity-enforced by ColorTokenParityTest
+// Status indicators
 val StatusGood = Color(0xFF4CAF50)
 val StatusWarning = Color(0xFFFF9800)
 val StatusDanger = Color(0xFFF44336)
