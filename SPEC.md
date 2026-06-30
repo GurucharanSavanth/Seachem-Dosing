@@ -15,11 +15,9 @@ precision-safe aquarium dosing + fertilizer + medication engines. evidence-groun
 - `web/` (TS) vs `Base_Template/` (JS) dual stack — owner decision pending (R6)
 
 ## §I
-- in: sealed `DosingResult`{Success(BigDecimal,unit,secondary,warnings), Error(code,msg,recoverable)}
-- in: sealed `ValidationResult`{Valid, Invalid(field,reason)}
 - in: `logic/SeachemCalculations` BigDecimal engine (Product, UnitScale, CalculationResult)
 - in: `logic/Calculations` Double legacy (XML screens) — retire after Compose parity
-- in: `domain/usecase/CalculateDoseUseCase` (BigDecimal, zero-vol guard)
+- in: `domain/usecase/{LogAdministeredDoseUseCase,RecordWaterParameterReadingUseCase}`
 - new: `core/result/CalcResult<T>` = Success<T> | NeedsMoreInput | UnsafeBlocked | Unsupported | CalculationError
 - new: `domain/engine/{UnitConversion,Dosing,Fertilizer,Medication,Validation,SymptomTriage,InteractionSafety}`
 - new: catalog seed JSON (Brand/Product/ActiveIngredient/DoseRule/Contraindication/EvidenceSource)
@@ -41,7 +39,7 @@ id|st|desc|cites
 T1|x|core/result/CalcResult<T> sealed + fold/map helpers|V1,V3
 T2|x|ValidationEngine: vol/conc/range → CalcResult|V3,V5
 T3|x|UnitConversionEngine BigDecimal (L,gal_US/UK,ppm,dKH; meq/L pending)|V2,V9
-T4|.|migrate DosingResult callers → CalcResult (2-state → 5-state)|V1
+T4|x|remove obsolete DosingResult staging; active result path is CalcResult|V1
 T5|x|boundary tests: zero/neg/overflow/unit round-trip|V3,V9
 T6|.|DosingCalculationEngine wrap SeachemCalculations under CalcResult|V1,V2
 T7|x|FertilizerChemistryEngine molar/ppm BigDecimal|V2,V7

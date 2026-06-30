@@ -40,10 +40,10 @@ WS1 Android (OFFICIAL), WS2 medication (7 Seachem OFFICIAL + 5 SECONDARY-pending
 
 ## 5. Architecture refactor (reconcile, don't rebuild)
 
-Inherited (keep): `domain/{model,usecase}`, `data/{local,repository}`, `di/` (Koin), `SeachemDosingApp`. Already BigDecimal at the domain boundary (`DosingResult.Success: BigDecimal`; `CalculateDoseUseCase` BigDecimal + zero-volume guard).
+Inherited (keep): `domain/{engine,history,medication,usecase}`, `data/{local,repository}`, `di/` (Koin), `SeachemDosingApp`. Obsolete `domain/model` staging was removed because it had no callers, schema role, or serialization boundary.
 
 To add/extend:
-- **Result model:** extend the 2-case `DosingResult` (Success/Error) to the safety-aware set: `Success | NeedsMoreInput | UnsafeBlocked | Unsupported | CalculationError` (generic `CalcResult<T>` reused by all engines).
+- **Result model:** use the safety-aware generic `CalcResult<T>` set: `Success | NeedsMoreInput | UnsafeBlocked | Unsupported | CalculationError`.
 - **Engines (domain/engine/):** `UnitConversionEngine`, `DosingCalculationEngine` (wrap existing Seachem math), `FertilizerChemistryEngine` + `StockSolutionSolver` + `NutrientTargetSolver`, `MedicationDoseEngine` + `SymptomTriageEngine` + `MedicationInteractionSafetyEngine`, `ValidationEngine`, `AuditLogEngine`.
 - **Retire** legacy `logic/Calculations.kt` (Double) only as Compose screens replace the XML fragments that use it.
 - `core/` for units + numeric precision + result types (new).
@@ -100,7 +100,7 @@ Unit (JUnit/MockK), property-ish boundary tests (zero/neg/overflow/NaN/round-tri
 |---|---|---|---|
 | `app/build.gradle.kts` | edit | minSdk 24→33 | low |
 | `.gradle_user/**` | `git rm --cached` + ignore | tracked build cache | low |
-| `domain/model/DosingResult.kt` | extend | add NeedsMoreInput/UnsafeBlocked/Unsupported/CalculationError | med (callers) |
+| `core/result/CalcResult.kt` | keep | safety-aware sealed result type for engines/UI | low |
 | `logic/Calculations.kt` (Double) | retire-after-parity | superseded by BigDecimal path | med |
 | `logic/SeachemCalculations.kt` | keep/verify | BigDecimal engine — confirm scale/rounding | med |
 | `domain/engine/*` | create | new precision-safe engines | med |
