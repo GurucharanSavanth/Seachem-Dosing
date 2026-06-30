@@ -17,7 +17,8 @@ export function calculateKhco3Grams(
   litres: number,
   purity: number
 ): number {
-  if (purity <= 0 || !Number.isFinite(purity)) return 0;
-  const grams = ((targetKh - currentKh) * COEFF_KHCO3_STOICH * litres) / purity;
+  if (!Number.isFinite(purity) || purity <= 0) return 0;
+  const safePurity = Math.max(0.01, purity); // mirrors Kotlin MIN_PURITY=0.01 clamp
+  const grams = ((targetKh - currentKh) * COEFF_KHCO3_STOICH * litres) / safePurity;
   return Math.max(0, grams);
 }

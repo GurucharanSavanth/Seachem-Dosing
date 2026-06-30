@@ -17,7 +17,8 @@ export function calculateNeutralRegulatorGrams(
   currentKh: number
 ): number {
   if (targetPh >= currentPh) return 0;
-  const khEffectFactor = Math.min(currentKh, 4) / 4;
+  const safeKh = Math.max(0, currentKh); // mirrors Kotlin safeKh = max(0, currentKh)
+  const khEffectFactor = Math.min(safeKh, 4) / 4;
   const baseGramsPerLitre =
     GPL_MIN_NR + (GPL_MAX_NR - GPL_MIN_NR) * khEffectFactor;
   const phSteps = (currentPh - targetPh) / 0.5;

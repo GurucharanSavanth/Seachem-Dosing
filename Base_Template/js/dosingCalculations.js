@@ -17,9 +17,9 @@
  * @returns {number} Grams of KHCO₃ to dose (precision: 0.0001).
  */
 function calculateKhco3Grams(currentKh, targetKh, litres, purity) {
-    if (purity <= 0 || !isFinite(purity)) return 0;
-    // Using stoichiometric coefficient based on molecular weight
-    const grams = (targetKh - currentKh) * COEFF_KHCO3_STOICH * litres / purity;
+    if (!isFinite(purity) || purity <= 0) return 0;
+    const safePurity = Math.max(0.01, purity); // mirrors Kotlin MIN_PURITY=0.01 clamp
+    const grams = (targetKh - currentKh) * COEFF_KHCO3_STOICH * litres / safePurity;
     return Math.max(0, grams);
 }
 
@@ -46,7 +46,8 @@ function calculateEquilibriumGrams(deltaGh, litres) {
 function calculateNeutralRegulatorGrams(litres, currentPh, targetPh, currentKh) {
     // This formula was verified as correct.
     if (targetPh >= currentPh) return 0;
-    const khEffectFactor = Math.min(currentKh, 4) / 4;
+    const safeKh = Math.max(0, currentKh); // mirrors Kotlin safeKh = max(0, currentKh)
+    const khEffectFactor = Math.min(safeKh, 4) / 4;
     const baseGramsPerLitre = GPL_MIN_NR + (GPL_MAX_NR - GPL_MIN_NR) * khEffectFactor;
     const phSteps = (currentPh - targetPh) / 0.5;
     if (phSteps <= 0) return 0;
