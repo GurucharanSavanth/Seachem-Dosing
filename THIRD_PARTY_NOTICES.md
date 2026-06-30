@@ -16,7 +16,6 @@ This app bundles third-party open-source software. Versions are pinned in
 | AndroidX Core-KTX, AppCompat, Activity-Compose | Apache-2.0 |
 | AndroidX Lifecycle (ViewModel, runtime-compose, viewmodel-compose, livedata) | Apache-2.0 |
 | AndroidX Navigation (fragment-ktx, ui-ktx) | Apache-2.0 |
-| AndroidX ConstraintLayout | Apache-2.0 |
 | Jetpack Compose (BOM, ui, ui-graphics, material3, tooling-preview, runtime-livedata) | Apache-2.0 |
 | Material Components for Android (`com.google.android.material`) | Apache-2.0 |
 | AndroidX Room (runtime, ktx; KSP compiler) | Apache-2.0 |

@@ -122,9 +122,6 @@ dependencies {
     // Material Design 3 (XML)
     implementation(libs.material)
 
-    // Constraint Layout (XML)
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-
     // Navigation (Fragment-based — XML stack)
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
