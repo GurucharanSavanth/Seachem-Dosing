@@ -15,21 +15,18 @@ This app bundles third-party open-source software. Versions are pinned in
 | kotlinx-coroutines (`org.jetbrains.kotlinx:kotlinx-coroutines-*`) | Apache-2.0 |
 | AndroidX Core-KTX, AppCompat, Activity-Compose | Apache-2.0 |
 | AndroidX Lifecycle (ViewModel, runtime-compose, viewmodel-compose, livedata) | Apache-2.0 |
-| AndroidX Navigation (fragment-ktx, ui-ktx, compose) | Apache-2.0 |
-| AndroidX DataStore (preferences) | Apache-2.0 |
+| AndroidX Navigation (fragment-ktx, ui-ktx) | Apache-2.0 |
 | AndroidX ConstraintLayout | Apache-2.0 |
 | Jetpack Compose (BOM, ui, ui-graphics, material3, tooling-preview, runtime-livedata) | Apache-2.0 |
 | Material Components for Android (`com.google.android.material`) | Apache-2.0 |
 | AndroidX Room (runtime, ktx; KSP compiler) | Apache-2.0 |
-| Koin (`io.insert-koin:koin-android`, `koin-androidx-compose`) | Apache-2.0 |
+| Koin (`io.insert-koin:koin-android`) | Apache-2.0 |
 
 ## Test-only dependencies (`testImplementation` / `androidTestImplementation`)
 
 | Component | License |
 |---|---|
 | JUnit 4 (`junit:junit`) | EPL-1.0 |
-| MockK (`io.mockk`) | Apache-2.0 |
-| Turbine (`app.cash.turbine`) | Apache-2.0 |
 | kotlinx-coroutines-test | Apache-2.0 |
 | AndroidX Test (ext-junit, espresso, runner, rules), Room-testing, arch-core-testing | Apache-2.0 |
 | Compose UI Test (`androidx.compose.ui:ui-test-junit4`, `ui-test-manifest`) | Apache-2.0 |

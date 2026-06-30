@@ -5,7 +5,7 @@ Grounded in `MainActivity.kt`, `res/navigation/mobile_navigation.xml`, `res/menu
 ## Mechanism
 - **Fragment-based** Jetpack Navigation (`navigation-fragment-ktx` / `navigation-ui-ktx`), XML graph, `BottomNavigationView.setupWithNavController` (`MainActivity.kt:53`).
 - Start destination: `navigation_profile`.
-- `navigation-compose` dependency present but **unused** — either adopt it (shell→Compose) or drop it. See remediation R-1.
+- `navigation-compose` dependency was unused and has been removed; the active shell remains Fragment Navigation. See remediation R-1.
 - Top app bar title is driven by destination `label`; two labels are hardcoded English in the graph (`Medication`, `Fertilizer` at `mobile_navigation.xml:26,31`) instead of `@string/...` → localization gap (ISSUE-A11Y-004).
 
 ## Destination graph

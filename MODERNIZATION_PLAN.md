@@ -77,7 +77,7 @@ To add/extend:
 
 ## 10. Testing strategy → `TESTING_STRATEGY.md` (P9)
 
-Unit (JUnit/MockK), property-ish boundary tests (zero/neg/overflow/NaN/round-trip units), golden tests for known doses, Koin `verifyAll` (exists), Compose UI tests, medication permutation tests (single/multi/contradictory/high-risk/FW-SW-mismatch/duplicate-class), catalog schema + duplicate-ID tests, web parity (`scripts/verify-sync.js`).
+Unit (JUnit), property-ish boundary tests (zero/neg/overflow/NaN/round-trip units), golden tests for known doses, Koin `verifyAll` (exists), Compose UI tests, medication permutation tests (single/multi/contradictory/high-risk/FW-SW-mismatch/duplicate-class), catalog schema + duplicate-ID tests, web parity (`scripts/verify-sync.js`).
 
 ## 11. Execution phases
 

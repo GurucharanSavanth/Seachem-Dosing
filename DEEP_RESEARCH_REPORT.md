@@ -27,7 +27,7 @@
 | FGS types | Apps targeting **API 34 (Android 14)** must declare `foregroundServiceType`. **A utility/calculator app with no foreground services is unaffected.** | OFFICIAL ([fgs-types-required](https://developer.android.com/about/versions/14/changes/fgs-types-required)) |
 | Edge-to-edge | **Enforced for apps targeting API 35+.** Status/nav bars transparent; content draws behind them; `setStatusBarColor`/`setNavigationBarColor` deprecated; `Configuration.screenWidthDp/heightDp` no longer exclude system bars. **Must handle `WindowInsets`** — Material 3 `Scaffold` does this automatically. | OFFICIAL ([behavior-changes-15](https://developer.android.com/about/versions/15/behavior-changes-15)) |
 | Device coverage | **API 33+ = 68.9%**, API 34+ = 54.5% of active devices (Statcounter Apr 2026, via apilevels.com). | SECONDARY ([apilevels.com](https://apilevels.com/)) |
-| Library floors | Compose BOM 2024.12.01, Koin 4.0.0, Room 2.6.1, navigation-compose 2.8.5, activity-compose 1.9.3, lifecycle 2.8.7, datastore 1.0.0, Material 1.11.0 — all support minSdk far below 33. None requires > 33. | STANDARD (declared floors ≤ 24) |
+| Library floors | Active stack checks covered Compose BOM 2024.12.01, Koin 4.0.0, Room 2.6.1, activity-compose 1.9.3, lifecycle 2.8.7, Material 1.11.0 — all support minSdk far below 33. None requires > 33. | STANDARD (declared floors ≤ 24) |
 
 **Implications for the plan:**
 - minSdk 33 is a deliberate ~31% device-coverage trade for a cleaner modern baseline — **document in an ADR** (owner explicitly chose "33 and up" for latest-SDK features).

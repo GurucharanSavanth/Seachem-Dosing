@@ -32,7 +32,7 @@ already shipped.
 - Tests: screenshot/golden per component (light/dark/font-scale); semantics tests.
 
 **Step 2 — App shell + adaptive nav**
-- Decide ARCH-001: keep Fragment shell (and **remove `navigation-compose`**) or migrate to single-Activity Compose `NavigationSuiteScaffold`.
+- Decide ARCH-001: keep Fragment shell or migrate to single-Activity Compose `NavigationSuiteScaffold`.
 - Add `WindowSizeClass` → bottom bar (compact) / rail (medium) / rail+pane (expanded); content `widthIn(max)` wrapper (RESP-001).
 - Verify theme-mode propagation to Compose on device (DS-008, test T-THEME-1).
 - Global aquarium-profile context, beginner/expert toggle pattern, global search entry — design as shell affordances.
@@ -50,7 +50,7 @@ already shipped.
   grep confirmation. AI/chat orphans are already removed.
 
 ## Decisions — RESOLVED 2026-06-28 (owner)
-1. **Shell:** Keep Fragment/XML shell this phase; do not migrate to Compose `NavHost`. → [ADR-007](../architecture/adr-007-retain-fragment-shell.md). `navigation-compose` removal gated on a repo-wide dependency-analysis proof (separate follow-up commit).
+1. **Shell:** Keep Fragment/XML shell this phase; do not migrate to Compose `NavHost`. → [ADR-007](../architecture/adr-007-retain-fragment-shell.md). The unused `navigation-compose` dependency was removed after repo-wide dependency-analysis proof.
 2. **History feature:** Build & connect the full History vertical slice (use the existing Room layer). → [ADR-008](../architecture/adr-008-history-feature.md).
 3. **AI/chat:** Removed the former orphan implementation after reachability proof;
    preserve future-AI requirements in docs. → [ADR-010](../architecture/adr-010-remove-ai-chat.md) (supersedes ADR-005).

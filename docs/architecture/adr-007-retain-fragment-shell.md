@@ -6,7 +6,7 @@
 **Supersedes:** none · **Related:** ADR-001 (Compose for screens), `docs/design/TARGETED_UI_REMEDIATION_PLAN.md`
 
 ## Context
-The shell is the legacy View stack — `MainActivity` (`AppCompatActivity` + ViewBinding) hosting `activity_main.xml` → `NavHostFragment` + `BottomNavigationView` + AppCompat top app bar; Compose renders only leaf screens inside per-fragment `ComposeView` (e.g. `DashboardFragment.kt:41-51`). `androidx.navigation:navigation-compose` is on the classpath but unused. See `docs/design/SCREEN_INVENTORY.md`, `NAVIGATION_AND_FLOW_MAP.md`.
+The shell is the legacy View stack — `MainActivity` (`AppCompatActivity` + ViewBinding) hosting `activity_main.xml` → `NavHostFragment` + `BottomNavigationView` + AppCompat top app bar; Compose renders only leaf screens inside per-fragment `ComposeView` (e.g. `DashboardFragment.kt:41-51`). The unused `androidx.navigation:navigation-compose` dependency was removed after repo-wide proof. See `docs/design/SCREEN_INVENTORY.md`, `NAVIGATION_AND_FLOW_MAP.md`.
 
 ## Decision
 Keep the Fragment/XML shell for the current remediation phase. Do **not** migrate to single-Activity Compose `NavHost` now. This is a *temporary* target, not declared permanent.
@@ -20,7 +20,7 @@ Rationale: the shell works; a nav migration carries broad route, lifecycle, back
 - **Back-stack:** single bottom-nav graph; Profile/Settings via top-bar overflow. Profile hides chrome (`MainActivity.kt:58-61`).
 - **Adaptive-nav limitation:** `BottomNavigationView` only; no rail/drawer for medium/expanded widths (RESP-001). A Compose adaptive surface can be introduced later without a full shell rewrite.
 
-## `navigation-compose` removal — gated
+## `navigation-compose` removal
 Remove the unused dependency **only after** a repository-wide proof of non-use:
 repo-wide symbol/dep search · `./gradlew :app:dependencies` / dependency-analysis · compile all variants · unit tests · lint · relevant instrumented/nav tests. Tracked as a separate follow-up commit (not bundled with unrelated work).
 

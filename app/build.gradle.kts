@@ -144,15 +144,12 @@ dependencies {
     implementation(libs.androidx.compose.runtime.livedata)   // observeAsState: LiveData -> Compose bridge during migration
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.navigation.compose)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 
     // ===== v2.0 — Koin DI (per ADR-002) =====
     implementation(libs.koin.android)
-    implementation(libs.koin.androidx.compose)
     testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit4)
 
@@ -166,8 +163,6 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation("androidx.arch.core:core-testing:2.2.0")
     testImplementation("org.json:json:20240303")
-    testImplementation(libs.mockk)
-    testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

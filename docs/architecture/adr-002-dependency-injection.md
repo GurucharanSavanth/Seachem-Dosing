@@ -23,7 +23,7 @@ Forces:
 - Koin and Hilt are the two viable Android DI frameworks in 2026; Dagger-only is dated.
 - Build times matter — KSP/KAPT chains on Hilt add ~5-15s per clean build.
 - Test ergonomics matter — we need mock-easy DI for ViewModel + Repository unit tests.
-- Compose interop matters — both have first-class `koinViewModel()` / `hiltViewModel()` helpers.
+- Compose interop matters if a composable owns a ViewModel; current ViewModels are still fragment-owned.
 
 ## Decision
 
@@ -83,7 +83,7 @@ User chose B (Koin). Build-time win and DSL readability outweigh compile-time sa
 
 **Easier:**
 - Adding a new Repository/UseCase → one `single { }` line in module.
-- ViewModel injection → `viewModel { MainViewModel(get(), get()) }` + `koinViewModel()` in Composable.
+- ViewModel injection → `viewModel { ... }` in modules, with fragment-owned `by viewModel()` in current code.
 - Test fakes → `loadKoinModules(testModule)` swaps bindings.
 
 **Harder:**

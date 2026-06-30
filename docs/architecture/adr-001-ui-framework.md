@@ -36,7 +36,7 @@ Keep XML, modernize accessibility, theme attributes, ViewBinding null-safety. Re
 **Cons:** Caps long-term UI velocity. Doesn't solve imperative card-wiring bloat.
 
 ### Option B — Migrate to Compose (CHOSEN)
-Replace fragments + XML with Compose screens. Use `androidx.navigation:navigation-compose`. State via `StateFlow.collectAsStateWithLifecycle()`. Reusable composables for card patterns.
+Replace fragments + XML with Compose screens. The original end state used `androidx.navigation:navigation-compose`; ADR-007 keeps the Fragment shell for the current phase, so that dependency is not active until shell migration resumes. State via `StateFlow.collectAsStateWithLifecycle()`. Reusable composables for card patterns.
 
 | Dimension | Score (1-5) |
 |---|---|
@@ -63,7 +63,7 @@ The 12 `card_*.xml` files compress into ~3 reusable composables (`UniversalCalcu
 ## Consequences
 
 **Easier:**
-- New calculator → write Composable + register in NavHost. No XML, no findViewById, no TextWatcher.
+- New calculator → write Composable and register it in the active shell. No XML, no findViewById, no TextWatcher once the screen is migrated.
 - Theming via MaterialTheme tokens propagates automatically.
 - Recomposition automatic with StateFlow.
 
@@ -78,7 +78,7 @@ The 12 `card_*.xml` files compress into ~3 reusable composables (`UniversalCalcu
 
 ## Action Items
 
-1. Add Compose BOM + lifecycle-runtime-compose + navigation-compose + activity-compose to `gradle/libs.versions.toml`.
+1. Add Compose BOM + lifecycle-runtime-compose + activity-compose to `gradle/libs.versions.toml`; add navigation-compose only when shell migration resumes.
 2. Add `kotlin-compose` plugin (`org.jetbrains.kotlin.plugin.compose`).
 3. Set `buildFeatures { compose = true }` in `app/build.gradle.kts`.
 4. Create `ui/theme/` with `Color.kt`, `Theme.kt`, `Type.kt` matching existing `colors.xml` + `themes.xml` palette.

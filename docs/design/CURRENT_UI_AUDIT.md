@@ -16,8 +16,8 @@ Severity: 🔴 high · 🟠 med · 🟡 low.
 - **Current:** `AppCompatActivity` + ViewBinding + XML `BottomNavigationView` + XML nav graph + AppCompat top bar; Compose only inside per-fragment `ComposeView`.
 - **Expected:** Either (a) keep the Fragment shell deliberately (documented), or (b) finish migration to a single-Activity Compose `NavHost` + `NavigationSuiteScaffold`. The half-state carries both nav stacks' cost.
 - **Standard:** Android recommended app architecture; Compose navigation guidance.
-- **User impact:** none directly. **A11y impact:** none. **Functional impact:** `navigation-compose` dead dep; two theme worlds (see ISSUE-DS-008); harder maintenance.
-- **Correction:** Decide in ADR. If keeping Fragments, **remove `navigation-compose`** dep. If migrating, do it after the design-system layer lands.
+- **User impact:** none directly. **A11y impact:** none. **Functional impact:** two theme worlds (see ISSUE-DS-008); harder maintenance.
+- **Correction:** Decide in ADR. The unused `navigation-compose` dependency has been removed; migrate shell navigation only after the design-system layer lands.
 - **Dependencies:** ADR-001 (Compose), design-system module.
 - **Acceptance:** ADR recorded; no unused nav dependency on classpath; one navigation mechanism documented.
 - **Tests:** build + `dependency-analysis` (unused-dep) check.
@@ -35,7 +35,7 @@ Severity: 🔴 high · 🟠 med · 🟡 low.
 - **Correction:** Split incrementally behind the design-system work; route calculations through the **already-built** use cases (closes ISSUE-CONN-002).
 - **Dependencies:** ISSUE-CONN-002, ISSUE-CALC (see below).
 - **Acceptance:** each feature has its own VM; `MainViewModel` shrinks to shared app/profile state or is removed; unit tests per VM.
-- **Tests:** new VM unit tests (Turbine + coroutines-test).
+- **Tests:** new VM unit tests with coroutines-test; add a Flow probe dependency only if a test needs it.
 - **Claude Design:** manual.
 
 ### ISSUE-ARCH-003 🟠 — Two contradictory state patterns

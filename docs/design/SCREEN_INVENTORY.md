@@ -10,8 +10,7 @@ The app is **not** full Compose. The shell is the legacy View stack; Compose ren
 - `MainActivity` (`AppCompatActivity` + ViewBinding) hosts `activity_main.xml` → `NavHostFragment` + `BottomNavigationView` + AppCompat top app bar. `MainActivity.kt:33,49,53`
 - Navigation = Fragment XML graph `res/navigation/mobile_navigation.xml` (not Navigation Compose).
 - Each destination is a `Fragment` whose `onCreateView` returns a `ComposeView` calling `SeachemTheme { XxxScreen(...) }`. Pattern confirmed in `DashboardFragment.kt:41-51`.
-- `androidx.navigation:navigation-compose` is on the classpath but **unused** (no
-  `NavHost(` in source) → candidate dependency cleanup after proof.
+- `androidx.navigation:navigation-compose` was unused (no `NavHost(` in source) and was removed after dependency-analysis proof.
 
 ## Screens (7 destinations)
 
