@@ -23,3 +23,10 @@ local.properties
 
 # Firebase config — contains an API key, must not be committed.
 /app/google-services.json
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# Web build outputs and dependencies
+web/node_modules/
+web/dist/
