@@ -1,7 +1,7 @@
 # CURRENT_STATE - autonomous execution handoff
 
 **Branch:** `v2.0-wip` (local-only, no upstream)
-**Latest completed documentation correction commit before this update:** `5ff8808`
+**Latest baseline commit:** `63b3110` (+ pending commit adding SBOM + Phase-9 verification report)
 
 ## Commit policy
 
@@ -25,7 +25,9 @@
 - `./gradlew assembleDebug` passed.
 - `./gradlew testDebugUnitTest assembleDebugAndroidTest lintDebug` passed after the AndroidX Test dependency bump.
 - `connectedDebugAndroidTest` was not run because `adb` is not on PATH in this shell.
-- Release build was not rerun in the current docs-remediation workstream. Existing generated artifact path is `app/build/outputs/apk/release/SeachemDosing-v2.0-release.apk`, but treat it as historical until `assembleRelease` is rerun.
+- `assembleRelease` rerun 2026-06-30: **BUILD SUCCESSFUL in 1m 56s** (R8 minify + resource shrink). APK `app/build/outputs/apk/release/SeachemDosing-v2.0-release.apk` (~16.3 MB) regenerated and current.
+- Calculation parity ("sync invariant") verified 2026-06-30: all 17 shared coefficients identical Kotlin↔JS; no coefficient redefinition outside `Calculations.kt`. See `PHASE9_VERIFICATION.md`.
+- Static security scan 2026-06-30: zero permissions, no committed secrets, single required LAUNCHER export, `allowBackup=false`. Clean. See `PHASE9_VERIFICATION.md`.
 
 ## Known blockers / risks
 
@@ -33,10 +35,16 @@
   `docs/audit/DOCUMENTATION_TRUTH_AUDIT.md`.
 - Compose instrumented UI tests are not CI-gated; prior API-36 Espresso runs hit `InputManager.getInstance`.
 - Web v2 is a Vite/TypeScript scaffold and partial engine port, not a complete PWA replacement for `Base_Template/`.
-- No SBOM artifact exists yet.
+- SBOM now exists: `docs/sbom/SBOM.md` (direct-dependency level; upgrade path to CycloneDX noted in-file).
 
 ## Next executable task
 
-Continue Phase 9 verification: security/privacy checks, accessibility review, and
-performance/emulator QA only when `adb`/device tooling is available. Then move to
-release/SBOM readiness.
+Phase 9 static verification (security, calc parity) and the Phase 10 release-build
+gate are GREEN (`PHASE9_VERIFICATION.md`). Remaining work is device-tooling-blocked
+or owner-gated:
+- Run `connectedDebugAndroidTest` / Compose UI tests + emulator performance once
+  `adb`/an AVD is available (prior API-36 Espresso `InputManager.getInstance` blocker).
+- Validate the uncommitted web `package.json` major bumps (Vite 8 / Vitest 4) against
+  the `web/` build before committing them.
+- Optional cosmetic: mirror the two Kotlin invalid-input guards into the JS
+  (CALC-1/CALC-2 in `PHASE9_VERIFICATION.md`).
