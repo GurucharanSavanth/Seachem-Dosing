@@ -1,9 +1,7 @@
 /**
  * Salt Mix Calculator.
  *
- * Mirrors:
- *   - Feature_Update/salt-mix-calculator.js (extracted from BRS calculator)
- *   - app/src/main/java/.../logic/SaltMixCalculations.kt
+ * Mirrors app/src/main/java/.../logic/SaltMixCalculations.kt.
  *
  * Factor unit: grams per (US gallon × 1 PPT).
  */

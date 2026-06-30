@@ -29,7 +29,7 @@ Android side (`SeachemCalculations.kt` + `Calculations.kt` + `SaltMixCalculation
   - REEF_BUFFER, REEF_BUILDER, REEF_CARBONATE
   - REEF_CALCIUM, REEF_COMPLETE, REEF_FUSION_1, REEF_FUSION_2, REEF_IODIDE, REEF_STRONTIUM
   - Substrate (Gravel) calculator with 11 product specs.
-  - SaltMix calculator with 17 product factors (Kotlin already integrated; JS exists in `Feature_Update/salt-mix-calculator.js` orphan).
+  - SaltMix calculator with 17 product factors (Kotlin already integrated; the old `Feature_Update/` drop was removed after parity).
 
 User decision: **4a — full parity**. Target web scope is all Android calculators,
 but the current `web/` scaffold is not yet the shipped parity replacement.
@@ -99,7 +99,7 @@ User picked **4a** — full parity. Implications: 14+ new calculators on web sid
 | REEF_BUFFER / BUILDER / CARBONATE | `SeachemCalculations.kt:179-210` | 3 ports + tests |
 | REEF_CALCIUM / COMPLETE / FUSION_1 / FUSION_2 / IODIDE / STRONTIUM | `SeachemCalculations.kt:256-310` | 6 ports + tests |
 | Substrate (Gravel) | `SeachemCalculations.kt:374` | Port + 11 product specs |
-| SaltMix | `Feature_Update/salt-mix-calculator.js` (already JS) | Move to `web/src/calculators/saltMix.ts`, port to TS |
+| SaltMix | `SaltMixCalculations.kt` + `web/src/engine/salt-mix.ts` | Keep parity tests |
 
 For BigDecimal Kotlin functions, web port uses `decimal.js` library or `BigInt`-based fixed-point if precision-critical. Default: `Number` (IEEE 754) since web sync-check passes within 1e-9.
 
@@ -201,7 +201,7 @@ These are the implementation plan, not a statement of completed work.
 3. Port `utils.js` constants → `web/src/core/constants.ts`. Add JSDoc-derived comments referencing Seachem labels.
 4. Port 9 existing `dosingCalculations.js` functions → `web/src/calculators/*.ts` (one file each).
 5. Add 14 new calculators from `SeachemCalculations.kt` → `web/src/calculators/*.ts`.
-6. Move `Feature_Update/salt-mix-calculator.js` → `web/src/calculators/salt-mix.ts` (port to TS).
+6. Keep `web/src/engine/salt-mix.ts` aligned with `SaltMixCalculations.kt`.
 7. Build PWA scaffold (`vite-plugin-pwa`, `manifest.json`, app icons from `mipmap`).
 8. Add `web/tests/sync-validation.test.ts` that imports `web/src/core/constants.ts` and compares to a JSON dump of Kotlin constants (produced by `scripts/verify-sync.js --emit-json`).
 9. Once `web/` is at parity, archive `Base_Template/` → `archive/Base_Template-v1/` (don't delete; useful reference for 1 release cycle).
