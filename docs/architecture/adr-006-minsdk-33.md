@@ -12,7 +12,7 @@ The app shipped at `minSdk = 24` (Android 7.0). `compileSdk`/`targetSdk` were al
 Evidence (`DEEP_RESEARCH_REPORT.md` WS1, official Android docs):
 - `POST_NOTIFICATIONS` is a runtime permission from **API 33** — a uniform minSdk 33 removes the dual-path notification permission handling for any future reminder/alert feature.
 - Edge-to-edge is enforced at targetSdk 35+ (already targeting 36) — orthogonal to minSdk but reinforces the modern-baseline direction.
-- All toolchain libraries (Compose BOM 2024.12.01, Koin 4.0.0, Room 2.6.1, navigation-compose 2.8.5, lifecycle 2.8.7, DataStore 1.0.0, Material 1.11.0) declare floors well below 33 — none blocks the bump.
+- All toolchain libraries (Compose BOM 2024.12.01, Koin 4.0.0, Room 2.6.1, navigation-compose 2.8.5, lifecycle 2.8.7, Material 1.11.0) declare floors well below 33 — none blocks the bump.
 
 ## Decision
 

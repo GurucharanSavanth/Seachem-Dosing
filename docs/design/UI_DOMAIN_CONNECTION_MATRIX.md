@@ -20,7 +20,6 @@ Legend: **Wired** = consumed by a screen/VM on a live path · **Orphan** = built
 | `RecordWaterParameterReadingUseCase` | `domain/usecase/` | ✅ Wired | `DashboardFragment` → `WaterReadingsRecorder` | Saves dashboard water readings to History. |
 | `HistoryEventRepository` / `HistoryEventRepositoryImpl` | `data/repository/` | ✅ Wired | `HistoryViewModel`, history write use cases | ISSUE-CONN-003 resolved by ADR-008/011 implementation. |
 | `HistoryDao` / `AppDatabase` (Room v2) | `data/local/` | ✅ Wired | `HistoryEventRepositoryImpl` | v2 append-only event schema backs History read/write paths. |
-| `SettingsRepository` | `data/repository/` | ❓ Verify | Settings? | Verify Settings screen uses it vs. `MainViewModel`. |
 | AI/chat package/resources | `ai/`, chat resources | ✅ Removed | ADR-010 | ISSUE-CONN-004 resolved; future AI re-entry is documentation-gated. |
 
 ## Orphan resources
@@ -32,7 +31,7 @@ future resource deletion.
 remain. Confirm no references, then delete in a focused cleanup (ISSUE-ARCH-004).
 
 ## Net
-History is no longer orphaned, and AI/chat dead code is removed. Remaining wiring debt:
-Medication/Fertilizer still call domain engines inside composables, SettingsRepository
-needs a live-consumer check, and legacy `MainViewModel` holders/setters need deletion
-only after grep/lint proof.
+History is no longer orphaned, AI/chat dead code is removed, and the unused
+settings repository staging layer was deleted. Remaining wiring debt:
+Medication/Fertilizer still call domain engines inside composables, and legacy
+`MainViewModel` holders/setters need deletion only after grep/lint proof.

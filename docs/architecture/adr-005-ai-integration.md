@@ -152,7 +152,7 @@ class LocalLlmClient(
 class AiRepository(
     private val gemini: GeminiClient,
     private val local: LocalLlmClient?,
-    private val settings: SettingsRepository
+    private val settings: AiSettingsStore
 ) {
     suspend fun generate(prompt: String): Result<String> {
         val useLocal = settings.useLocalLlmEnabled.first() &&

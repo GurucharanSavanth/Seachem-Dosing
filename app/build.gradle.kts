@@ -133,9 +133,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
 
-    // Preferences DataStore
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-
     // ===== v2.0 — Compose stack (per ADR-001) =====
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)

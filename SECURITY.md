@@ -28,7 +28,7 @@ Reviewed at v2.0 (offline-first). Attack surface is intentionally minimal:
 
 The app stores data on-device only. Current storage is Room v2 for history/audit
 records, SharedPreferences for the selected profile, and SavedStateHandle for active
-screen state; DataStore Preferences is staged but not wired. This is **low-sensitivity hobbyist data** — no personal
+screen state. This is **low-sensitivity hobbyist data** — no personal
 identifiers, credentials, payment data, or human medical records.
 
 - **Not encrypted at rest.** Justified: there are no secrets to protect, and the data is

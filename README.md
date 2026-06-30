@@ -54,7 +54,7 @@ A dual-platform application (Android & Web) for aquarium enthusiasts to calculat
 | **UI** | Jetpack Compose screens hosted in the Fragment/XML Navigation shell through ComposeView; ViewBinding remains in `MainActivity` shell |
 | **Design** | Material Design 3 |
 | **Async** | Kotlin Coroutines |
-| **Storage** | Room v2 for history/audit persistence; active settings/profile state uses SavedStateHandle + SharedPreferences; DataStore Preferences is staged, not wired |
+| **Storage** | Room v2 for history/audit persistence; selected profile uses SharedPreferences; active screen/settings state uses SavedStateHandle and in-memory fragment state |
 
 ### Web App
 | | |

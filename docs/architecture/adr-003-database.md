@@ -12,7 +12,7 @@ append-only event schema (`history_event`, `dose_event_detail`,
 
 ## Context
 
-Current persistence: only `SavedStateHandle` (process-death survival of single ViewModel) + `SharedPreferences` for selected profile (`ProfileSelectionFragment.kt:88-97`) + `DataStore Preferences 1.0.0` already in classpath but unused.
+Current non-Room persistence: `SavedStateHandle` (process-death survival of single ViewModel) + `SharedPreferences` for selected profile (`ProfileSelectionFragment.kt:88-97`). A staged DataStore interface/dependency was removed because no implementation or caller existed.
 
 Phase 7 of v2.0 plan adds:
 - **Parameter history** — time-series of pH/KH/GH/NH₃/NO₂/NO₃ over time, with charts (per Phase 7.1 of project prompt).
