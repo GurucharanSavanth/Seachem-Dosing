@@ -2,7 +2,7 @@
 
 > Legacy static web app documentation. `Base_Template/` has no local `package.json`
 > or Jest test suite in this repository; npm/Jest/CI claims below are historical.
-> The active TypeScript scaffold lives in `web/`.
+> The incomplete TypeScript scaffold was removed from the v2 release tree.
 
 ## [Click here for Calculator](https://gurucharansavanth.github.io/Seachem-Dosing-Calculator/)
 
@@ -38,7 +38,7 @@
 | **Accessibility** | WCAG 2.2 AA colours, full keyboard nav, `aria‑live` results, English + ಕನ್ನಡ toggle.                                                                                      |
 | **Theming**       | One‑click light/dark (prefers‐color‑scheme aware).                                                                                                                        |
 | **Responsive**    | Mobile‑first layout; footer action‑bar for Android/iOS convenience.                                                                                                       |
-| **Reliability**   | Legacy static implementation; current automated web work is under `web/`.                                                                                                  |
+| **Reliability**   | Legacy static implementation; formula parity is checked by `scripts/verify-sync.js`.                                                                                       |
 
 
 
@@ -57,7 +57,7 @@ git clone https://github.com/GurucharanSavanth/Seachem-Dosing.git
 cd Seachem-Dosing/Base_Template
 
 # No local npm workflow exists in Base_Template in this repository.
-# Use ../web for the current TypeScript scaffold.
+# Use scripts/verify-sync.js from the repository root for formula parity.
 ```
 
 > A simple static file server (e.g. `npx serve`) is handy for live‑reload previewing.
@@ -116,8 +116,8 @@ All equations are unit‑tested against manufacturer tables and stoichiometric c
 
 ## Testing
 
-No Base_Template-local Jest/ESLint workflow exists in this repository. Current web
-automation belongs to `web/` and repository CI.
+No Base_Template-local Jest/ESLint workflow exists in this repository. Repository
+CI runs the Android/legacy-JS calculation sync check.
 
 ---
 
@@ -125,7 +125,7 @@ automation belongs to `web/` and repository CI.
 
 | Stage      | Tool         | Purpose                                              |
 | ---------- | ------------ | ---------------------------------------------------- |
-| **Lint/Test** | `web/` workflow | Current TypeScript scaffold checks                  |
+| **Sync Check** | `scripts/verify-sync.js` | Android legacy math ↔ static web math              |
 | **Deploy** | GitHub Pages | Auto‑publish `main` → live demo (via Pages settings) |
 
 
@@ -134,8 +134,8 @@ automation belongs to `web/` and repository CI.
 ## Contributing
 
 1. **Fork** & create a feature branch (`git checkout -b feat/my-fix`).
-2. For legacy static-only changes, verify the affected page manually; for the
-   current TypeScript scaffold, use the workflows documented in `../web/README.md`.
+2. For legacy static-only changes, verify the affected page manually and run the
+   repository calculation sync check.
 3. Commit with [Conventional Commits](https://www.conventionalcommits.org/) (`chore:`, `fix:`, `feat:`…).
 4. Open a PR – GitHub Actions will run automatically.
 

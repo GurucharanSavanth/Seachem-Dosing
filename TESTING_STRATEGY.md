@@ -10,7 +10,7 @@
 | On-device smoke | adb (`installDebug` + `screencap` + `input tap`) | Compose screen rendering + key interactions | historical Pixel_10_Pro_XL (API 36) smoke; not rerun in docs-remediation workstream |
 | Instrumented (Compose) | androidx.compose.ui.test | `ProfileSelectionScreenTest` | exists, but not CI-gated; prior API-36 emulator run blocked on Espresso `InputManager.getInstance` |
 | Lint | `lintDebug` | unused resources, a11y, correctness | run each phase |
-| Web parity | `scripts/verify-sync.js` (legacy) | `Calculations.kt` ↔ `Base_Template` constants only | does not cover `web/src/**` or `SeachemCalculations.kt` yet |
+| Web parity | `scripts/verify-sync.js` (legacy) | `Calculations.kt` ↔ `Base_Template` constants only | retained static web surface; no active TS scaffold in v2 |
 
 ## Unit suites (`app/src/test`)
 
@@ -48,4 +48,4 @@ adb install + am start + screencap + input tap                        # on-devic
 1. Per-engine boundary expansion (overflow, NaN, extreme volumes) — partially covered, extend.
 2. Medication permutation matrix (multi-symptom, contradictory, prior-failed) — beginner flow.
 3. Compose UI tests on an **API ≤ 34 AVD** (unblocks the Espresso path).
-4. Web parity once the `Base_Template` vs `web/` decision (R6) is made.
+4. Full web parity if the future TypeScript stack from ADR-004 is reintroduced.

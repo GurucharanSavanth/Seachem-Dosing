@@ -12,7 +12,7 @@ precision-safe aquarium dosing + fertilizer + medication engines. evidence-groun
 - no med/chem fact invented — manufacturer-sourced, schema-sourced, or UNKNOWN [PRODUCT_CATALOG_SCHEMA.md]
 - BigDecimal final math; round only at display
 - no push/release/signing change w/o owner OK
-- `web/` (TS) vs `Base_Template/` (JS) dual stack — owner decision pending (R6)
+- web release surface is `Base_Template/`; no active TS scaffold ships in v2
 
 ## §I
 - in: `logic/SeachemCalculations` BigDecimal engine (Product, UnitScale, CalculationResult)

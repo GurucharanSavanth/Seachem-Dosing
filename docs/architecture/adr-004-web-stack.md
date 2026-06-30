@@ -5,11 +5,10 @@
 **Deciders:** Gurucharan.S
 **User decision:** B (Vite + TS) + sub-decision 4a (full parity with Android)
 
-**Current implementation note (2026-06-29):** `web/` exists as an alpha scaffold, not
-the shipped replacement for `Base_Template/`. PWA config exists but install/offline
-behavior and icon assets are not verified. CI currently runs web typecheck and lint,
-not web tests/build. `scripts/verify-sync.js` still checks the legacy `Base_Template`
-pair only.
+**Current implementation note (2026-06-30):** the incomplete `web/` alpha scaffold
+was removed from the v2 release tree. `Base_Template/` remains the retained static
+web surface. `scripts/verify-sync.js` still checks the legacy `Base_Template` pair
+only.
 
 ## Context
 
@@ -32,7 +31,7 @@ Android side (`SeachemCalculations.kt` + `Calculations.kt` + `SaltMixCalculation
   - SaltMix calculator with 17 product factors (Kotlin already integrated; the old `Feature_Update/` drop was removed after parity).
 
 User decision: **4a — full parity**. Target web scope is all Android calculators,
-but the current `web/` scaffold is not yet the shipped parity replacement.
+but there is no active `web/` implementation in the v2 release tree.
 
 ## Decision
 
@@ -105,8 +104,7 @@ For BigDecimal Kotlin functions, web port uses `decimal.js` library or `BigInt`-
 
 ## Target Web Module Structure
 
-This is the accepted target shape, not the complete current implementation. See
-`web/README.md` for the current alpha scaffold layout.
+This is the accepted target shape, not a statement about the current release tree.
 
 ```
 web/
@@ -186,7 +184,7 @@ No frontend framework (React/Vue) — keep zero-runtime-dep ethos. Use vanilla D
 **Harder:**
 - Build step in dev loop (Vite HMR mitigates).
 - Target CI gate: `npm ci && npm run lint && npm test && npm run build`. Current CI only runs install, typecheck, and lint.
-- Calculation sync invariant now spans 3 places: `Calculations.kt`, `dosingCalculations.js` (legacy until migration done), `web/src/calculators/*.ts`. Two-source migration period.
+- When the TypeScript stack is reintroduced, calculation sync will span `Calculations.kt`, `dosingCalculations.js`, and `web/src/calculators/*.ts`.
 
 **Revisit if:**
 - Bundle size grows >300KB (consider code-splitting per route).

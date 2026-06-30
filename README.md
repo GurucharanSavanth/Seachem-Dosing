@@ -59,9 +59,9 @@ A dual-platform application (Android & Web) for aquarium enthusiasts to calculat
 ### Web App
 | | |
 |---|---|
-| **Stack** | Vite + TypeScript PWA bootstrap in `web/`; legacy static app remains in `Base_Template/` |
-| **Framework** | No UI framework currently wired |
-| **Testing** | Vitest + ESLint (`web/`); legacy static tests remain under `Base_Template/` where applicable |
+| **Stack** | Legacy static JavaScript app in `Base_Template/` |
+| **Framework** | None |
+| **Testing** | `scripts/verify-sync.js` checks Android legacy math against `Base_Template/js/dosingCalculations.js` |
 
 ---
 
@@ -112,7 +112,6 @@ Seachem-Dosing/
 │   └── util/
 │       └── DebouncedTextWatcher.kt  # Performance utility
 │
-├── web/                         # Vite + TypeScript v2 web bootstrap
 ├── Base_Template/
 │   ├── index.html
 │   └── js/
@@ -122,7 +121,7 @@ Seachem-Dosing/
 │
 └── docs/
     ├── architecture/  # ADRs
-    └── design/        # UI/design audits and remediation plans
+    └── sbom/          # SBOM generation notes
 ```
 
 ---
@@ -171,7 +170,7 @@ Contributions are welcome! Please read the guidelines:
 
 ### Before You Start
 1. Check [Issues](https://github.com/GurucharanSavanth/Seachem-Dosing/issues) for existing discussions
-2. Read `AGENTS.md` for code style guidelines
+2. Read `SPEC.md` and the accepted ADRs before changing calculator behavior
 
 ### Important Rules
 
