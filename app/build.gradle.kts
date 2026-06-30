@@ -91,6 +91,10 @@ android {
     sourceSets.getByName("androidTest").assets.srcDir(files("$projectDir/schemas"))
 
     packaging {
+        jniLibs {
+            // Dependency native library is already packaged safely; strip emits a warning.
+            keepDebugSymbols += "**/libandroidx.graphics.path.so"
+        }
         resources {
             excludes += "META-INF/INDEX.LIST"
             excludes += "META-INF/DEPENDENCIES"
