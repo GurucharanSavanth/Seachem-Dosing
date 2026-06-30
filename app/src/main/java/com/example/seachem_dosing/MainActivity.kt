@@ -1,7 +1,6 @@
 package com.example.seachem_dosing
 
 import android.os.Bundle
-import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -10,6 +9,7 @@ import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isGone
 import androidx.core.view.updatePadding
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -55,10 +55,9 @@ class MainActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             binding.topAppBar.title = destination.label?.toString() ?: getString(R.string.app_name)
-            binding.navView.visibility =
-                if (destination.id == R.id.navigation_profile) View.GONE else View.VISIBLE
-            binding.appBar.visibility =
-                if (destination.id == R.id.navigation_profile) View.GONE else View.VISIBLE
+            val isProfileDestination = destination.id == R.id.navigation_profile
+            binding.navView.isGone = isProfileDestination
+            binding.appBar.isGone = isProfileDestination
             updateNavHostPadding()
         }
 
@@ -143,8 +142,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateNavHostPadding() {
         val systemBars = systemBarInsets ?: return
-        val topInset = if (binding.appBar.visibility == View.GONE) systemBars.top else 0
-        val bottomInset = if (binding.navView.visibility == View.GONE) systemBars.bottom else 0
+        val topInset = if (binding.appBar.isGone) systemBars.top else 0
+        val bottomInset = if (binding.navView.isGone) systemBars.bottom else 0
         binding.navHostFragmentActivityMain.updatePadding(top = topInset, bottom = bottomInset)
     }
 }

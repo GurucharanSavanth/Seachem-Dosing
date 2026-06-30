@@ -102,6 +102,11 @@ android {
         }
     }
 
+    lint {
+        // Availability checks are reviewed deliberately instead of upgraded during build cleanup.
+        disable += setOf("AndroidGradlePluginVersion", "GradleDependency", "NewerVersionAvailable")
+    }
+
     compileOptions {
         // v2.0 — bumped from JDK 11 → 17 (required by Koin 4.x, AGP 8.x toolchain).
         sourceCompatibility = JavaVersion.VERSION_17
@@ -127,12 +132,12 @@ dependencies {
     implementation(libs.material)
 
     // Navigation (Fragment-based — XML stack)
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 
     // Lifecycle & ViewModel (LiveData kept until Phase 4.7 StateFlow mig)
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
     // ===== v2.0 — Compose stack (per ADR-001) =====
     val composeBom = platform(libs.androidx.compose.bom)
@@ -162,8 +167,8 @@ dependencies {
 
     // ===== Testing =====
     testImplementation(libs.junit)
-    testImplementation("androidx.arch.core:core-testing:2.2.0")
-    testImplementation("org.json:json:20240303")
+    testImplementation(libs.androidx.arch.core.testing)
+    testImplementation(libs.org.json)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

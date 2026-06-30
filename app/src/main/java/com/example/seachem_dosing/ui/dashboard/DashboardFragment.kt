@@ -70,7 +70,11 @@ class DashboardFragment : Fragment() {
         val batchKey = "dashboard:${UUID.randomUUID()}"
         viewLifecycleOwner.lifecycleScope.launch {
             val saved = WaterReadingsRecorder(recordReading).save(profileId, volume, batchKey, readings)
-            Toast.makeText(requireContext(), getString(R.string.save_readings_done, saved), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                resources.getQuantityString(R.plurals.save_readings_done, saved, saved),
+                Toast.LENGTH_SHORT,
+            ).show()
         }
     }
 

@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,8 +45,13 @@ import com.example.seachem_dosing.logic.SeachemCalculations.Product
 import com.example.seachem_dosing.logic.SeachemCalculations.UnitScale
 import com.example.seachem_dosing.ui.MainViewModel
 import com.example.seachem_dosing.ui.MainViewModel.AquariumProfile
+import java.util.Locale
 
 private enum class Group { FW, SW }
+
+private fun formatOneDecimal(value: Double): String = String.format(Locale.ROOT, "%.1f", value)
+
+private fun formatTwoDecimals(value: Double): String = String.format(Locale.ROOT, "%.2f", value)
 
 private data class UniCard(
     val product: Product,
@@ -111,7 +117,7 @@ fun CalculatorsScreen(
 
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
         Text(stringResource(R.string.nav_calculators), style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onBackground)
-        Text(stringResource(R.string.calc_volume_label, String.format("%.1f", litres)), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+        Text(stringResource(R.string.calc_volume_label, formatOneDecimal(litres)), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
 
         when (profile) {
             AquariumProfile.FRESHWATER -> {
@@ -231,11 +237,11 @@ private fun Dropdown(options: List<String>, selectedIndex: Int, onSelect: (Int) 
 @Composable
 private fun QuickDoses(viewModel: MainViewModel, litres: Double) {
     val wcDefault by viewModel.defaultWaterChangePercent.observeAsState(20.0)
-    ExpandableCard("Prime", null, stringResource(R.string.result_ml, String.format("%.1f", viewModel.calculatePrimeDose())), content = {})
-    ExpandableCard("Stability", null, stringResource(R.string.result_ml, String.format("%.1f", viewModel.calculateStabilityDose())), content = {})
-    ExpandableCard("Safe", null, stringResource(R.string.result_grams, String.format("%.2f", viewModel.calculateSafeSimple())), content = {})
+    ExpandableCard("Prime", null, stringResource(R.string.result_ml, formatOneDecimal(viewModel.calculatePrimeDose())), content = {})
+    ExpandableCard("Stability", null, stringResource(R.string.result_ml, formatOneDecimal(viewModel.calculateStabilityDose())), content = {})
+    ExpandableCard("Safe", null, stringResource(R.string.result_grams, formatTwoDecimals(viewModel.calculateSafeSimple())), content = {})
     var pct by remember { mutableStateOf(wcDefault.toInt().toString()) }
-    ExpandableCard("Water Change", null, stringResource(R.string.result_change_volume, String.format("%.1f", viewModel.calculateWaterChangeLitres(pct.toDoubleOrNull() ?: 0.0))), initiallyExpanded = true) {
+    ExpandableCard("Water Change", null, stringResource(R.string.result_change_volume, formatOneDecimal(viewModel.calculateWaterChangeLitres(pct.toDoubleOrNull() ?: 0.0))), initiallyExpanded = true) {
         OutlinedTextField(pct, { pct = it }, label = { Text("%") }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.width(120.dp))
     }
 }
@@ -246,11 +252,11 @@ private fun SubstrateCard(viewModel: MainViewModel) {
     var l by remember { mutableStateOf("") }
     var w by remember { mutableStateOf("") }
     var d by remember { mutableStateOf("") }
-    var prodIdx by remember { mutableStateOf((viewModel.subProduct.value ?: 0).coerceIn(products.indices)) }
+    var prodIdx by remember { mutableIntStateOf((viewModel.subProduct.value ?: 0).coerceIn(products.indices)) }
     viewModel.setSubLength(l.toDoubleOrNull() ?: 0.0); viewModel.setSubWidth(w.toDoubleOrNull() ?: 0.0); viewModel.setSubDepth(d.toDoubleOrNull() ?: 0.0)
     val res = remember(l, w, d, prodIdx) { viewModel.calculateSubstrate(prodIdx) }
     val bags = res.primaryValue.toDouble()
-    ExpandableCard(stringResource(R.string.calc_substrate_title), products[prodIdx], stringResource(R.string.result_substrate_bags, res.primaryValue.toPlainString(), String.format("%.1f", bags * 7.0)), initiallyExpanded = true) {
+    ExpandableCard(stringResource(R.string.calc_substrate_title), products[prodIdx], stringResource(R.string.result_substrate_bags, res.primaryValue.toPlainString(), formatOneDecimal(bags * 7.0)), initiallyExpanded = true) {
         Dropdown(products, prodIdx) { prodIdx = it }
         Spacer(Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -264,7 +270,7 @@ private fun SubstrateCard(viewModel: MainViewModel) {
 @Composable
 private fun SaltMixCard(viewModel: MainViewModel) {
     val products = remember { com.example.seachem_dosing.logic.SaltMixCalculations.SALT_MIX_PRODUCTS.keys.toList() }
-    var prodIdx by remember { mutableStateOf((viewModel.saltMixProduct.value ?: 0).coerceIn(products.indices.takeIf { products.isNotEmpty() } ?: 0..0)) }
+    var prodIdx by remember { mutableIntStateOf((viewModel.saltMixProduct.value ?: 0).coerceIn(products.indices.takeIf { products.isNotEmpty() } ?: 0..0)) }
     var vol by remember { mutableStateOf("") }
     var cur by remember { mutableStateOf("") }
     var tar by remember { mutableStateOf("") }

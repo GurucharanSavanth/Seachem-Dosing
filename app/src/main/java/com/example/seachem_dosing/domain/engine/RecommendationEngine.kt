@@ -2,6 +2,7 @@ package com.example.seachem_dosing.domain.engine
 
 import com.example.seachem_dosing.R
 import com.example.seachem_dosing.logic.Calculations
+import java.util.Locale
 
 /**
  * Pure dashboard recommendation logic, extracted from DashboardFragment (ADR-001
@@ -38,7 +39,7 @@ object RecommendationEngine {
         val temp: Double, val strontium: Double, val iodide: Double,
     )
 
-    private fun fmt(value: Double, decimals: Int): String = String.format("%.${decimals}f", value)
+    private fun fmt(value: Double, decimals: Int): String = String.format(Locale.ROOT, "%.${decimals}f", value)
 
     fun freshwater(i: FreshwaterInput): Report {
         val actions = mutableListOf<Msg>()

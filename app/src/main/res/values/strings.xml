@@ -1,6 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Aquarium Dosing</string>
-    <string name="app_tagline">Dose smarter, keep water stable.</string>
     <string name="profile_select_title">Choose your aquarium profile</string>
     <string name="profile_select_subtitle">Profiles tailor readings and calculators.</string>
     <string name="profile_select_continue">Continue</string>
@@ -13,17 +12,19 @@
     <string name="profile_freshwater_features">Includes Flourish series dosing.</string>
     <string name="profile_saltwater_features">Includes Reef series dosing.</string>
     <string name="profile_pond_features">Includes substrate volume calculators.</string>
-    <string name="profile_badge_freshwater">Planted Profile</string>
-    <string name="profile_badge_saltwater">Saltwater Profile</string>
-    <string name="profile_badge_pond">Sand and Gravel Profile</string>
 
     <!-- Navigation -->
     <string name="nav_dashboard">Dashboard</string>
     <string name="nav_calculators">Calculators</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_history">History</string>
+    <string name="nav_medication">Medication</string>
+    <string name="nav_fertilizer">Fertilizer</string>
     <string name="action_save_readings">Save readings to history</string>
-    <string name="save_readings_done">Saved %1$d readings to history</string>
+    <plurals name="save_readings_done">
+        <item quantity="one">Saved %1$d reading to history</item>
+        <item quantity="other">Saved %1$d readings to history</item>
+    </plurals>
     <string name="save_readings_none">Enter water parameters first</string>
     <string name="action_log_administered">Log as administered</string>
     <string name="dose_logged">Logged to history</string>
@@ -32,11 +33,8 @@
     <!-- Dashboard -->
     <string name="dashboard_title">Water Status</string>
     <string name="dashboard_subtitle">Monitor your aquarium parameters</string>
-    <string name="dashboard_section_profile">Tank Profile</string>
     <string name="section_parameters">Water Parameters</string>
     <string name="section_recommendations">Recommendations</string>
-    <string name="section_volume">Tank Volume</string>
-    <string name="volume_edit_title">Edit tank volume</string>
 
     <!-- Parameters -->
     <string name="param_ammonia">Ammonia (NH₃/NH₄⁺)</string>
@@ -51,7 +49,6 @@
     <string name="param_calcium">Calcium (Ca)</string>
     <string name="param_magnesium">Magnesium (Mg)</string>
     <string name="param_phosphate">Phosphate (PO4)</string>
-    <string name="param_oxygen">Dissolved Oxygen</string>
     <string name="unit_ppm">ppm</string>
     <string name="unit_ppm_caps">PPM</string>
     <string name="unit_dgh">°dGH</string>
@@ -64,7 +61,6 @@
     <string name="unit_calcium_ppm">ppm</string>
     <string name="unit_magnesium_ppm">ppm</string>
     <string name="unit_phosphate_ppm">ppm</string>
-    <string name="unit_oxygen_mg_l">mg/L</string>
 
     <string name="param_potassium">Potassium (K)</string>
     <string name="param_iron">Iron (Fe)</string>
@@ -72,72 +68,31 @@
     <string name="param_iodide">Iodide (I)</string>
     <string name="unit_mg_l">mg/L</string>
     
-    <!-- Status Messages -->
-    <string name="status_good">Good</string>
-    <string name="status_danger">DANGER</string>
-    <string name="status_warning">High</string>
-    <string name="status_info">Info</string>
-
     <!-- Volume -->
     <string name="volume_direct">Direct Entry</string>
     <string name="volume_lbh">L × B × H</string>
     <string name="label_volume">Volume</string>
-    <string name="label_length">Length</string>
-    <string name="label_breadth">Breadth</string>
-    <string name="label_height">Height</string>
-    <string name="unit_liters">Litres (L)</string>
     <string name="unit_litre">Litres</string>
     <string name="unit_us_gallon">US Gallons</string>
     <string name="unit_uk_gallon">UK Gallons</string>
-    <string name="unit_l_short">L</string>
-    <string name="unit_us_gal_short">US gal</string>
-    <string name="unit_uk_gal_short">UK gal</string>
     <string name="unit_cm">cm</string>
     <string name="unit_in">in</string>
     <string name="unit_ft">ft</string>
     <string name="calculated_volume">Calculated: %s L</string>
 
     <!-- Calculators -->
-    <string name="calc_title">Dosing Calculators</string>
-    <string name="calc_subtitle">Precision dosing based on your live readings</string>
     <string name="calc_volume_label">Tank Volume: %s L</string>
-    <string name="calc_quick_doses">Quick Doses</string>
-    <string name="calc_utilities">Utilities</string>
-    <string name="calc_section_supplements">Supplements</string>
-    <string name="calc_section_buffers_minerals">Buffers &amp; Minerals</string>
-    <string name="calc_section_reef_supplements">Reef Supplements</string>
-    <string name="calc_prime_title">Seachem Prime</string>
-    <string name="calc_prime_subtitle">Detoxifier &amp; Conditioner</string>
-    <string name="calc_stability_title">Seachem Stability</string>
-    <string name="calc_stability_subtitle">New Tank Stabilization</string>
-    <string name="calc_water_change_title">Water Change Planner</string>
-    <string name="calc_water_change_subtitle">Calculate replacement volume</string>
-    <string name="calc_prime_info">Use after ammonia spikes or transport stress.</string>
-    <string name="calc_stability_info">Supports nitrifying bacteria during cycling.</string>
-    <string name="label_change_percent">Change %</string>
     <string name="result_change_volume">Replace %s L</string>
-    <string name="result_change_volume_unit">%1$s L (%2$s %3$s)</string>
     
     <string name="calc_khco3_title">Potassium Bicarbonate</string>
     <string name="calc_khco3_subtitle">Generic KH Booster (KHCO₃)</string>
     
     <string name="calc_equilibrium_title">Seachem Equilibrium</string>
     <string name="calc_equilibrium_subtitle">GH Booster</string>
-    <string name="calc_safe_title">Seachem Safe</string>
-    <string name="calc_safe_subtitle">Concentrated Conditioner</string>
-    <string name="calc_safe_info">Removes chlorine, chloramine &amp; detoxifies ammonia.
-Dose: 1g per 200L.</string>
-    <string name="calc_apt_title">APT Complete</string>
-    <string name="calc_apt_subtitle">Plant Fertilizer (80% dose)</string>
-    <string name="calc_section_buffers">pH Buffers</string>
-    <string name="calc_apt_info">80% of standard 3ml/100L daily dose.
-Estimated NO₃ increase shown below.</string>
     <string name="calc_neutral_title">Seachem Neutral Regulator</string>
     <string name="calc_neutral_subtitle">pH Neutralizer</string>
     <string name="calc_acid_title">Seachem Acid Buffer</string>
     <string name="calc_acid_subtitle">KH &amp; pH Reducer</string>
-    <string name="calc_gold_title">Seachem Gold Buffer</string>
-    <string name="calc_gold_subtitle">Goldfish Buffer</string>
 
     <!-- New Planted Products -->
     <string name="calc_flourish_title">Seachem Flourish</string>
@@ -181,9 +136,6 @@ Estimated NO₃ increase shown below.</string>
     <string name="calc_reef_strontium_title">Seachem Reef Strontium</string>
     <string name="calc_reef_strontium_subtitle">Strontium (Liquid)</string>
 
-    <!-- Units -->
-    <string name="unit_meq_l">meq/L</string>
-
     <!-- Calculator Inputs -->
     <string name="label_current">Current</string>
     <string name="label_target">Target</string>
@@ -198,11 +150,6 @@ Estimated NO₃ increase shown below.</string>
     <string name="label_target_sr">Desired Sr</string>
     <string name="label_current_i">Current I</string>
     <string name="label_target_i">Desired I</string>
-    
-    <string name="label_current_kh_meq">Current KH</string>
-    <string name="label_target_kh_meq">Desired KH</string>
-    <string name="label_current_gh_meq">Current GH</string>
-    <string name="label_target_gh_meq">Desired GH</string>
     
     <string name="label_current_n">Current N</string>
     <string name="label_target_n">Desired N</string>
@@ -219,59 +166,33 @@ Estimated NO₃ increase shown below.</string>
     <string name="label_target_gh">Target GH (°dGH)</string>
     <string name="label_current_ph">Current pH</string>
     <string name="label_target_ph">Target pH</string>
-    <string name="label_purity">Purity</string>
-    <string name="label_purity_hint">0.5 - 1.0</string>
-    <string name="label_unit_note">Inputs use %s</string>
-    <string name="label_unit_note_converted">Inputs use %s (converted from ppm)</string>
 
     <!-- Results -->
     <string name="result_grams">%s g</string>
     <string name="result_ml">%s ml</string>
     <string name="result_no_dose">NA</string>
-    <string name="result_gh_above_target">GH already at or above target</string>
-    <string name="result_full_dose">Full Dose</string>
-    <string name="result_half_dose">Half Dose</string>
-    <string name="nitrate_estimate">Est. NO₃ +%s ppm</string>
 
     <!-- Recommendations -->
-    <string name="reco_title">Emergency Actions</string>
-    <string name="reco_ok">✓ All parameters look good!</string>
-    <string name="reco_ammonia">⚠️ Ammonia detected!
-Dose %.2f mL Seachem Prime immediately.</string>
-    <string name="reco_nitrite">⚠️ Nitrite detected!
-Add %.2f mL Seachem Stability.</string>
-    <string name="reco_nitrate">⚠️ High Nitrates (>50ppm)
-Consider 30-50%% water change.</string>
-    <string name="reco_gh_low">ℹ️ GH is low (&lt;3 dGH)
-Consider adding Seachem Equilibrium.</string>
-    <string name="reco_kh_low">ℹ️ KH is low (&lt;3 dKH)
-Low KH can cause pH swings.</string>
-    <string name="reco_enter_volume">Enter tank volume to calculate doses.</string>
-    <string name="reco_nitrate_salt">⚠️ Nitrate is high for reef systems (>20ppm).
-Consider water change or export media.</string>
-    <string name="reco_phosphate_high">⚠️ Phosphate is high (>0.1ppm).
-Consider water change or phosphate control.</string>
     <string name="reco_section_actions">Immediate actions</string>
     <string name="reco_section_interpretation">Reading interpretation</string>
-    <string name="reco_line_format">%1$s: %2$s - %3$s</string>
+    <string name="reco_line_format">%1$s: %2$s – %3$s</string>
     <string name="reco_action_ammonia">Ammonia detected: dose %.2f mL Seachem Prime and increase aeration.</string>
     <string name="reco_action_ammonia_generic">Ammonia detected: detoxify immediately and increase aeration.</string>
     <string name="reco_action_nitrite">Nitrite detected: add %.2f mL Seachem Stability and reduce feeding.</string>
     <string name="reco_action_nitrite_generic">Nitrite detected: add bacteria support and reduce feeding.</string>
-    <string name="reco_action_nitrate_high">High nitrate: plan a 30-50%% water change (~ %s L).</string>
-    <string name="reco_action_nitrate_high_generic">High nitrate: plan a 30-50%% water change.</string>
+    <string name="reco_action_nitrate_high">High nitrate: plan a 30–50%% water change (~ %s L).</string>
+    <string name="reco_action_nitrate_high_generic">High nitrate: plan a 30–50%% water change.</string>
     <string name="reco_action_nitrate_reef_high">High nitrate for reef systems: target &lt;20 ppm; plan a water change (~ %s L).</string>
     <string name="reco_action_nitrate_reef_high_generic">High nitrate for reef systems: target &lt;20 ppm; plan a water change.</string>
     <string name="reco_action_phosphate_high">High phosphate: consider export media and a water change (~ %s L).</string>
     <string name="reco_action_phosphate_high_generic">High phosphate: consider export media and a water change.</string>
     <string name="reco_action_kh_low">Low KH: buffer to reduce pH swings.</string>
-    <string name="reco_action_oxygen_low">Low dissolved oxygen: increase aeration immediately.</string>
     <string name="reco_action_volume_needed">Enter tank volume to compute dosing and water-change amounts.</string>
     <string name="reco_msg_ammonia_ok">Ideal is 0 ppm; biofilter looks stable.</string>
     <string name="reco_msg_ammonia_high">Any detectable level is harmful; check filtration and feeding.</string>
     <string name="reco_msg_nitrite_ok">Ideal is 0 ppm; nitrification looks stable.</string>
     <string name="reco_msg_nitrite_high">Any detectable level is harmful; add bacteria support.</string>
-    <string name="reco_msg_nitrate_low">Lower is better; keep under 20-40 ppm.</string>
+    <string name="reco_msg_nitrate_low">Lower is better; keep under 20–40 ppm.</string>
     <string name="reco_msg_nitrate_moderate">Elevated; plan routine maintenance.</string>
     <string name="reco_msg_nitrate_high">High; schedule a larger water change.</string>
     <string name="reco_msg_nitrate_reef_low">Lower is better; aim for &lt;20 ppm in reef systems.</string>
@@ -289,8 +210,8 @@ Consider water change or phosphate control.</string>
     <string name="reco_msg_temp_low">Cool for most tropical fish; raise gradually.</string>
     <string name="reco_msg_temp_ok">Typical tropical range.</string>
     <string name="reco_msg_temp_high">Warm; increase aeration and reduce heat sources.</string>
-    <string name="reco_msg_salinity_low">Low salinity; top off with saltwater to reach 34-35 ppt.</string>
-    <string name="reco_msg_salinity_ok">Stable reef range around 34-35 ppt.</string>
+    <string name="reco_msg_salinity_low">Low salinity; top off with saltwater to reach 34–35 ppt.</string>
+    <string name="reco_msg_salinity_ok">Stable reef range around 34–35 ppt.</string>
     <string name="reco_msg_salinity_high">High salinity; top off with fresh RO/DI water.</string>
     <string name="reco_msg_alkalinity_low">Low alkalinity; stability risk for coral.</string>
     <string name="reco_msg_alkalinity_ok">Stable buffering range.</string>
@@ -310,12 +231,6 @@ Consider water change or phosphate control.</string>
     <string name="reco_msg_temp_salt_low">Cool for marine livestock.</string>
     <string name="reco_msg_temp_salt_ok">Typical reef range.</string>
     <string name="reco_msg_temp_salt_high">Warm; increase aeration and cooling.</string>
-    <string name="reco_msg_oxygen_critical">Critically low oxygen; add aeration immediately.</string>
-    <string name="reco_msg_oxygen_low">Low oxygen; increase surface agitation or aeration.</string>
-    <string name="reco_msg_oxygen_ok">Oxygen levels look healthy.</string>
-    <string name="reco_msg_temp_pond_low">Cold water slows metabolism; reduce feeding.</string>
-    <string name="reco_msg_temp_pond_ok">Within a typical pond range.</string>
-    <string name="reco_msg_temp_pond_high">Warm; increase aeration and shade.</string>
     <string name="reco_action_potassium_low">Low Potassium: Consider dosing Flourish Potassium.</string>
     <string name="reco_action_iron_low">Low Iron: Consider dosing Flourish Iron.</string>
     <string name="reco_action_strontium_low">Low Strontium: Dose Reef Strontium.</string>
@@ -354,7 +269,6 @@ Consider water change or phosphate control.</string>
     <string name="settings_reset_confirm">Reset all values to defaults?</string>
     <string name="settings_support">Support</string>
     <string name="settings_contact">Contact Developer</string>
-    <string name="settings_share">Share App</string>
     <string name="settings_source_code">Source Code</string>
     <string name="settings_source_url">https://github.com/GurucharanSavanth/Seachem-Dosing</string>
     <string name="settings_no_app_available">No app available to open this action.</string>
@@ -365,46 +279,21 @@ Consider water change or phosphate control.</string>
     <string name="settings_special_thanks">Special thanks: Seachem, Bulk Reef Supply.</string>
 
     <!-- Actions -->
-    <string name="action_calculate">Calculate</string>
     <string name="action_copy">Copy</string>
     <string name="action_share">Share</string>
     <string name="action_copied">Copied!</string>
-    <string name="action_reset">Reset</string>
-    <string name="action_cancel">Cancel</string>
-    <string name="action_ok">OK</string>
-    <string name="action_edit">Edit</string>
 
     <!-- Menus -->
     <string name="menu_switch_profile">Switch profile</string>
     <string name="menu_theme">Theme</string>
     <string name="menu_hardness_unit">Hardness unit</string>
     <string name="menu_settings">Settings</string>
-    <string name="menu_copy_recommendations">Copy recommendations</string>
-    <string name="menu_share_recommendations">Share recommendations</string>
     <string name="share_recommendations_title">Share recommendations</string>
 
-    <!-- Content descriptions -->
-    <string name="cd_status_icon">Status indicator</string>
-    <string name="cd_copy_result">Copy result to clipboard</string>
-    <string name="cd_recommendations_menu">Recommendations menu</string>
-    <string name="cd_expand_card">Expand or collapse card</string>
-    <string name="cd_card_expanded">Card expanded. Double tap to collapse.</string>
-    <string name="cd_card_collapsed">Card collapsed. Double tap to expand.</string>
-
     <!-- Utility calculator strings -->
-    <string name="label_measurement_scale">Measurement Scale</string>
     <string name="calc_substrate_title">Substrate Calculator</string>
-    <string name="calc_substrate_subtitle">Calculate required bags</string>
-    <string name="label_product">Product</string>
-    <string name="label_depth">Depth</string>
     <string name="calc_salt_mix_title">Salt Mix Calculator</string>
-    <string name="calc_salt_mix_subtitle">Calculate mix for water changes</string>
-    <string name="label_salt_product">Salt Product</string>
-    <string name="label_salt_volume_us_gallons">Volume (US Gallons)</string>
-    <string name="label_current_ppt">Current (PPT)</string>
-    <string name="label_desired_ppt">Desired (PPT)</string>
     <string name="result_substrate_bags">%1$s Bags (~%2$s kg)</string>
     <string name="result_alternate">Alternate: %1$s %2$s</string>
     <string name="result_placeholder">--</string>
-    <string name="error_salt_mix_inputs">Enter valid inputs (Target &gt; Current)</string>
 </resources>

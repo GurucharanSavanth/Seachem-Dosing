@@ -11,11 +11,11 @@
     <item
         android:id="@+id/navigation_medication"
         android:icon="@drawable/ic_water_drop"
-        android:title="Medication" />
+        android:title="@string/nav_medication" />
     <item
         android:id="@+id/navigation_fertilizer"
         android:icon="@drawable/ic_calculate"
-        android:title="Fertilizer" />
+        android:title="@string/nav_fertilizer" />
     <item
         android:id="@+id/navigation_settings"
         android:icon="@drawable/ic_settings"

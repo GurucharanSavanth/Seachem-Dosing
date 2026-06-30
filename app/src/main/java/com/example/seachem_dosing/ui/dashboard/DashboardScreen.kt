@@ -54,6 +54,7 @@ import com.example.seachem_dosing.ui.theme.StatusDanger
 import com.example.seachem_dosing.ui.theme.StatusGood
 import com.example.seachem_dosing.ui.theme.StatusInfo
 import com.example.seachem_dosing.ui.theme.StatusWarning
+import java.util.Locale
 
 private fun Status.color(): Color = when (this) {
     Status.GOOD -> StatusGood
@@ -61,6 +62,8 @@ private fun Status.color(): Color = when (this) {
     Status.DANGER -> StatusDanger
     Status.INFO -> StatusInfo
 }
+
+private fun formatOneDecimal(value: Double): String = String.format(Locale.ROOT, "%.1f", value)
 
 /** Hardness status mirrors DashboardFragment.updateHardnessStatus: 0.1–2.99 dH = warning. */
 private fun hardnessColor(degrees: Double): Color =
@@ -169,7 +172,7 @@ private fun VolumeSection(viewModel: MainViewModel) {
             }
             Spacer(Modifier.height(10.dp))
             Text(
-                text = stringResource(R.string.calculated_volume, String.format("%.1f", viewModel.getEffectiveVolumeLitres())),
+                text = stringResource(R.string.calculated_volume, formatOneDecimal(viewModel.getEffectiveVolumeLitres())),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
             )

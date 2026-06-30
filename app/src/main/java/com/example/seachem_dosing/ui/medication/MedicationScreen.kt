@@ -32,6 +32,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -91,7 +92,7 @@ private fun WarningCard(text: String) {
 private fun ExpertFlow() {
     var waterType by remember { mutableStateOf(WaterType.FRESHWATER) }
     val products = remember(waterType) { MedicationCatalog.forWaterType(waterType) }
-    var productIdx by remember(waterType) { mutableStateOf(0) }
+    var productIdx by remember(waterType) { mutableIntStateOf(0) }
     var volume by remember { mutableStateOf("") }
     var inverts by remember { mutableStateOf(false) }
     var filtration by remember { mutableStateOf(false) }

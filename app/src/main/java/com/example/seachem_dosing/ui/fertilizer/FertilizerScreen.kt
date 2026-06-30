@@ -26,6 +26,7 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -71,13 +72,13 @@ private fun InfoCard(text: String) {
 
 @Composable
 private fun ExpertCalculator() {
-    var compoundIdx by remember { mutableStateOf(0) }
+    var compoundIdx by remember { mutableIntStateOf(0) }
     val compound = COMPOUNDS[compoundIdx.coerceIn(COMPOUNDS.indices)]
     var targetMode by remember { mutableStateOf(false) } // false = dose→ppm, true = target ppm→grams
     var volume by remember { mutableStateOf("") }
     var dose by remember { mutableStateOf("") }
     var targetPpm by remember { mutableStateOf("") }
-    var nutrientIdx by remember(compound) { mutableStateOf(0) }
+    var nutrientIdx by remember(compound) { mutableIntStateOf(0) }
     var result by remember { mutableStateOf<String?>(null) }
 
     Dropdown("Compound", COMPOUNDS.map { it.formula }, compoundIdx) { compoundIdx = it; result = null }

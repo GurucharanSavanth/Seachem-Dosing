@@ -23,12 +23,12 @@
     <fragment
         android:id="@+id/navigation_medication"
         android:name="com.example.seachem_dosing.ui.medication.MedicationFragment"
-        android:label="Medication" />
+        android:label="@string/nav_medication" />
 
     <fragment
         android:id="@+id/navigation_fertilizer"
         android:name="com.example.seachem_dosing.ui.fertilizer.FertilizerFragment"
-        android:label="Fertilizer" />
+        android:label="@string/nav_fertilizer" />
 
     <fragment
         android:id="@+id/navigation_settings"

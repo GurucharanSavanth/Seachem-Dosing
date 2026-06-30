@@ -5,7 +5,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,9 +14,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.os.LocaleListCompat
@@ -56,10 +58,10 @@ class SettingsFragment : Fragment() {
         setContent {
             SeachemTheme {
                 currentThemeMode = resolveThemeMode()
-                var themeMode by remember { mutableStateOf(currentThemeMode) }
+                var themeMode by remember { mutableIntStateOf(currentThemeMode) }
                 var volumeUnit by remember { mutableStateOf(viewModel.volumeUnit.value ?: "US") }
                 var ghUnit by remember { mutableStateOf(viewModel.ghUnit.value ?: "dh") }
-                var waterChange by remember { mutableStateOf(viewModel.defaultWaterChangePercent.value ?: 20.0) }
+                var waterChange by remember { mutableDoubleStateOf(viewModel.defaultWaterChangePercent.value ?: 20.0) }
 
                 SettingsScreen(
                     themeLabel = themeLabel(themeMode),
@@ -230,7 +232,7 @@ class SettingsFragment : Fragment() {
 
     private fun contactSupport() {
         val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
+            data = "mailto:".toUri()
             putExtra(Intent.EXTRA_EMAIL, arrayOf("savanthgc@gmail.com"))
             putExtra(Intent.EXTRA_SUBJECT, "Seachem Dosing App Support")
         }
@@ -238,7 +240,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun openSourceCode() {
-        startActivitySafely(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.settings_source_url))))
+        startActivitySafely(Intent(Intent.ACTION_VIEW, getString(R.string.settings_source_url).toUri()))
     }
 
     private fun startActivitySafely(intent: Intent) {
