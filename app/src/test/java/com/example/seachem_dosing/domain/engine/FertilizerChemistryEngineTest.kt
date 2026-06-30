@@ -6,7 +6,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.math.BigDecimal
 
-/** SPEC §V2/§V3/§V7 — chemistry numbers match DEEP_RESEARCH_REPORT WS3 worked examples. */
+/** SPEC §V2/§V3/§V7 — chemistry numbers match PRODUCT_CATALOG_SCHEMA.md examples. */
 class FertilizerChemistryEngineTest {
 
     private fun ppmOf(r: CalcResult<List<FertilizerChemistryEngine.PpmResult>>, symbol: String): Double =

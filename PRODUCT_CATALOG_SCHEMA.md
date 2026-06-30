@@ -24,7 +24,16 @@ Schemas for the in-code reference catalogs. (Phase 8 keeps these in Kotlin objec
 | evidence | enum | yes | OFFICIAL \| SECONDARY |
 | doseVerified | Boolean | default true | false ⇒ surface "verify label" warning (e.g. Kordon, #14) |
 
-**Validation:** `MedicationSearchEngine.duplicateIds()` must be empty (§V8); `waterTypes` non-empty; `actives` non-empty; OFFICIAL entries map to a manufacturer URL in `DEEP_RESEARCH_REPORT.md`.
+**Validation:** `MedicationSearchEngine.duplicateIds()` must be empty (§V8); `waterTypes` non-empty; `actives` non-empty; OFFICIAL entries map to a manufacturer source below.
+
+### Medication Evidence Sources
+
+| product ids | grade | source |
+|---|---|---|
+| `seachem_kanaplex`, `seachem_metroplex`, `seachem_neoplex`, `seachem_sulfaplex`, `seachem_polyguard`, `seachem_paraguard`, `seachem_cupramine` | OFFICIAL | Seachem manufacturer product pages, `https://www.seachem.com/` |
+| `api_general_cure`, `api_em_erythromycin` | SECONDARY | API manufacturer product pages, `https://www.apifishcare.com/` |
+| `fritz_maracyn`, `fritz_maracyn_two` | SECONDARY | Fritz/Mardel manufacturer product pages, `https://fritzaquatics.com/` |
+| `kordon_rid_ich_plus` | SECONDARY, `doseVerified=false` | Kordon manufacturer product page, `https://www.kordon.com/` |
 
 ## Fertilizer — `Compound` (`domain/engine/FertilizerChemistryEngine.kt`)
 
@@ -36,7 +45,7 @@ Schemas for the in-code reference catalogs. (Phase 8 keeps these in Kotlin objec
 | nutrients | List<Nutrient(symbol, massFraction)> | massFraction ∈ (0,1] |
 | category | enum | MACRO \| MICRO \| GH_KH \| REEF |
 
-**Validation:** Σ no constraint (compounds carry only the nutrients of interest); massFraction derived = element mass / molarMass; ppm identity `dose_g × fraction × 1000 / volume_L` unit-tested.
+**Validation:** Σ no constraint (compounds carry only the nutrients of interest); massFraction derived = element mass / molarMass using IUPAC conventional atomic weights; ppm identity `dose_g × fraction × 1000 / volume_L` unit-tested.
 
 ## Symptom (beginner observation set, `ui/medication/MedicationScreen.kt`)
 

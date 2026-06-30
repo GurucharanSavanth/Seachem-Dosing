@@ -42,4 +42,4 @@ This app bundles third-party open-source software. Versions are pinned in
 
 Dosing and chemistry coefficients are derived from manufacturer labels and chemistry references;
 in-app source/evidence attribution and the formula provenance basis are documented in
-`DEEP_RESEARCH_REPORT.md` and ADRs. No third-party datasets are bundled.
+`PRODUCT_CATALOG_SCHEMA.md` and ADRs. No third-party datasets are bundled.

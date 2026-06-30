@@ -3,7 +3,7 @@
 **Status:** Accepted
 **Date:** 2026-06-28
 **Deciders:** Gurucharan.S
-**Related:** ADR-003 (Room), `docs/design/UI_DOMAIN_CONNECTION_MATRIX.md` (ISSUE-CONN-003)
+**Related:** ADR-003 (Room)
 
 **Current implementation note (2026-06-29):** the decision to connect History is
 implemented. The old v1 DAO/repository names and destructive delete/clear scope

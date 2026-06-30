@@ -1,6 +1,6 @@
 # SPEC — Seachem-Dosing v2.0 (aquarium super-app)
 
-distilled 2026-06-27 from code + DEEP_RESEARCH_REPORT.md + MODERNIZATION_PLAN.md + ADR-001..006. caveman format. `?` = unconfirmed.
+distilled 2026-06-27 from code + ADR-001..006 + PRODUCT_CATALOG_SCHEMA.md. caveman format. `?` = unconfirmed.
 
 ## §G
 precision-safe aquarium dosing + fertilizer + medication engines. evidence-grounded, safety-gated decision support. NOT veterinary diagnosis.
@@ -9,7 +9,7 @@ precision-safe aquarium dosing + fertilizer + medication engines. evidence-groun
 - minSdk 33, target/compile 36 [ADR-006]
 - Compose + Koin + Room [ADR-001/002/003]; offline-first; no backend
 - parity: `logic/Calculations.kt` ↔ `Base_Template/js/dosingCalculations.js` — coeffs identical
-- no med/chem fact invented — manufacturer-sourced or UNKNOWN [DEEP_RESEARCH_REPORT]
+- no med/chem fact invented — manufacturer-sourced, schema-sourced, or UNKNOWN [PRODUCT_CATALOG_SCHEMA.md]
 - BigDecimal final math; round only at display
 - no push/release/signing change w/o owner OK
 - `web/` (TS) vs `Base_Template/` (JS) dual stack — owner decision pending (R6)

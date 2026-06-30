@@ -1,9 +1,9 @@
 package com.example.seachem_dosing.domain.medication
 
 /**
- * Evidence-grounded medication catalog (SPEC §C: no invented facts). Every field
- * below is from DEEP_RESEARCH_REPORT.md WS2 — Seachem entries are OFFICIAL
- * (manufacturer pages), the others SECONDARY (search summaries) pending task #14.
+ * Evidence-grounded medication catalog (SPEC §C: no invented facts). Source
+ * grades are maintained in PRODUCT_CATALOG_SCHEMA.md: Seachem entries are
+ * OFFICIAL, the others SECONDARY pending task #14.
  * Anything not on an authoritative source is left null/UNKNOWN, never guessed.
  *
  * In-code reference data (small, stable) like the fertilizer chemistry table.

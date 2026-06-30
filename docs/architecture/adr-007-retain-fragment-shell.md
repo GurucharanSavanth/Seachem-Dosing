@@ -3,10 +3,10 @@
 **Status:** Accepted
 **Date:** 2026-06-28
 **Deciders:** Gurucharan.S
-**Supersedes:** none · **Related:** ADR-001 (Compose for screens), `docs/design/TARGETED_UI_REMEDIATION_PLAN.md`
+**Supersedes:** none · **Related:** ADR-001 (Compose for screens)
 
 ## Context
-The shell is the legacy View stack — `MainActivity` (`AppCompatActivity` + ViewBinding) hosting `activity_main.xml` → `NavHostFragment` + `BottomNavigationView` + AppCompat top app bar; Compose renders only leaf screens inside per-fragment `ComposeView` (e.g. `DashboardFragment.kt:41-51`). The unused `androidx.navigation:navigation-compose` dependency was removed after repo-wide proof. See `docs/design/SCREEN_INVENTORY.md`, `NAVIGATION_AND_FLOW_MAP.md`.
+The shell is the legacy View stack — `MainActivity` (`AppCompatActivity` + ViewBinding) hosting `activity_main.xml` → `NavHostFragment` + `BottomNavigationView` + AppCompat top app bar; Compose renders only leaf screens inside per-fragment `ComposeView` (e.g. `DashboardFragment.kt:41-51`). The unused `androidx.navigation:navigation-compose` dependency was removed after repo-wide proof.
 
 ## Decision
 Keep the Fragment/XML shell for the current remediation phase. Do **not** migrate to single-Activity Compose `NavHost` now. This is a *temporary* target, not declared permanent.

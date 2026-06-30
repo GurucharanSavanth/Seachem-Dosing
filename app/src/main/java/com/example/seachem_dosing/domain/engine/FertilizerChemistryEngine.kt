@@ -9,8 +9,8 @@ import java.math.RoundingMode
 /**
  * DIY fertilizer chemistry (SPEC §V2, §V7).
  *
- * Molar masses + nutrient mass-fractions are from DEEP_RESEARCH_REPORT WS3,
- * computed from IUPAC standard atomic weights (arithmetic shown in the report).
+ * Molar masses + nutrient mass-fractions are from PRODUCT_CATALOG_SCHEMA.md,
+ * computed from IUPAC conventional atomic weights.
  * These are stable reference constants — unlike the medication *product*
  * catalog, which lives in versioned JSON seed (Phase 6/9).
  *

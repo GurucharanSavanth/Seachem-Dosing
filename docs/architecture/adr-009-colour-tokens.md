@@ -3,7 +3,7 @@
 **Status:** Accepted
 **Date:** 2026-06-28
 **Deciders:** Gurucharan.S
-**Related:** `docs/design/DESIGN_SYSTEM_AUDIT.md` (ISSUE-DS-001), ADR-007 (shell retained → XML theme still live)
+**Related:** ADR-007 (shell retained → XML theme still live)
 
 ## Context
 Colour tokens live in **two hand-synced sources**: `ui/theme/Color.kt` (Compose) and `res/values/colors.xml` + `values-night/themes.xml` (XML). `Color.kt:5` literally says "Mirrors res/values/colors.xml … Keep in sync." Silent drift risk. The Fragment/XML shell (ADR-007) still consumes XML colours, so XML cannot be deleted yet.

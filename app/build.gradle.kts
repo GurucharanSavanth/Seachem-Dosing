@@ -30,7 +30,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.seachem_dosing"
-        minSdk = 33   // v2.0 — Android 13+ per ADR-006 (owner decision); ~68.9% device coverage (DEEP_RESEARCH_REPORT WS1)
+        minSdk = 33   // v2.0 — Android 13+ per ADR-006 owner decision.
         targetSdk = 36
         versionCode = 2
         versionName = "2.0"
