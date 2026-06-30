@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Verify - Local" type="GradleRunConfiguration" factoryName="Gradle">
+    <ExternalSystemSettings>
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalSystemIdString" value="GRADLE" />
+      <option name="scriptParameters" value=":app:testDebugUnitTest :app:lintDebug :app:assembleDebug :app:assembleRelease" />
+      <option name="taskNames">
+        <list>
+          <option value=":app:testDebugUnitTest" />
+          <option value=":app:lintDebug" />
+          <option value=":app:assembleDebug" />
+          <option value=":app:assembleRelease" />
+        </list>
+      </option>
+    </ExternalSystemSettings>
+    <method v="2" />
+  </configuration>
+</component>
