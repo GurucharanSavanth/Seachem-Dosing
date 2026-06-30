@@ -2,6 +2,7 @@ package com.example.seachem_dosing.di
 
 import com.example.seachem_dosing.data.repository.HistoryEventRepository
 import org.junit.Test
+import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.test.verify.verify
 
 /**
@@ -12,6 +13,7 @@ import org.koin.test.verify.verify
  * resolves androidContext() at runtime; that path is exercised by
  * androidTest/ integration tests once Phase 4.3 instrumented tests land.
  */
+@OptIn(KoinExperimentalAPI::class)
 class KoinVerifyAllTest {
 
     @Test
