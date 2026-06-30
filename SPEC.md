@@ -36,7 +36,7 @@ V10 | any dosing-coeff change = two-file patch (Kotlin + JS) + test; else parity
 
 ## §T
 id|st|desc|cites
-T1|x|core/result/CalcResult<T> sealed + fold/map helpers|V1,V3
+T1|x|core/result/CalcResult<T> sealed + failure short-circuit helper|V1,V3
 T2|x|ValidationEngine: vol/conc/range → CalcResult|V3,V5
 T3|x|UnitConversionEngine BigDecimal (L,gal_US/UK,ppm,dKH; meq/L pending)|V2,V9
 T4|x|remove obsolete DosingResult staging; active result path is CalcResult|V1

@@ -4,8 +4,8 @@ package com.example.seachem_dosing.core.result
  * Outcome of any user-facing calculation (dosing, fertilizer, medication).
  *
  * Enforces SPEC §V1 + §V3: engines never throw to the UI and never return a
- * bare number — every result is exactly one of these typed cases. Callers
- * `when`/[fold] over them, so a new failure mode cannot be silently ignored.
+ * bare number — every result is exactly one of these typed cases. Callers use
+ * exhaustive `when` expressions, so a new failure mode cannot be silently ignored.
  */
 sealed interface CalcResult<out T> {
 
@@ -28,32 +28,6 @@ sealed interface CalcResult<out T> {
     /** Numeric/domain error (overflow, NaN, negative, bad unit). [debugMessage] is log-safe (§V3). */
     data class CalculationError(val errorType: String, val debugMessage: String) : CalcResult<Nothing>
 }
-
-/** Transform the success value; every non-success case passes through unchanged. */
-inline fun <T, R> CalcResult<T>.map(transform: (T) -> R): CalcResult<R> = when (this) {
-    is CalcResult.Success -> CalcResult.Success(transform(value), warnings)
-    is CalcResult.NeedsMoreInput -> this
-    is CalcResult.UnsafeBlocked -> this
-    is CalcResult.Unsupported -> this
-    is CalcResult.CalculationError -> this
-}
-
-/** Collapse all five cases to a single [R]. Exhaustive — a new case forces every caller to update. */
-inline fun <T, R> CalcResult<T>.fold(
-    onSuccess: (value: T, warnings: List<String>) -> R,
-    onNeedsMoreInput: (required: List<String>, reason: String) -> R,
-    onUnsafeBlocked: (reason: String, evidence: String?, escalation: String?) -> R,
-    onUnsupported: (reason: String, evidenceGap: String?) -> R,
-    onError: (errorType: String, debugMessage: String) -> R,
-): R = when (this) {
-    is CalcResult.Success -> onSuccess(value, warnings)
-    is CalcResult.NeedsMoreInput -> onNeedsMoreInput(required, reason)
-    is CalcResult.UnsafeBlocked -> onUnsafeBlocked(reason, evidence, escalation)
-    is CalcResult.Unsupported -> onUnsupported(reason, evidenceGap)
-    is CalcResult.CalculationError -> onError(errorType, debugMessage)
-}
-
-val CalcResult<*>.isSuccess: Boolean get() = this is CalcResult.Success
 
 /**
  * The non-success cases re-typed to [Nothing] (value absent), or null if Success.
